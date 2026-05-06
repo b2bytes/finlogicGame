@@ -87,12 +87,11 @@ export default function LyaChatWidget() {
         query,
         mode: 'text',
         userProfile: 'general',
-        history: sessionIdRef.current
-          ? [{ sessionId: sessionIdRef.current }, ...priorHistory]
-          : priorHistory,
+        history: priorHistory,
+        sessionId: sessionIdRef.current || undefined,
       });
       const data = res.data || {};
-      // Persistir sessionId para que todos los turnos se agrupen en /Transparencia
+      // Persistir sessionId para agrupar todos los turnos en /Transparencia
       if (data.sessionId && !sessionIdRef.current) {
         sessionIdRef.current = data.sessionId;
       }

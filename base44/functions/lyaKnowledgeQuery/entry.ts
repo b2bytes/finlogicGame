@@ -202,7 +202,7 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    const { query, mode = 'text', userProfile = 'general', history = [] } = await req.json();
+    const { query, mode = 'text', userProfile = 'general', history = [], sessionId: incomingSessionId } = await req.json();
 
     if (!query || typeof query !== 'string' || query.trim().length < 3) {
       return Response.json({ error: 'query requerido (mín 3 caracteres)' }, { status: 400 });
@@ -211,8 +211,11 @@ Deno.serve(async (req) => {
     const startTime = Date.now();
 
     // ─── Historial conversacional (memoria del chat) ──────────────────────
-    // Solo últimos 6 turnos para mantener prompt acotado y RAG anclado al "now".
-    const safeHistory = Array.isArray(history) ? history.slice(-6) : [];
+    // Filtra a turnos reales (con role + content). Ignoramos cualquier objeto
+    // de metadata que el cliente pudiera mezclar (ej: { sessionId }).
+    const safeHistory = (Array.isArray(history) ? history : [])
+      .filter((h) => h && typeof h === 'object' && h.role && h.content)
+      .slice(-6);
     const historyBlock = safeHistory.length > 0
       ? `\n\n═══ CONVERSACIÓN PREVIA (memoria del chat) ═══\n${safeHistory.map(h => `${h.role === 'assistant' ? 'Lya' : 'Usuario'}: ${String(h.content || '').substring(0, 600)}`).join('\n')}\n═══════════════════════════════════════════════════════\nUsa esta memoria para entender follow-ups del usuario ("y entonces?", "explícame eso", "cuánto sería?"). NO repitas saludos. Continúa el hilo.`
       : '';
@@ -324,8 +327,9 @@ Responde como Lya (continuando el hilo si aplica):`;
     // ─── PERSISTENCIA · AgentTrace + ConsultationHistory (fire-and-forget) ─
     // El widget Lya genera el grueso de las conversaciones. Sin persistir, ni
     // /Transparencia ni aggregateWeeklyFeedback ven estos turnos. Mandato §AIAgents.
-    // Generamos sessionId estable: si hay history, reusa el primero; sino crea uno.
-    const sessionId = (Array.isArray(history) && history.length > 0 && history[0]?.sessionId)
+    // sessionId: el cliente lo manda explícito desde el segundo turno; si no, generamos uno.
+    const sessionId = incomingSessionId
+      || (Array.isArray(history) && history.find((h) => h?.sessionId)?.sessionId)
       || crypto.randomUUID();
     (async () => {
       try {
