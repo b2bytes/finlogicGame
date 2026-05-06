@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import HeroIllustration from './HeroIllustration';
 
 const QUICK_PILLS = [
   { label: 'Cobros indebidos', query: 'Tengo un cobro que no reconozco en mi tarjeta' },
@@ -8,8 +9,6 @@ const QUICK_PILLS = [
   { label: 'Deudas', query: 'Quiero entender mi deuda y tasas que me cobran' },
   { label: 'Inversiones', query: 'Tengo dudas sobre una inversión que me ofrecieron' },
 ];
-
-const HERO_ILLUSTRATION = 'https://media.base44.com/images/public/69fae03fe83575f06c206e95/95b6d6fd9_generated_image.png';
 
 export default function HeroSection() {
   const [query, setQuery] = useState('');
@@ -94,14 +93,9 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right — Illustration */}
+          {/* Right — Illustration with floating cards */}
           <div className="relative animate-fade-up" style={{ animationDelay: '120ms' }}>
-            <img
-              src={HERO_ILLUSTRATION}
-              alt="Ciudadanos chilenos diversos protegiendo sus finanzas"
-              className="w-full h-auto"
-              loading="eager"
-            />
+            <HeroIllustration />
           </div>
         </div>
       </div>
