@@ -14,6 +14,7 @@ import AntesDespues from '@/components/home/AntesDespues';
 import Footer from '@/components/home/Footer';
 import ImpactPullQuote from '@/components/home/ImpactPullQuote';
 import CapasFinLogic from '@/components/home/CapasFinLogic';
+import SFAUrgencyBanner from '@/components/home/SFAUrgencyBanner';
 import { useReferralCapture } from '@/lib/useReferralCapture';
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <HeroNav />
       <main>
+        <SFAUrgencyBanner />
         <HeroSection />
         <MediaLogos />
         <StatsBar />

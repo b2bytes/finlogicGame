@@ -49,13 +49,22 @@ export default function B2BSection() {
                 <div className="text-amber-300 mt-1">{`{ "valid": true, "tmc_max": 41.2 }`}</div>
               </div>
 
-              <div className="flex flex-wrap gap-x-5 gap-y-2 mb-7">
+              <div className="flex flex-wrap gap-x-5 gap-y-2 mb-5">
                 {['5 endpoints listos', '99.9% uptime', 'SOC 2 ready'].map((t) => (
                   <div key={t} className="flex items-center gap-1.5 text-xs text-background/80">
                     <Check className="w-3.5 h-3.5 text-mint-300" />
                     {t}
                   </div>
                 ))}
+              </div>
+
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-500/10 border border-mint-500/20 mb-6">
+                <span className="text-[10px] font-bold tracking-wider uppercase text-mint-300">
+                  + Embed
+                </span>
+                <span className="text-xs text-background/75">
+                  $0.015 USD / consulta · setup $2.5M
+                </span>
               </div>
 
               <Link

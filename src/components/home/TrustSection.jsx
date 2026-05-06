@@ -29,8 +29,8 @@ const pillars = [
   {
     number: '04',
     icon: Scale,
-    title: 'Independiente',
-    description: 'No emitimos productos financieros. No tenemos conflicto de interés con bancos.',
+    title: '12 normativas vivas',
+    description: 'Ley Fintech, NCG 502, SERNAC, SII, datos, fraude, cripto, pyme. Todo el corpus regulatorio.',
     bg: 'bg-[#FFF3D6]',
     iconColor: 'text-amber-700',
   },
