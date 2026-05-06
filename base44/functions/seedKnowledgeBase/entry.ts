@@ -1,10 +1,14 @@
-// seedKnowledgeBase — Carga inicial del corpus normativo FinLogic en KnowledgeChunk.
-// Genera embeddings con OpenAI text-embedding-3-small y persiste cada chunk.
-// Solo admin. Idempotente: salta chunks que ya existen (mismo lawReference + title).
+// seedKnowledgeBase — Carga inicial del corpus normativo FinLogic en Pinecone Serverless.
+// Crea el índice "finlogic-knowledge" si no existe (modelo integrado multilingual-e5-large,
+// dimension 1024, métrica cosine, región AWS us-east-1). Solo admin. Idempotente.
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const EMBEDDING_MODEL = 'text-embedding-3-small';
+const PINECONE_API = 'https://api.pinecone.io';
+const INDEX_NAME = 'finlogic-knowledge';
+const NAMESPACE = 'finlogic-prod';
+const EMBED_MODEL = 'multilingual-e5-large';
+const EMBED_DIM = 1024;
 
 const CORPUS = [
   // ── LEY 20.009 — FRAUDE TARJETAS ──────────────────────────────────────
@@ -148,31 +152,96 @@ const CORPUS = [
   },
 ];
 
-async function generateEmbedding(text) {
-  const apiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!apiKey) throw new Error('OPENAI_API_KEY no configurada');
+// ─── Helpers Pinecone ───────────────────────────────────────────────────
 
-  const response = await fetch('https://api.openai.com/v1/embeddings', {
-    method: 'POST',
+async function pineconeFetch(apiKey, url, options = {}) {
+  return fetch(url, {
+    ...options,
     headers: {
+      'Api-Key': apiKey,
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
+      'X-Pinecone-API-Version': '2024-10',
+      ...(options.headers || {}),
     },
+  });
+}
+
+// Verifica si existe el índice; si no, lo crea (serverless AWS us-east-1)
+async function ensureIndex(apiKey) {
+  const checkRes = await pineconeFetch(apiKey, `${PINECONE_API}/indexes/${INDEX_NAME}`);
+
+  if (checkRes.ok) {
+    const data = await checkRes.json();
+    return { host: data.host, created: false };
+  }
+
+  if (checkRes.status !== 404) {
+    const err = await checkRes.text();
+    throw new Error(`Pinecone check failed: ${checkRes.status} ${err}`);
+  }
+
+  // Crear índice serverless
+  const createRes = await pineconeFetch(apiKey, `${PINECONE_API}/indexes`, {
+    method: 'POST',
     body: JSON.stringify({
-      model: EMBEDDING_MODEL,
-      input: text.substring(0, 8000),
+      name: INDEX_NAME,
+      dimension: EMBED_DIM,
+      metric: 'cosine',
+      spec: {
+        serverless: { cloud: 'aws', region: 'us-east-1' },
+      },
     }),
   });
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`OpenAI embeddings failed: ${response.status} ${err}`);
+  if (!createRes.ok) {
+    const err = await createRes.text();
+    throw new Error(`Pinecone create index failed: ${createRes.status} ${err}`);
   }
 
-  const data = await response.json();
-  return data.data[0].embedding;
+  // Esperar a que el índice esté ready (max 30s)
+  for (let i = 0; i < 15; i++) {
+    await new Promise(r => setTimeout(r, 2000));
+    const statusRes = await pineconeFetch(apiKey, `${PINECONE_API}/indexes/${INDEX_NAME}`);
+    if (statusRes.ok) {
+      const data = await statusRes.json();
+      if (data.status?.ready) return { host: data.host, created: true };
+    }
+  }
+  throw new Error('Índice Pinecone creado pero no ready en 30s');
 }
 
+// Embedding batch con Pinecone Inference (multilingual-e5-large)
+async function embedBatch(apiKey, texts, inputType = 'passage') {
+  const res = await pineconeFetch(apiKey, `${PINECONE_API}/embed`, {
+    method: 'POST',
+    body: JSON.stringify({
+      model: EMBED_MODEL,
+      inputs: texts.map(t => ({ text: t.substring(0, 4000) })),
+      parameters: { input_type: inputType, truncate: 'END' },
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Pinecone embed failed: ${res.status} ${err}`);
+  }
+  const data = await res.json();
+  return data.data.map(d => d.values);
+}
+
+// Upsert vectores en Pinecone
+async function upsertVectors(apiKey, host, vectors) {
+  const res = await pineconeFetch(apiKey, `https://${host}/vectors/upsert`, {
+    method: 'POST',
+    body: JSON.stringify({ namespace: NAMESPACE, vectors }),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Pinecone upsert failed: ${res.status} ${err}`);
+  }
+  return res.json();
+}
+
+// ─── Handler ────────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -181,50 +250,58 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Forbidden: admin required' }, { status: 403 });
     }
 
+    const apiKey = Deno.env.get('PINECONE_API_KEY');
+    if (!apiKey) {
+      return Response.json({ error: 'PINECONE_API_KEY no configurada' }, { status: 500 });
+    }
+
     const { force = false } = await req.json().catch(() => ({}));
 
-    // Obtiene chunks existentes para idempotencia (por lawReference + title)
-    const existing = await base44.asServiceRole.entities.KnowledgeChunk.list('-created_date', 500);
-    const existingKeys = new Set(existing.map(c => `${c.lawReference}::${c.title}`));
+    // 1. Asegurar que el índice existe
+    const { host, created } = await ensureIndex(apiKey);
+    console.log(`Índice ${INDEX_NAME} ${created ? 'CREADO' : 'ya existía'}, host: ${host}`);
 
-    let inserted = 0;
-    let skipped = 0;
-    let failed = 0;
-    const errors = [];
+    // 2. Generar embeddings batch (e5-large soporta hasta 96 inputs por call)
+    const texts = CORPUS.map(c => `${c.title}\n${c.lawReference}\n${c.content}`);
+    const embeddings = await embedBatch(apiKey, texts, 'passage');
 
-    for (const chunk of CORPUS) {
-      const key = `${chunk.lawReference}::${chunk.title}`;
-      if (existingKeys.has(key) && !force) {
-        skipped++;
-        continue;
-      }
+    if (embeddings.length !== CORPUS.length) {
+      throw new Error(`Mismatch embeddings: ${embeddings.length} vs ${CORPUS.length}`);
+    }
 
-      try {
-        const embeddingText = `${chunk.title}\n${chunk.lawReference}\n${chunk.content}`;
-        const embedding = await generateEmbedding(embeddingText);
+    // 3. Construir vectores con metadata
+    const vectors = CORPUS.map((chunk, i) => ({
+      id: `${chunk.module}::${chunk.lawReference}::${i}`.replace(/\s+/g, '_'),
+      values: embeddings[i],
+      metadata: {
+        module: chunk.module,
+        regulatoryBody: chunk.regulatoryBody,
+        title: chunk.title,
+        lawReference: chunk.lawReference,
+        sourceUrl: chunk.sourceUrl,
+        content: chunk.content,
+        tags: chunk.tags || [],
+      },
+    }));
 
-        await base44.asServiceRole.entities.KnowledgeChunk.create({
-          ...chunk,
-          embedding,
-          embeddingModel: EMBEDDING_MODEL,
-          tokens: Math.ceil(embeddingText.length / 4),
-          active: true,
-        });
-        inserted++;
-      } catch (e) {
-        failed++;
-        errors.push({ title: chunk.title, error: e.message });
-        console.error(`Failed to seed "${chunk.title}":`, e.message);
-      }
+    // 4. Upsert en batches de 100 (límite Pinecone)
+    let upserted = 0;
+    for (let i = 0; i < vectors.length; i += 100) {
+      const batch = vectors.slice(i, i + 100);
+      await upsertVectors(apiKey, host, batch);
+      upserted += batch.length;
     }
 
     return Response.json({
       success: true,
-      inserted,
-      skipped,
-      failed,
+      provider: 'pinecone',
+      indexName: INDEX_NAME,
+      indexHost: host,
+      indexCreated: created,
+      namespace: NAMESPACE,
+      embedModel: EMBED_MODEL,
+      upserted,
       total: CORPUS.length,
-      errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
     console.error('seedKnowledgeBase error:', error);

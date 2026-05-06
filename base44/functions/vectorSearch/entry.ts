@@ -1,49 +1,48 @@
-// vectorSearch — Búsqueda vectorial nativa FinLogic (estilo Pinecone, sin dependencia externa).
-// Genera embedding de la query con OpenAI text-embedding-3-small y calcula similitud coseno
-// contra los KnowledgeChunk vigentes. Retorna top-K más relevantes para alimentar al especialista.
+// vectorSearch — RAG con Pinecone Serverless + Inference API (multilingual-e5-large).
+// Solo necesita PINECONE_API_KEY. El índice "finlogic-knowledge" se crea automáticamente
+// vía seedKnowledgeBase. Embeddings nativos Pinecone (espa\u00f1ol-optimizado, sin OpenAI).
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-const EMBEDDING_MODEL = 'text-embedding-3-small';
-const EMBEDDING_DIM = 1536;
+const PINECONE_API = 'https://api.pinecone.io';
+const INDEX_NAME = 'finlogic-knowledge';
+const NAMESPACE = 'finlogic-prod';
+const EMBED_MODEL = 'multilingual-e5-large';
 
-// Similitud coseno entre dos vectores
-function cosineSimilarity(a, b) {
-  if (!a || !b || a.length !== b.length) return 0;
-  let dot = 0, normA = 0, normB = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
-  }
-  const denom = Math.sqrt(normA) * Math.sqrt(normB);
-  return denom === 0 ? 0 : dot / denom;
+// Resuelve el host del índice (cacheado en memoria por contenedor)
+let cachedHost = null;
+async function getIndexHost(apiKey) {
+  if (cachedHost) return cachedHost;
+  const res = await fetch(`${PINECONE_API}/indexes/${INDEX_NAME}`, {
+    headers: { 'Api-Key': apiKey, 'X-Pinecone-API-Version': '2024-10' },
+  });
+  if (!res.ok) throw new Error(`Pinecone índice no encontrado (${res.status}). Ejecuta seedKnowledgeBase primero.`);
+  const data = await res.json();
+  cachedHost = data.host;
+  return cachedHost;
 }
 
-// Genera embedding usando OpenAI directamente (text-embedding-3-small)
-async function generateEmbedding(text) {
-  const apiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!apiKey) throw new Error('OPENAI_API_KEY no configurada');
-
-  const response = await fetch('https://api.openai.com/v1/embeddings', {
+// Embedding de la query con Pinecone Inference (no requiere OpenAI)
+async function embedQuery(apiKey, text) {
+  const res = await fetch(`${PINECONE_API}/embed`, {
     method: 'POST',
     headers: {
+      'Api-Key': apiKey,
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
+      'X-Pinecone-API-Version': '2024-10',
     },
     body: JSON.stringify({
-      model: EMBEDDING_MODEL,
-      input: text.substring(0, 8000), // límite del modelo
+      model: EMBED_MODEL,
+      inputs: [{ text: text.substring(0, 4000) }],
+      parameters: { input_type: 'query', truncate: 'END' },
     }),
   });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`OpenAI embeddings failed: ${response.status} ${err}`);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Pinecone embed failed: ${res.status} ${err}`);
   }
-
-  const data = await response.json();
-  return data.data[0].embedding;
+  const data = await res.json();
+  return data.data[0].values;
 }
 
 Deno.serve(async (req) => {
@@ -61,14 +60,23 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'query requerida (mín 3 caracteres)' }, { status: 400 });
     }
 
+    const apiKey = Deno.env.get('PINECONE_API_KEY');
+    if (!apiKey) {
+      return Response.json({
+        success: false,
+        error: 'pinecone_not_configured',
+        chunks: [],
+      }, { status: 200 });
+    }
+
     const startTime = Date.now();
 
     // 1. Embedding de la query
     let queryEmbedding;
     try {
-      queryEmbedding = await generateEmbedding(query);
+      queryEmbedding = await embedQuery(apiKey, query);
     } catch (e) {
-      console.error('embedding generation failed:', e.message);
+      console.error('embedding failed:', e.message);
       return Response.json({
         success: false,
         error: 'embedding_failed',
@@ -77,48 +85,76 @@ Deno.serve(async (req) => {
       }, { status: 200 });
     }
 
-    // 2. Cargar chunks activos (filtros opcionales)
-    const filter = { active: true };
-    if (moduleFilter) filter.module = moduleFilter;
-    if (regulatoryBody) filter.regulatoryBody = regulatoryBody;
-
-    const allChunks = await base44.asServiceRole.entities.KnowledgeChunk.filter(filter, '-created_date', 500);
-
-    if (allChunks.length === 0) {
+    // 2. Resolver host del índice
+    let host;
+    try {
+      host = await getIndexHost(apiKey);
+    } catch (e) {
       return Response.json({
-        success: true,
+        success: false,
+        error: 'index_not_found',
+        message: e.message,
         chunks: [],
-        totalScanned: 0,
-        latencyMs: Date.now() - startTime,
-        message: 'Base de conocimiento vacía. Ejecuta seedKnowledgeBase primero.',
-      });
+      }, { status: 200 });
     }
 
-    // 3. Calcular similitud coseno y ordenar
-    const scored = allChunks
-      .filter(c => Array.isArray(c.embedding) && c.embedding.length === EMBEDDING_DIM)
-      .map(c => ({
-        id: c.id,
-        title: c.title,
-        content: c.content,
-        lawReference: c.lawReference,
-        module: c.module,
-        regulatoryBody: c.regulatoryBody,
-        sourceUrl: c.sourceUrl,
-        score: cosineSimilarity(queryEmbedding, c.embedding),
-      }))
-      .filter(c => c.score >= minScore)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, topK);
+    // 3. Query a Pinecone (con filtro opcional)
+    const pineconeFilter = {};
+    if (moduleFilter) pineconeFilter.module = { $eq: moduleFilter };
+    if (regulatoryBody) pineconeFilter.regulatoryBody = { $eq: regulatoryBody };
+
+    const queryRes = await fetch(`https://${host}/query`, {
+      method: 'POST',
+      headers: {
+        'Api-Key': apiKey,
+        'Content-Type': 'application/json',
+        'X-Pinecone-API-Version': '2024-10',
+      },
+      body: JSON.stringify({
+        namespace: NAMESPACE,
+        vector: queryEmbedding,
+        topK: Math.min(topK, 20),
+        includeMetadata: true,
+        ...(Object.keys(pineconeFilter).length > 0 ? { filter: pineconeFilter } : {}),
+      }),
+    });
+
+    if (!queryRes.ok) {
+      const err = await queryRes.text();
+      throw new Error(`Pinecone query failed: ${queryRes.status} ${err}`);
+    }
+
+    const queryData = await queryRes.json();
+    const matches = queryData.matches || [];
+
+    // 4. Mapear matches al formato esperado por processConsultation
+    const chunks = matches
+      .filter(m => m.score >= minScore)
+      .map(m => ({
+        id: m.id,
+        title: m.metadata?.title || '',
+        content: m.metadata?.content || '',
+        lawReference: m.metadata?.lawReference || '',
+        module: m.metadata?.module || '',
+        regulatoryBody: m.metadata?.regulatoryBody || '',
+        sourceUrl: m.metadata?.sourceUrl || '',
+        score: m.score,
+      }));
 
     return Response.json({
       success: true,
-      chunks: scored,
-      totalScanned: allChunks.length,
+      chunks,
+      totalScanned: matches.length,
       latencyMs: Date.now() - startTime,
+      provider: 'pinecone',
+      embedModel: EMBED_MODEL,
     });
   } catch (error) {
     console.error('vectorSearch error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({
+      success: false,
+      error: error.message,
+      chunks: [],
+    }, { status: 200 });
   }
 });
