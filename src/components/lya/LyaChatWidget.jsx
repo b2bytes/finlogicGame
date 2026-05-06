@@ -71,6 +71,11 @@ export default function LyaChatWidget() {
     setInput('');
     setHasInteracted(true);
     const userMsg = { role: 'user', content: query, ts: Date.now() };
+    // Snapshot del historial ANTES de añadir el mensaje nuevo (eso es el contexto previo)
+    const priorHistory = messages.slice(-6).map((m) => ({
+      role: m.role === 'lya' ? 'assistant' : 'user',
+      content: m.content,
+    }));
     setMessages((m) => [...m, userMsg]);
     setLoading(true);
 
@@ -79,6 +84,7 @@ export default function LyaChatWidget() {
         query,
         mode: 'text',
         userProfile: 'general',
+        history: priorHistory,
       });
       const data = res.data || {};
       setMessages((m) => [

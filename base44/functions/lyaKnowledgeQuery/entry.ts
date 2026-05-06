@@ -202,7 +202,7 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    const { query, mode = 'text', userProfile = 'general' } = await req.json();
+    const { query, mode = 'text', userProfile = 'general', history = [] } = await req.json();
 
     if (!query || typeof query !== 'string' || query.trim().length < 3) {
       return Response.json({ error: 'query requerido (mín 3 caracteres)' }, { status: 400 });
@@ -210,9 +210,22 @@ Deno.serve(async (req) => {
 
     const startTime = Date.now();
 
+    // ─── Historial conversacional (memoria del chat) ──────────────────────
+    // Solo últimos 6 turnos para mantener prompt acotado y RAG anclado al "now".
+    const safeHistory = Array.isArray(history) ? history.slice(-6) : [];
+    const historyBlock = safeHistory.length > 0
+      ? `\n\n═══ CONVERSACIÓN PREVIA (memoria del chat) ═══\n${safeHistory.map(h => `${h.role === 'assistant' ? 'Lya' : 'Usuario'}: ${String(h.content || '').substring(0, 600)}`).join('\n')}\n═══════════════════════════════════════════════════════\nUsa esta memoria para entender follow-ups del usuario ("y entonces?", "explícame eso", "cuánto sería?"). NO repitas saludos. Continúa el hilo.`
+      : '';
+
+    // Para el RAG: si hay historial, fusiona la última pregunta del asistente + query actual
+    // para mejorar recall en consultas-follow-up cortas ("y el plazo?").
+    const ragQuery = safeHistory.length > 0 && query.length < 40
+      ? `${safeHistory.filter(h => h.role === 'user').slice(-1)[0]?.content || ''} ${query}`.trim()
+      : query;
+
     // ─── RAG · Pinecone INLINE (evita 403 de invoke entre funciones) ─────
     const ragStart = Date.now();
-    const ragChunks = await pineconeRagSearch(query, 5, 0.3);
+    const ragChunks = await pineconeRagSearch(ragQuery, 5, 0.3);
     const ragLatencyMs = Date.now() - ragStart;
     console.log(`[Lya RAG] chunks=${ragChunks.length} latency=${ragLatencyMs}ms`);
 
@@ -260,11 +273,12 @@ Deno.serve(async (req) => {
 CONTEXTO USUARIO: ${profileTone}
 ${modeInstructions}
 ${ragContext}
+${historyBlock}
 
-CONSULTA DEL CIUDADANO:
+CONSULTA ACTUAL DEL CIUDADANO:
 ${query}
 
-Responde como Lya:`;
+Responde como Lya (continuando el hilo si aplica):`;
 
     const llmResponse = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt,
