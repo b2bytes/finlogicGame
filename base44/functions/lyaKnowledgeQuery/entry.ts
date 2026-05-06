@@ -321,6 +321,44 @@ Responde como Lya (continuando el hilo si aplica):`;
 
     const latencyMs = Date.now() - startTime;
 
+    // ─── PERSISTENCIA · AgentTrace + ConsultationHistory (fire-and-forget) ─
+    // El widget Lya genera el grueso de las conversaciones. Sin persistir, ni
+    // /Transparencia ni aggregateWeeklyFeedback ven estos turnos. Mandato §AIAgents.
+    // Generamos sessionId estable: si hay history, reusa el primero; sino crea uno.
+    const sessionId = (Array.isArray(history) && history.length > 0 && history[0]?.sessionId)
+      || crypto.randomUUID();
+    (async () => {
+      try {
+        await Promise.all([
+          base44.asServiceRole.entities.AgentTrace.create({
+            sessionId,
+            query: query.substring(0, 500),
+            category: 'normativa_consulta',
+            pipelineStage: 'complete',
+            ragLatencyMs,
+            totalLatencyMs: latencyMs,
+            verifierScore: verification.verifierScore,
+            lawsCited: verification.verified || [],
+            toolsUsed: [],
+            responsePreview: responseText.substring(0, 200),
+            citizenSummary: (llmResponse.suggestedAction || responseText).substring(0, 200),
+            modelUsed: 'sonnet',
+            isPublic: true,
+          }),
+          base44.asServiceRole.entities.ConsultationHistory.create({
+            sessionId,
+            userMessage: query.substring(0, 1000),
+            agentResponse: responseText.substring(0, 4000),
+            agentName: 'Lya',
+            regulatoryBodyIdentified: llmResponse.regulatoryBody || 'ninguno',
+            inputChannel: mode === 'voice' ? 'voice' : 'web',
+          }),
+        ]);
+      } catch (e) {
+        console.warn('lya persistence skipped:', e.message);
+      }
+    })();
+
     return Response.json({
       response: responseText,
       sources,
@@ -337,6 +375,7 @@ Responde como Lya (continuando el hilo si aplica):`;
       ragChunksFound: ragChunks.length,
       ragLatencyMs,
       latencyMs,
+      sessionId,
     });
   } catch (error) {
     console.error('lyaKnowledgeQuery error:', error);
