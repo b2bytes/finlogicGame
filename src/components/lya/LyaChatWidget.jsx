@@ -115,14 +115,14 @@ export default function LyaChatWidget() {
 
   return (
     <>
-      {/* ─── FAB · Botón flotante ──────────────────────────────────── */}
+      {/* ─── FAB · Botón flotante (Apple-style premium) ──────────────── */}
       <AnimatePresence>
         {!open && (
           <motion.button
             key="fab"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
+            initial={{ scale: 0, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0, opacity: 0, y: 20 }}
             transition={{ type: 'spring', stiffness: 380, damping: 22 }}
             onClick={() => setOpen(true)}
             aria-label="Abrir chat con Lya"
@@ -130,33 +130,69 @@ export default function LyaChatWidget() {
               bottom: 'max(1.25rem, env(safe-area-inset-bottom))',
               right: 'max(1rem, env(safe-area-inset-right))',
             }}
-            className="fixed md:!bottom-6 md:!right-6 z-50 group"
+            className="fixed md:!bottom-6 md:!right-6 z-50 group outline-none"
           >
-            {/* Halo animado */}
-            <span className="absolute inset-0 rounded-full bg-mint-400/40 blur-xl scale-110 group-hover:scale-125 transition-transform" />
-            <span className="absolute -inset-1 rounded-full bg-gradient-to-br from-mint-300 via-mint-500 to-mint-700 opacity-60 blur-md animate-pulse-soft" />
+            {/* Halo de respiración (slow pulse) */}
+            <motion.span
+              aria-hidden
+              animate={{ scale: [1, 1.25, 1], opacity: [0.35, 0.55, 0.35] }}
+              transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute inset-0 rounded-full bg-mint-400/50 blur-xl"
+            />
 
-            {/* Botón principal */}
-            <span className="relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-mint-500 to-mint-700 shadow-soft-lg ring-1 ring-white/20 transition-transform group-hover:scale-105 group-active:scale-95">
-              {/* Marca "L" editorial */}
-              <span className="relative flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/95 shadow-inner">
-                <span className="font-editorial text-mint-700 text-xl md:text-2xl font-bold leading-none -mt-0.5">
+            {/* Anillo gradient sutil */}
+            <span
+              aria-hidden
+              className="absolute -inset-[3px] rounded-full bg-gradient-to-br from-mint-300 via-mint-500 to-mint-700 opacity-90 group-hover:opacity-100 transition-opacity"
+              style={{
+                boxShadow:
+                  '0 8px 24px -4px hsl(var(--mint-600) / 0.45), 0 4px 12px -2px hsl(var(--mint-600) / 0.3)',
+              }}
+            />
+
+            {/* Cuerpo del botón — círculo blanco con avatar */}
+            <span className="relative flex items-center justify-center w-16 h-16 md:w-[72px] md:h-[72px] rounded-full bg-gradient-to-br from-white to-mint-50 ring-1 ring-white/80 transition-transform duration-300 group-hover:scale-[1.04] group-active:scale-95 overflow-hidden">
+              {/* Brillo Apple-style superior */}
+              <span
+                aria-hidden
+                className="absolute inset-x-2 top-1 h-4 rounded-full bg-white/70 blur-sm"
+              />
+
+              {/* Mark "L" editorial centrado */}
+              <span className="relative flex items-center justify-center w-full h-full">
+                <span
+                  className="font-editorial text-transparent bg-clip-text bg-gradient-to-br from-mint-600 to-mint-700 text-[34px] md:text-[40px] font-bold leading-none"
+                  style={{ lineHeight: 1, marginTop: '-2px' }}
+                >
                   L
                 </span>
-                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-mint-400 ring-2 ring-white animate-pulse-soft" />
+              </span>
+
+              {/* Dot online verde — anclado afuera del círculo */}
+              <span
+                aria-hidden
+                className="absolute bottom-1 right-1 flex items-center justify-center"
+              >
+                <span className="absolute w-3 h-3 rounded-full bg-emerald-400 animate-ping opacity-60" />
+                <span className="relative w-3 h-3 rounded-full bg-emerald-500 ring-[2.5px] ring-white" />
               </span>
             </span>
 
-            {/* Tooltip "Pregunta a Lya" — solo desktop primer load */}
+            {/* Pill "Pregunta a Lya" — solo primer load desktop */}
             {!hasInteracted && (
               <motion.span
-                initial={{ opacity: 0, x: 8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.4, duration: 0.4 }}
-                className="hidden md:flex absolute right-[72px] top-1/2 -translate-y-1/2 items-center gap-1.5 px-3 py-2 rounded-full bg-foreground text-background text-xs font-semibold whitespace-nowrap shadow-soft pointer-events-none"
+                initial={{ opacity: 0, x: 12, scale: 0.9 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ delay: 1.2, type: 'spring', stiffness: 260, damping: 20 }}
+                className="hidden md:flex absolute right-[80px] top-1/2 -translate-y-1/2 items-center gap-2 pl-3 pr-4 py-2 rounded-full bg-foreground/95 backdrop-blur text-background text-[13px] font-semibold whitespace-nowrap shadow-soft-lg pointer-events-none"
               >
-                <Sparkles className="w-3 h-3 text-mint-300" />
+                <Sparkles className="w-3.5 h-3.5 text-mint-300" />
                 Pregunta a Lya
+                {/* Triángulo apuntando al botón */}
+                <span
+                  aria-hidden
+                  className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rotate-45 bg-foreground/95"
+                />
               </motion.span>
             )}
           </motion.button>

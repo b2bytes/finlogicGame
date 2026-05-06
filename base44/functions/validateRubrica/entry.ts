@@ -5,6 +5,54 @@
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// ─── Helpers Pinecone (inline, sin invoke entre funciones) ──────────
+const PINECONE_INDEX = 'finlogic-knowledge';
+const PINECONE_NAMESPACE = 'finlogic-prod';
+const PINECONE_EMBED_MODEL = 'multilingual-e5-large';
+let _cachedHost = null;
+
+async function pineconeSearch(query, topK = 5, minScore = 0.25) {
+  const apiKey = Deno.env.get('PINECONE_API_KEY');
+  if (!apiKey) return [];
+  try {
+    if (!_cachedHost) {
+      const idxRes = await fetch(`https://api.pinecone.io/indexes/${PINECONE_INDEX}`, {
+        headers: { 'Api-Key': apiKey, 'X-Pinecone-API-Version': '2024-10' },
+      });
+      if (!idxRes.ok) return [];
+      _cachedHost = (await idxRes.json()).host;
+    }
+    const embedRes = await fetch('https://api.pinecone.io/embed', {
+      method: 'POST',
+      headers: { 'Api-Key': apiKey, 'Content-Type': 'application/json', 'X-Pinecone-API-Version': '2024-10' },
+      body: JSON.stringify({
+        model: PINECONE_EMBED_MODEL,
+        inputs: [{ text: query.substring(0, 4000) }],
+        parameters: { input_type: 'query', truncate: 'END' },
+      }),
+    });
+    if (!embedRes.ok) return [];
+    const vector = (await embedRes.json()).data[0].values;
+    const qRes = await fetch(`https://${_cachedHost}/query`, {
+      method: 'POST',
+      headers: { 'Api-Key': apiKey, 'Content-Type': 'application/json', 'X-Pinecone-API-Version': '2024-10' },
+      body: JSON.stringify({ namespace: PINECONE_NAMESPACE, vector, topK, includeMetadata: true }),
+    });
+    if (!qRes.ok) return [];
+    const matches = (await qRes.json()).matches || [];
+    return matches
+      .filter(m => m.score >= minScore)
+      .map(m => ({
+        lawReference: m.metadata?.lawReference || '',
+        sourceUrl: m.metadata?.sourceUrl || '',
+        title: m.metadata?.title || '',
+      }));
+  } catch (e) {
+    console.error('pineconeSearch failed:', e.message);
+    return [];
+  }
+}
+
 // URLs institucionales chilenas válidas
 const OFFICIAL_DOMAINS = [
   'cmf.cl', 'cmfchile.cl', 'sii.cl', 'sernac.cl', 'bcn.cl', 'leychile.cl',
@@ -129,15 +177,8 @@ async function runCriterion(base44, criterionId) {
       // Recolectar URLs únicas del corpus Pinecone via vectorSearch
       const probeQueries = ['fraude tarjeta', 'derechos consumidor', 'IVA pyme', 'datos personales ARCO'];
       const allUrls = new Set();
-      for (const q of probeQueries) {
-        try {
-          const r = await base44.asServiceRole.functions.invoke('vectorSearch', { query: q, topK: 5 });
-          const chunks = r?.data?.chunks || r?.chunks || [];
-          chunks.forEach((c) => {
-            if (c.sourceUrl) allUrls.add(c.sourceUrl);
-          });
-        } catch (_) {}
-      }
+      const probes = await Promise.all(probeQueries.map(q => pineconeSearch(q, 5)));
+      probes.flat().forEach(c => { if (c.sourceUrl) allUrls.add(c.sourceUrl); });
       const officialOnly = Array.from(allUrls).filter((u) =>
         OFFICIAL_DOMAINS.some((d) => u.toLowerCase().includes(d))
       );
@@ -155,15 +196,20 @@ async function runCriterion(base44, criterionId) {
       let lawsCitedInResponse = [];
       let lawsInRag = new Set();
       try {
-        const consultation = await base44.asServiceRole.functions.invoke('processConsultation', {
-          query: testQuery,
-        });
-        lawsCitedInResponse = consultation?.data?.response?.lawsCited || consultation?.response?.lawsCited || [];
-        const ragRes = await base44.asServiceRole.functions.invoke('vectorSearch', {
-          query: testQuery,
-          topK: 5,
-        });
-        const ragChunks = ragRes?.data?.chunks || ragRes?.chunks || [];
+        // En lugar de invocar processConsultation (lento), buscamos en
+        // AgentTrace el último trace de fraude tarjeta para extraer leyes citadas.
+        const recentTraces = await base44.asServiceRole.entities.AgentTrace.filter(
+          { category: 'fraude_digital' }, '-created_date', 5
+        ).catch(() => []);
+        if (recentTraces.length > 0) {
+          lawsCitedInResponse = recentTraces[0].lawsCited || [];
+        }
+        // Si no hay traces, ejecutamos el pipeline real (más lento pero garantiza evidencia)
+        if (lawsCitedInResponse.length === 0) {
+          const c = await base44.asServiceRole.functions.invoke('processConsultation', { query: testQuery });
+          lawsCitedInResponse = c?.data?.response?.lawsCited || c?.response?.lawsCited || [];
+        }
+        const ragChunks = await pineconeSearch(testQuery, 5);
         ragChunks.forEach((c) => {
           if (c.lawReference) lawsInRag.add(c.lawReference);
         });
