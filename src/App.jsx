@@ -40,27 +40,9 @@ import Rubrica from '@/pages/Rubrica';
 import Demo from '@/pages/Demo';
 import Entregables from '@/pages/Entregables';
 
-// Rutas 100% públicas — no requieren auth ni redirigen al login.
-// Visitantes externos (jurado, prensa, fintechs) pueden entrar directo.
-const PUBLIC_ROUTES = [
-  '/PitchDeck',
-  '/Demo',
-  '/Rubrica',
-  '/Rúbrica',
-  '/Marca',
-  '/Diseno',
-  '/Diseño',
-  '/Entregables',
-  '/Embed/Lya',
-];
-
-const isPublicRoute = (pathname) =>
-  PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'));
-
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
   const location = useLocation();
-  const publicRoute = isPublicRoute(location?.pathname || '');
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -71,15 +53,12 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors — saltar para rutas públicas
-  if (authError && !publicRoute) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
-    }
+  // App 100% pública — Claude Impact Lab CL 2026.
+  // NUNCA bloqueamos ninguna ruta. Cualquier persona (jurado, prensa, ciudadanos)
+  // puede entrar a cualquier página. Solo mostramos UserNotRegisteredError si el
+  // visitante llega con un token de otro app inválido.
+  if (authError && authError.type === 'user_not_registered') {
+    return <UserNotRegisteredError />;
   }
 
   // Render the main app — cada zona aislada en su propio ErrorBoundary
