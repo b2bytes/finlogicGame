@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,6 +8,7 @@ import Logo from '@/components/home/Logo';
 import PipelineLoader from '@/components/consulta/PipelineLoader';
 import ResponseCard from '@/components/consulta/ResponseCard';
 import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
+import VoiceInput from '@/components/consulta/VoiceInput';
 
 export default function Consulta() {
   const [query, setQuery] = useState('');
@@ -15,6 +16,21 @@ export default function Consulta() {
   const [response, setResponse] = useState(null);
   const [traceId, setTraceId] = useState(null);
   const [error, setError] = useState(null);
+  const [voiceMode, setVoiceMode] = useState(false);
+  const location = useLocation();
+
+  // Lee ?q= del HeroSection y ?modo=voz para activar voz al entrar
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q');
+    const modo = params.get('modo');
+    if (q) setQuery(q);
+    if (modo === 'voz') setVoiceMode(true);
+  }, [location.search]);
+
+  const handleVoiceTranscript = (text) => {
+    setQuery((prev) => (prev ? `${prev} ${text}`.trim() : text));
+  };
 
   const examples = [
     'Me cobraron $47.500 que no reconozco en mi tarjeta',
@@ -88,13 +104,19 @@ export default function Consulta() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {voiceMode && (
+                <VoiceInput onTranscript={handleVoiceTranscript} disabled={loading} />
+              )}
+
               <div className="relative">
                 <Textarea
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Por ejemplo: Me cobraron una comisión que no entiendo en mi cuenta corriente y el banco no me responde…"
+                  placeholder={voiceMode
+                    ? 'Lo que digas aparecerá aquí…'
+                    : 'Por ejemplo: Me cobraron una comisión que no entiendo en mi cuenta corriente y el banco no me responde…'}
                   className="min-h-[180px] text-base rounded-3xl border-2 p-5 resize-none bg-card focus-visible:ring-mint-500"
-                  autoFocus
+                  autoFocus={!voiceMode}
                 />
                 <div className="absolute bottom-4 right-4">
                   <Button
@@ -108,6 +130,16 @@ export default function Consulta() {
                   </Button>
                 </div>
               </div>
+
+              {!voiceMode && (
+                <button
+                  type="button"
+                  onClick={() => setVoiceMode(true)}
+                  className="text-xs text-mint-700 hover:text-mint-600 font-semibold underline-offset-4 hover:underline"
+                >
+                  ¿Prefieres hablar? Activar modo voz
+                </button>
+              )}
 
               {error && (
                 <div className="flex items-start gap-2.5 p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-sm text-destructive">

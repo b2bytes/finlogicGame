@@ -21,6 +21,8 @@ import Marca from '@/pages/Marca';
 import CasoDetalle from '@/pages/CasoDetalle';
 import PitchDeck from '@/pages/PitchDeck';
 import OperacionesDashboard from '@/pages/OperacionesDashboard';
+import Embajadores from '@/pages/Embajadores';
+import Insights from '@/pages/Insights';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -63,6 +65,8 @@ const AuthenticatedApp = () => {
       <Route path="/MisCasos/:id" element={<CasoDetalle />} />
       <Route path="/PitchDeck" element={<PitchDeck />} />
       <Route path="/OperacionesDashboard" element={<OperacionesDashboard />} />
+      <Route path="/Embajadores" element={<Embajadores />} />
+      <Route path="/Insights" element={<Insights />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

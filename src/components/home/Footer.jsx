@@ -23,16 +23,19 @@ export default function Footer() {
               <li><Link to="/Consulta" className="hover:text-foreground transition-colors">Consultar</Link></li>
               <li><Link to="/MisCasos" className="hover:text-foreground transition-colors">Mis Casos</Link></li>
               <li><Link to="/Transparencia" className="hover:text-foreground transition-colors">Transparencia</Link></li>
+              <li><Link to="/Embajadores" className="hover:text-foreground transition-colors">Embajadores</Link></li>
               <li><Link to="/Marca" className="hover:text-foreground transition-colors">Manual de marca</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4">Empresa</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-4">Para empresas</h4>
             <ul className="space-y-2.5 text-sm text-muted-foreground">
-              <li><a href="#confianza" className="hover:text-foreground transition-colors">Seguridad</a></li>
+              <li><Link to="/api-compliance" className="hover:text-foreground transition-colors">Compliance API</Link></li>
+              <li><Link to="/Insights" className="hover:text-foreground transition-colors">FinLogic Insights</Link></li>
+              <li><Link to="/Pyme" className="hover:text-foreground transition-colors">Pyme</Link></li>
+              <li><Link to="/Pricing" className="hover:text-foreground transition-colors">Precios</Link></li>
               <li><a href="https://github.com/b2bytes/finlogic" target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors">GitHub</a></li>
-              <li><span className="text-muted-foreground/60">Compliance API · próximamente</span></li>
             </ul>
           </div>
         </div>

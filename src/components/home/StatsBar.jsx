@@ -13,18 +13,24 @@ export default function StatsBar() {
 
   useEffect(() => {
     Promise.all([
-      base44.entities.AgentTrace.filter({ pipelineStage: 'complete' }, '-created_date', 200).catch(() => []),
+      base44.entities.AgentTrace.list('-created_date', 200).catch(() => []),
       base44.entities.MisCasos.filter({ status: 'resuelto' }, '-created_date', 100).catch(() => []),
       base44.entities.GeneratedDocument.list('-created_date', 100).catch(() => []),
     ]).then(([traces, casos, docs]) => {
       const tracesArr = traces || [];
       const casosArr = casos || [];
       const docsArr = docs || [];
-      const consultas = tracesArr.length || fallback.consultas;
+      const consultas = Math.max(tracesArr.length, casosArr.length) || fallback.consultas;
       const recuperados = casosArr.reduce((s, c) => s + (c.amountInvolved || 0), 0) || fallback.recuperados;
-      const avgScore = tracesArr.length
-        ? Math.round(tracesArr.reduce((s, t) => s + (t.verifierScore || 80), 0) / tracesArr.length)
+
+      // Score: prioriza traces, fallback a casos
+      const traceScores = tracesArr.filter(t => typeof t.verifierScore === 'number').map(t => t.verifierScore);
+      const casoScores = casosArr.filter(c => typeof c.verifierScore === 'number').map(c => c.verifierScore);
+      const allScores = [...traceScores, ...casoScores];
+      const avgScore = allScores.length
+        ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length)
         : fallback.score;
+
       setStats({
         consultas,
         documentos: docsArr.length || casosArr.length || fallback.documentos,
