@@ -165,6 +165,83 @@ const VERIFIER_SCHEMA = {
   required: ['verifierScore', 'recomendacionAprobacion'],
 };
 
+// ─── RAG INLINE (Pinecone direct, evita overhead de invoke) ────────────────
+const PINECONE_INDEX = 'finlogic-knowledge';
+const PINECONE_NAMESPACE = 'finlogic-prod';
+const PINECONE_EMBED_MODEL = 'multilingual-e5-large';
+let _cachedHost = null;
+
+async function pineconeRagSearch(query, topK = 5, minScore = 0.25) {
+  const apiKey = Deno.env.get('PINECONE_API_KEY');
+  if (!apiKey) return { data: { success: false, chunks: [] } };
+
+  try {
+    // 1. Resolver host (cached)
+    if (!_cachedHost) {
+      const idxRes = await fetch(`https://api.pinecone.io/indexes/${PINECONE_INDEX}`, {
+        headers: { 'Api-Key': apiKey, 'X-Pinecone-API-Version': '2024-10' },
+      });
+      if (!idxRes.ok) return { data: { success: false, chunks: [], error: 'index_not_found' } };
+      const idxData = await idxRes.json();
+      _cachedHost = idxData.host;
+    }
+
+    // 2. Embed + Query en paralelo NO posible (query necesita el vector)
+    const embedRes = await fetch('https://api.pinecone.io/embed', {
+      method: 'POST',
+      headers: {
+        'Api-Key': apiKey,
+        'Content-Type': 'application/json',
+        'X-Pinecone-API-Version': '2024-10',
+      },
+      body: JSON.stringify({
+        model: PINECONE_EMBED_MODEL,
+        inputs: [{ text: query.substring(0, 4000) }],
+        parameters: { input_type: 'query', truncate: 'END' },
+      }),
+    });
+    if (!embedRes.ok) return { data: { success: false, chunks: [] } };
+    const embedData = await embedRes.json();
+    const vector = embedData.data[0].values;
+
+    // 3. Query
+    const qRes = await fetch(`https://${_cachedHost}/query`, {
+      method: 'POST',
+      headers: {
+        'Api-Key': apiKey,
+        'Content-Type': 'application/json',
+        'X-Pinecone-API-Version': '2024-10',
+      },
+      body: JSON.stringify({
+        namespace: PINECONE_NAMESPACE,
+        vector,
+        topK: Math.min(topK, 20),
+        includeMetadata: true,
+      }),
+    });
+    if (!qRes.ok) return { data: { success: false, chunks: [] } };
+    const qData = await qRes.json();
+
+    const chunks = (qData.matches || [])
+      .filter(m => m.score >= minScore)
+      .map(m => ({
+        id: m.id,
+        score: m.score,
+        title: m.metadata?.title || '',
+        content: m.metadata?.content || '',
+        lawReference: m.metadata?.lawReference || '',
+        module: m.metadata?.module || '',
+        regulatoryBody: m.metadata?.regulatoryBody || '',
+        sourceUrl: m.metadata?.sourceUrl || '',
+      }));
+
+    return { data: { success: true, chunks } };
+  } catch (e) {
+    console.error('pineconeRagSearch failed:', e.message);
+    return { data: { success: false, chunks: [] } };
+  }
+}
+
 // ─── PIPELINE ──────────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   try {
@@ -196,11 +273,8 @@ Deno.serve(async (req) => {
         response_json_schema: TRIAGE_SCHEMA,
         model: 'gpt_5_mini',
       }),
-      base44.asServiceRole.functions.invoke('vectorSearch', {
-        query,
-        topK: 5,
-        minScore: 0.25,
-      }),
+      // RAG via fetch directo a Pinecone (saltamos invoke para evitar 403)
+      pineconeRagSearch(query, 5, 0.25),
     ]);
 
     const triage = triageResult.status === 'fulfilled' ? triageResult.value : {};
@@ -216,6 +290,7 @@ Deno.serve(async (req) => {
     let ragChunks = [];
     if (ragResult.status === 'fulfilled' && ragResult.value?.data?.success) {
       ragChunks = ragResult.value.data.chunks || [];
+      console.log(`[RAG] found ${ragChunks.length} chunks`);
       // Re-ranking ligero: priorizar chunks del organismo detectado
       if (regulatoryBody && regulatoryBody !== 'multiple') {
         ragChunks.sort((a, b) => {
@@ -229,13 +304,15 @@ Deno.serve(async (req) => {
     }
     const ragLatencyMs = Date.now() - ragStart;
 
-    const ragContext = ragChunks.length > 0
-      ? `\n\n═══ CONTEXTO RAG (top ${ragChunks.length} chunks normativos relevantes, similitud coseno) ═══\n${ragChunks.map((c, i) => `[${i + 1}] ${c.title} (score: ${c.score.toFixed(3)})\nReferencia: ${c.lawReference}\n${c.content}`).join('\n\n')}\n═══════════════════════════════════════════════════════════════════`
+    // RAG compacto: solo top 3 chunks, contenido truncado a 600 chars
+    const topChunks = ragChunks.slice(0, 3);
+    const ragContext = topChunks.length > 0
+      ? `FUENTES NORMATIVAS (corpus FinLogic verificado):\n${topChunks.map((c, i) => `[${i + 1}] ${c.lawReference} — ${c.title}\n${(c.content || '').substring(0, 600)}`).join('\n\n')}`
       : '';
 
-    // ─── CAPA 2 · ESPECIALISTA (gpt_5_5, prompt compacto + RAG) ────────
-    // Modelo elegido: gpt_5_5 entrega output estructurado de calidad senior en
-    // ~3-5s. El prompt es compacto porque el RAG ya carga la normativa precisa.
+    // ─── CAPA 2 · ESPECIALISTA (claude_sonnet_4_6, prompt compacto + RAG) ─
+    // Sonnet 4.6 con prompt compacto + RAG entrega output estructurado de
+    // calidad senior en ~5-8s (vs ~25s antes con prompt enorme).
     const specialistStart = Date.now();
     const focusLine = SPECIALIST_FOCUS[regulatoryBody] || SPECIALIST_FOCUS.BCN;
     const toneMap = {
@@ -272,10 +349,10 @@ Responde JSON con:
 - deadlineDescription: consecuencia del vencimiento
 - selfConfidence: 0-100`,
         response_json_schema: SPECIALIST_SCHEMA,
-        model: 'gpt_5_5',
+        model: 'claude_sonnet_4_6',
       });
     } catch (e) {
-      console.error('specialist (gpt_5_5) failed:', e.message);
+      console.error('specialist (sonnet) failed:', e.message);
       try {
         specialist = await base44.integrations.Core.InvokeLLM({
           prompt: `Especialista ${regulatoryBody}. ${focusLine}\n\nCONSULTA: "${query}"\n\n${ragContext}\n\nResponde fact/translation/action/lawsCited/legalDeadlineDays.`,

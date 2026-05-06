@@ -271,7 +271,8 @@ Deno.serve(async (req) => {
 
     // 3. Construir vectores con metadata
     const vectors = CORPUS.map((chunk, i) => ({
-      id: `${chunk.module}::${chunk.lawReference}::${i}`.replace(/\s+/g, '_'),
+      // ID sólo ASCII (Pinecone requirement)
+      id: `${chunk.module}_${i}`.replace(/[^\x00-\x7F]/g, '').replace(/\s+/g, '_'),
       values: embeddings[i],
       metadata: {
         module: chunk.module,

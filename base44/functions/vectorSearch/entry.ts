@@ -1,68 +1,28 @@
 // vectorSearch — RAG con Pinecone Serverless + Inference API (multilingual-e5-large).
-// Solo necesita PINECONE_API_KEY (PINECONE_INDEX_NAME y PINECONE_NAMESPACE opcionales).
-// El índice "finlogic-knowledge" se crea automáticamente vía seedKnowledgeBase.
-// Embeddings nativos Pinecone (español-optimizado, sin OpenAI).
-//
-// Mejoras profesionales:
-//   • Retry con backoff exponencial en llamadas Pinecone (resiliencia ante 429/5xx).
-//   • MMR-lite: diversifica resultados por lawReference para no repetir misma ley.
-//   • Validación robusta de inputs y respuestas.
-//   • Cache en memoria del host del índice (evita re-fetch en cada query).
-
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+// Solo necesita PINECONE_API_KEY. El índice "finlogic-knowledge" se crea automáticamente
+// vía seedKnowledgeBase. Embeddings nativos Pinecone (espa\u00f1ol-optimizado, sin OpenAI).
 
 const PINECONE_API = 'https://api.pinecone.io';
-const INDEX_NAME = Deno.env.get('PINECONE_INDEX_NAME') || 'finlogic-knowledge';
-const NAMESPACE = Deno.env.get('PINECONE_NAMESPACE') || 'finlogic-prod';
+const INDEX_NAME = 'finlogic-knowledge';
+const NAMESPACE = 'finlogic-prod';
 const EMBED_MODEL = 'multilingual-e5-large';
-const EMBED_DIM = 1024;
 
-// Cache en memoria del host (re-resuelto si falla)
+// Resuelve el host del índice (cacheado en memoria por contenedor)
 let cachedHost = null;
-
-// Retry con backoff exponencial (200ms, 600ms, 1.4s)
-async function fetchWithRetry(url, options, maxRetries = 2) {
-  let lastErr;
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      const res = await fetch(url, options);
-      if (res.ok) return res;
-      // Retryable: 429, 500, 502, 503, 504
-      if (![429, 500, 502, 503, 504].includes(res.status) || attempt === maxRetries) {
-        return res;
-      }
-      lastErr = new Error(`HTTP ${res.status}`);
-    } catch (e) {
-      lastErr = e;
-      if (attempt === maxRetries) throw e;
-    }
-    const delay = 200 * Math.pow(3, attempt);
-    await new Promise(r => setTimeout(r, delay));
-  }
-  throw lastErr;
-}
-
 async function getIndexHost(apiKey) {
   if (cachedHost) return cachedHost;
-  const fixed = Deno.env.get('PINECONE_INDEX_HOST');
-  if (fixed && fixed !== 'auto') {
-    cachedHost = fixed.replace(/^https?:\/\//, '');
-    return cachedHost;
-  }
-  const res = await fetchWithRetry(`${PINECONE_API}/indexes/${INDEX_NAME}`, {
+  const res = await fetch(`${PINECONE_API}/indexes/${INDEX_NAME}`, {
     headers: { 'Api-Key': apiKey, 'X-Pinecone-API-Version': '2024-10' },
   });
-  if (!res.ok) {
-    throw new Error(`Pinecone índice "${INDEX_NAME}" no encontrado (${res.status}). Ejecuta seedKnowledgeBase primero.`);
-  }
+  if (!res.ok) throw new Error(`Pinecone índice no encontrado (${res.status}). Ejecuta seedKnowledgeBase primero.`);
   const data = await res.json();
-  if (!data.host) throw new Error(`Índice "${INDEX_NAME}" sin host (estado: ${data.status?.state})`);
   cachedHost = data.host;
   return cachedHost;
 }
 
+// Embedding de la query con Pinecone Inference (no requiere OpenAI)
 async function embedQuery(apiKey, text) {
-  const res = await fetchWithRetry(`${PINECONE_API}/embed`, {
+  const res = await fetch(`${PINECONE_API}/embed`, {
     method: 'POST',
     headers: {
       'Api-Key': apiKey,
@@ -80,38 +40,18 @@ async function embedQuery(apiKey, text) {
     throw new Error(`Pinecone embed failed: ${res.status} ${err}`);
   }
   const data = await res.json();
-  const values = data.data?.[0]?.values;
-  if (!Array.isArray(values) || values.length !== EMBED_DIM) {
-    throw new Error(`Embedding inválido (esperado ${EMBED_DIM}d, recibido ${values?.length})`);
-  }
-  return values;
-}
-
-// MMR-lite: garantiza diversidad por lawReference (no más de N chunks por misma ley)
-function diversifyByLaw(matches, maxPerLaw = 2) {
-  const counts = {};
-  const out = [];
-  for (const m of matches) {
-    const law = m.metadata?.lawReference || '_';
-    counts[law] = counts[law] || 0;
-    if (counts[law] < maxPerLaw) {
-      out.push(m);
-      counts[law]++;
-    }
-  }
-  return out;
+  return data.data[0].values;
 }
 
 Deno.serve(async (req) => {
   try {
-    const _base44 = createClientFromRequest(req);
+    // No requerimos auth (búsqueda vectorial es servicio interno)
     const {
       query,
       topK = 5,
       module: moduleFilter = null,
       regulatoryBody = null,
       minScore = 0.25,
-      diversify = true,
     } = await req.json();
 
     if (!query || typeof query !== 'string' || query.trim().length < 3) {
@@ -129,33 +69,39 @@ Deno.serve(async (req) => {
 
     const startTime = Date.now();
 
-    // 1. Embedding + host en paralelo
-    let queryEmbedding, host;
+    // 1. Embedding de la query
+    let queryEmbedding;
     try {
-      [queryEmbedding, host] = await Promise.all([
-        embedQuery(apiKey, query),
-        getIndexHost(apiKey),
-      ]);
+      queryEmbedding = await embedQuery(apiKey, query);
     } catch (e) {
-      console.error('vectorSearch setup failed:', e.message);
-      cachedHost = null;
+      console.error('embedding failed:', e.message);
       return Response.json({
         success: false,
-        error: 'setup_failed',
+        error: 'embedding_failed',
         message: e.message,
         chunks: [],
       }, { status: 200 });
     }
 
-    // 2. Query Pinecone con filtro de metadata
+    // 2. Resolver host del índice
+    let host;
+    try {
+      host = await getIndexHost(apiKey);
+    } catch (e) {
+      return Response.json({
+        success: false,
+        error: 'index_not_found',
+        message: e.message,
+        chunks: [],
+      }, { status: 200 });
+    }
+
+    // 3. Query a Pinecone (con filtro opcional)
     const pineconeFilter = {};
     if (moduleFilter) pineconeFilter.module = { $eq: moduleFilter };
     if (regulatoryBody) pineconeFilter.regulatoryBody = { $eq: regulatoryBody };
 
-    // Pedimos 2x para tener margen de diversificación
-    const requestedTopK = Math.min(topK * 2, 20);
-
-    const queryRes = await fetchWithRetry(`https://${host}/query`, {
+    const queryRes = await fetch(`https://${host}/query`, {
       method: 'POST',
       headers: {
         'Api-Key': apiKey,
@@ -165,7 +111,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         namespace: NAMESPACE,
         vector: queryEmbedding,
-        topK: requestedTopK,
+        topK: Math.min(topK, 20),
         includeMetadata: true,
         ...(Object.keys(pineconeFilter).length > 0 ? { filter: pineconeFilter } : {}),
       }),
@@ -177,34 +123,32 @@ Deno.serve(async (req) => {
     }
 
     const queryData = await queryRes.json();
-    const rawMatches = (queryData.matches || []).filter(m => m.score >= minScore);
+    const matches = queryData.matches || [];
 
-    // 3. Diversificación + corte a topK
-    const finalMatches = diversify ? diversifyByLaw(rawMatches, 2).slice(0, topK) : rawMatches.slice(0, topK);
-
-    const chunks = finalMatches.map(m => ({
-      id: m.id,
-      title: m.metadata?.title || '',
-      content: m.metadata?.content || '',
-      lawReference: m.metadata?.lawReference || '',
-      module: m.metadata?.module || '',
-      regulatoryBody: m.metadata?.regulatoryBody || '',
-      sourceUrl: m.metadata?.sourceUrl || '',
-      score: Number(m.score.toFixed(4)),
-    }));
+    // 4. Mapear matches al formato esperado por processConsultation
+    const chunks = matches
+      .filter(m => m.score >= minScore)
+      .map(m => ({
+        id: m.id,
+        title: m.metadata?.title || '',
+        content: m.metadata?.content || '',
+        lawReference: m.metadata?.lawReference || '',
+        module: m.metadata?.module || '',
+        regulatoryBody: m.metadata?.regulatoryBody || '',
+        sourceUrl: m.metadata?.sourceUrl || '',
+        score: m.score,
+      }));
 
     return Response.json({
       success: true,
       chunks,
-      totalScanned: rawMatches.length,
+      totalScanned: matches.length,
       latencyMs: Date.now() - startTime,
       provider: 'pinecone',
       embedModel: EMBED_MODEL,
-      diversified: diversify,
     });
   } catch (error) {
     console.error('vectorSearch error:', error);
-    cachedHost = null;
     return Response.json({
       success: false,
       error: error.message,
