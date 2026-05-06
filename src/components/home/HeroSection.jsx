@@ -55,14 +55,9 @@ export default function HeroSection() {
               </span>
             </div>
 
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05]">
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.02]">
               ¿Sabes cuánto te van a cobrar el día <span className="text-mint-600">28</span>?
             </h1>
-
-            <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Resolvemos cobros indebidos, fraudes y dudas financieras en lenguaje simple.
-              <span className="block mt-1 font-semibold text-foreground">Sin abogado. Sin letra chica. Gratis.</span>
-            </p>
 
             <div className="mt-8 inline-flex items-start gap-3 px-4 py-3 rounded-2xl bg-card border border-border shadow-soft">
               <div className="w-10 h-10 rounded-xl bg-mint-50 flex items-center justify-center flex-shrink-0">
@@ -71,17 +66,6 @@ export default function HeroSection() {
               <div className="text-sm">
                 <p className="font-semibold text-foreground">Registrada CMF · Ley Fintech 21.521</p>
                 <p className="text-muted-foreground text-xs mt-0.5">Tu seguridad protegida</p>
-              </div>
-            </div>
-
-            <div className="mt-8 flex items-center gap-6 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-mint-500 animate-pulse-soft" />
-                <span><span className="font-semibold text-foreground">12.847</span> consultas resueltas</span>
-              </div>
-              <div className="hidden sm:flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-mint-500" />
-                <span><span className="font-semibold text-foreground">49s</span> respuesta promedio</span>
               </div>
             </div>
           </div>

@@ -1,68 +1,67 @@
 import React from 'react';
-import { MessageCircle, Search, FileText, ShieldCheck } from 'lucide-react';
+import { FileSearch, ShieldCheck, Bell } from 'lucide-react';
 
 const steps = [
   {
-    icon: MessageCircle,
-    number: '01',
-    title: 'Cuéntanos qué pasó',
-    description: 'En tus palabras. Sin formularios técnicos. Por texto o por voz.',
+    number: '1',
+    icon: FileSearch,
+    title: 'Conecta tus cuentas',
+    description: 'Tu cobro de APP correcto.',
+    accentBg: 'bg-mint-50',
+    accentText: 'text-mint-600',
+    badge: '📊',
   },
   {
-    icon: Search,
-    number: '02',
-    title: 'Identificamos tu derecho',
-    description: 'Consultamos en vivo CMF, SERNAC, SII y la normativa chilena vigente.',
-  },
-  {
-    icon: FileText,
-    number: '03',
-    title: 'Generamos el documento',
-    description: 'Carta ARCO, reclamo SERNAC o denuncia CSIRT. Listo para enviar.',
-  },
-  {
+    number: '2',
     icon: ShieldCheck,
-    number: '04',
-    title: 'Hacemos seguimiento',
-    description: 'Te avisamos antes de que venza el plazo. Tu caso, siempre vivo.',
+    title: 'Analizamos tus datos',
+    description: 'Tu cobro de APP es correcto.',
+    accentBg: 'bg-mint-50',
+    accentText: 'text-mint-600',
+    badge: '✅',
+  },
+  {
+    number: '3',
+    icon: Bell,
+    title: 'Recibe informes y toma acción',
+    description: 'Alerta: Movimientos irregulares detectados.',
+    accentBg: 'bg-orange-50',
+    accentText: 'text-orange-600',
+    badge: '🙂',
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="como-funciona" className="py-24">
+    <section id="como-funciona" className="py-12 md:py-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-2xl mb-16">
-          <p className="text-sm font-semibold text-mint-600 mb-3 tracking-wide uppercase">
-            Cómo funciona
-          </p>
-          <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            De PDFs densos a acción concreta.
-            <span className="text-muted-foreground"> En 4 pasos.</span>
-          </h2>
-        </div>
+        <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-8">
+          Cómo funciona
+        </h2>
 
-        <div className="relative grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Connector line — desktop only */}
-          <div aria-hidden="true" className="hidden lg:block absolute top-12 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-mint-200 to-transparent" />
-
-          {steps.map((step, idx) => (
+        <div className="grid md:grid-cols-3 gap-5">
+          {steps.map((step) => (
             <div
               key={step.number}
-              className="group relative bg-card rounded-3xl p-7 border border-border/60 hover:border-mint-300 hover:shadow-soft transition-all duration-300"
+              className="group relative bg-card rounded-3xl p-6 border border-border/60 hover:shadow-soft-lg transition-all duration-300 flex items-start gap-4"
             >
-              <div className="relative w-12 h-12 rounded-2xl bg-mint-50 flex items-center justify-center mb-5 group-hover:bg-mint-500 transition-colors">
-                <step.icon className="w-6 h-6 text-mint-600 group-hover:text-white transition-colors" />
-                <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-foreground text-background text-[10px] font-bold flex items-center justify-center">
-                  {step.number}
-                </span>
+              <div className={`w-14 h-14 rounded-2xl ${step.accentBg} flex items-center justify-center flex-shrink-0`}>
+                <step.icon className={`w-7 h-7 ${step.accentText}`} />
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                {step.title}
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {step.description}
-              </p>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="w-5 h-5 rounded-full bg-mint-100 text-mint-700 text-xs font-bold flex items-center justify-center">
+                    {step.number}
+                  </span>
+                  <h3 className="font-display text-base font-bold text-foreground leading-tight">
+                    {step.title}
+                  </h3>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+              <div className="text-2xl flex-shrink-0">{step.badge}</div>
             </div>
           ))}
         </div>

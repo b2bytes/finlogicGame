@@ -93,21 +93,5 @@
     "contactEmail",
     "plan",
     "status"
-  ],
-  "rls": {
-    "read": {
-      "user_condition": {
-        "role": {
-          "$eq": "admin"
-        }
-      }
-    },
-    "write": {
-      "user_condition": {
-        "role": {
-          "$eq": "admin"
-        }
-      }
-    }
-  }
+  ]
 }
