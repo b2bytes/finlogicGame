@@ -32,6 +32,7 @@ import EmbedLya from '@/pages/EmbedLya';
 import Diseno from '@/pages/Diseno';
 import ScrollToTop from '@/components/ScrollToTop';
 import PWAInstallBanner from '@/components/pwa/PWAInstallBanner';
+import QuickAdminPanel from '@/components/admin/QuickAdminPanel';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -90,6 +91,7 @@ const AuthenticatedApp = () => {
     </Routes>
     <FloatingLyaCTA />
     <PWAInstallBanner />
+    <QuickAdminPanel />
     </>
   );
 };
