@@ -1,42 +1,37 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// processConsultation — Pipeline canónico FinLogic
-// Triage + Especialista (Claude Sonnet 4.6) + Verificador
-// Crea Case + LegalDeadline + AgentTrace para /Transparencia
+// processConsultation — Pipeline canónico FinLogic (mandato §PromptEngineer)
+// Capa 1: Triage rápido       → clasifica organismo + urgencia + módulo
+// Capa 2: Especialista profundo → genera respuesta estructurada citando normativa
+// Capa 3: Verificador          → audita la respuesta y entrega score 0-100
+// Crea MisCasos + LegalDeadline + AgentTrace para /Transparencia.
 
-const SYSTEM_PROMPT = `Eres Lya, el sistema operativo financiero del pueblo de Chile.
+// ─── CAPA 1 · TRIAGE ────────────────────────────────────────────────────────
+const TRIAGE_PROMPT = `Eres el TRIAGE de Lya (FinLogic). Clasifica la consulta del ciudadano chileno.
 
-IDENTIDAD: Traduces el sistema financiero chileno a lenguaje simple y EJECUTAS acciones por el ciudadano.
+ENRUTA al especialista correcto basándote en el organismo competente:
+- CMF: bancos, fintechs, fondos, NCG 502, Ley 21.521
+- SERNAC: cobros indebidos, contratos, Ley 19.496, Ley 20.555
+- SII: impuestos, IVA, F29, pyme, cripto, Ley 21.713
+- CSIRT: fraude digital, phishing, Ley 20.009, Ley 21.663
+- FOGAPE: garantías estatales pyme
+- SERCOTEC: subsidios pyme, formalización
+- BCN: consultas normativas generales
+- multiple: requiere coordinación entre 2+ organismos
 
-REGLAS CRÍTICAS:
-- NUNCA inventes normativa. Solo cita Ley 21.521, NCG 502 CMF, Ley 19.496 SERNAC, Ley 20.555, Ley 21.719, Ley 20.009, Ley 21.663, LIR Pro-Pyme, Ley 21.713, Open Finance, CSIRT.
-- NUNCA recomiendes instituciones financieras específicas.
-- SIEMPRE termina con UNA acción concreta que el ciudadano puede tomar HOY.
-- Si detectas urgencia (fraude activo, plazo <48h), actúa sin pedir confirmación.
+Detecta también el PERFIL del ciudadano (Camila 22 / Don Luis 68 / María José 34 emprendedora / Roberto 45 / general).
 
-PERFILES (adapta tono):
-- Camila (22, universitaria, Stgo): directo, digital
-- Don Luis (68, jubilado, Vlpo): simple, sin jerga, pasos claros
-- María José (34, emprendedora, Tco): práctico, orientado a impacto
-- Roberto (45, víctima fraude, Antof.): empático, urgente
+URGENCIA:
+- critical: fraude activo, plazo <48h, monto >5M
+- high: plazo <7d, derecho vulnerado claro
+- medium: consulta normativa con acción
+- low: consulta informativa
+- resolved: ya está resuelto`;
 
-ORGANISMOS: CMF, SERNAC, SII, CSIRT, IPS, SERCOTEC.
-
-FORMATO DE RESPUESTA: estructura tu respuesta en 3 bloques:
-1. HECHO: qué pasó en 1 frase
-2. TU DERECHO: ley específica que protege al ciudadano
-3. ACCIÓN: máximo 3 pasos concretos`;
-
-const RESPONSE_SCHEMA = {
+const TRIAGE_SCHEMA = {
   type: 'object',
   properties: {
-    fact: { type: 'string', description: 'Diagnóstico en 1 oración' },
-    translation: { type: 'string', description: 'Derecho aplicable + ley específica' },
-    action: { type: 'string', description: 'Acción concreta para el ciudadano (markdown con pasos numerados)' },
-    regulatoryBody: {
-      type: 'string',
-      enum: ['CMF', 'SERNAC', 'SII', 'CSIRT', 'BCN', 'FOGAPE', 'SERCOTEC', 'multiple'],
-    },
+    regulatoryBody: { type: 'string', enum: ['CMF', 'SERNAC', 'SII', 'CSIRT', 'BCN', 'FOGAPE', 'SERCOTEC', 'multiple'] },
     normativeModule: {
       type: 'string',
       enum: [
@@ -48,17 +43,85 @@ const RESPONSE_SCHEMA = {
     },
     urgencyLevel: { type: 'string', enum: ['critical', 'high', 'medium', 'low', 'resolved'] },
     detectedProfile: { type: 'string', enum: ['camila', 'don_luis', 'maria_jose', 'roberto', 'general'] },
-    lawsCited: { type: 'array', items: { type: 'string' } },
-    legalDeadlineDays: {
-      type: 'number',
-      description: 'Días hábiles del plazo legal aplicable (0 si no aplica)',
+    category: {
+      type: 'string',
+      enum: ['fraude_digital', 'cobro_indebido', 'derechos_arco', 'contrato_abusivo', 'normativa_consulta', 'indicadores_economicos', 'compliance_api', 'fuera_de_scope'],
     },
-    deadlineDescription: { type: 'string' },
-    verifierScore: { type: 'number', minimum: 0, maximum: 100 },
+    routingReason: { type: 'string', description: 'Por qué se enruta a este especialista (1 oración)' },
   },
-  required: ['fact', 'translation', 'action', 'regulatoryBody', 'urgencyLevel'],
+  required: ['regulatoryBody', 'urgencyLevel', 'detectedProfile', 'category'],
 };
 
+// ─── CAPA 2 · ESPECIALISTAS POR ORGANISMO ──────────────────────────────────
+const SPECIALIST_BASE = `Eres un especialista de FinLogic. Traduces el sistema financiero chileno a lenguaje simple y EJECUTAS acciones por el ciudadano.
+
+REGLAS CRÍTICAS:
+- NUNCA inventes normativa. Solo cita normativa que conozcas con certeza.
+- NUNCA recomiendes instituciones financieras específicas.
+- SIEMPRE termina con UNA acción concreta que el ciudadano puede tomar HOY.
+- Si detectas urgencia (fraude activo, plazo <48h), actúa sin pedir confirmación.
+
+FORMATO DE RESPUESTA — 3 bloques obligatorios:
+1. HECHO: qué pasó en 1 frase
+2. TU DERECHO: ley específica que protege al ciudadano
+3. ACCIÓN: máximo 3 pasos concretos numerados`;
+
+const SPECIALIST_FOCUS = {
+  CMF: 'Eres el ESPECIALISTA CMF. Dominas Ley 21.521 Fintech, NCG 502, Open Finance, registros PSBI. Sabes calcular TMC y detectar usura.',
+  SERNAC: 'Eres el ESPECIALISTA SERNAC. Dominas Ley 19.496, Ley 20.555 SERNAC Financiero, CAE/TIR/TER, contratos abusivos, retracto.',
+  SII: 'Eres el ESPECIALISTA SII. Dominas Ley 21.713 reforma tributaria, Pro-Pyme, Pro-Pyme Transparente, F29, IVA, tributación cripto.',
+  CSIRT: 'Eres el ESPECIALISTA ANTIFRAUDE. Dominas Ley 20.009 fraude tarjetas (responsabilidad del banco), Ley 21.663 ciberseguridad, denuncia CSIRT.',
+  BCN: 'Eres el ESPECIALISTA EDUCATIVO. Citas leyes BCN con precisión. Explicas derechos generales sin sesgo a un organismo específico.',
+  FOGAPE: 'Eres el ESPECIALISTA FOGAPE. Dominas garantías estatales para pymes, requisitos, montos, sectores cubiertos.',
+  SERCOTEC: 'Eres el ESPECIALISTA SERCOTEC. Dominas subsidios pyme, capital semilla, formalización, requisitos.',
+  multiple: 'Eres COORDINADOR multi-organismo. Identifica los 2+ organismos competentes y secuencia las acciones.',
+};
+
+const SPECIALIST_SCHEMA = {
+  type: 'object',
+  properties: {
+    fact: { type: 'string', description: 'Diagnóstico en 1 oración' },
+    translation: { type: 'string', description: 'Derecho aplicable + ley específica' },
+    action: { type: 'string', description: 'Acción concreta para el ciudadano (markdown con pasos numerados)' },
+    lawsCited: { type: 'array', items: { type: 'string' }, description: 'Leyes citadas, ej: ["Ley 19.496", "Art. 39 NCG 502 CMF"]' },
+    legalDeadlineDays: { type: 'number', description: 'Días hábiles del plazo legal (0 si no aplica)' },
+    deadlineDescription: { type: 'string' },
+    selfConfidence: { type: 'number', minimum: 0, maximum: 100, description: 'Confianza del especialista en su respuesta' },
+  },
+  required: ['fact', 'translation', 'action', 'lawsCited'],
+};
+
+// ─── CAPA 3 · VERIFICADOR ──────────────────────────────────────────────────
+const VERIFIER_PROMPT = `Eres el VERIFICADOR de Lya. Auditas la respuesta del especialista contra la consulta original.
+
+EVALÚA 4 dimensiones (0-100 cada una):
+1. precision_normativa: ¿las leyes citadas son reales y aplican?
+2. accionabilidad: ¿el ciudadano puede ejecutar HOY los pasos?
+3. claridad: ¿se entiende sin formación legal?
+4. ausencia_alucinacion: ¿no hay artículos/montos inventados?
+
+DETECTA RIESGOS:
+- artículos legales sospechosos
+- recomendación de institución específica
+- minimización del problema
+
+El verifierScore final es el promedio ponderado: precision×0.4 + accion×0.3 + claridad×0.2 + sin_aluc×0.1`;
+
+const VERIFIER_SCHEMA = {
+  type: 'object',
+  properties: {
+    verifierScore: { type: 'number', minimum: 0, maximum: 100 },
+    precisionNormativa: { type: 'number', minimum: 0, maximum: 100 },
+    accionabilidad: { type: 'number', minimum: 0, maximum: 100 },
+    claridad: { type: 'number', minimum: 0, maximum: 100 },
+    ausenciaAlucinacion: { type: 'number', minimum: 0, maximum: 100 },
+    riesgosDetectados: { type: 'array', items: { type: 'string' } },
+    recomendacionAprobacion: { type: 'string', enum: ['aprobar', 'aprobar_con_advertencia', 'rechazar'] },
+  },
+  required: ['verifierScore', 'recomendacionAprobacion'],
+};
+
+// ─── PIPELINE ──────────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -77,58 +140,93 @@ Deno.serve(async (req) => {
       // zero-login: continúa sin usuario autenticado
     }
 
-    // Llamada al especialista (Claude Sonnet 4.6 vía InvokeLLM)
-    let result;
+    // ─── CAPA 1 · TRIAGE ────────────────────────────────────────────────
+    const triageStart = Date.now();
+    let triage = {};
     try {
-      result = await base44.integrations.Core.InvokeLLM({
-        prompt: `${SYSTEM_PROMPT}
+      triage = await base44.integrations.Core.InvokeLLM({
+        prompt: `${TRIAGE_PROMPT}\n\nCONSULTA:\n"${query}"\n\nResponde SOLO con el JSON.`,
+        response_json_schema: TRIAGE_SCHEMA,
+      });
+    } catch (e) {
+      console.error('triage failed:', e.message);
+    }
+    const triageLatencyMs = Date.now() - triageStart;
 
-CONSULTA DEL CIUDADANO:
+    const regulatoryBody = triage.regulatoryBody || 'SERNAC';
+    const normativeModule = triage.normativeModule || 'ley_19496_sernac';
+    const urgencyLevel = triage.urgencyLevel || 'medium';
+    const detectedProfile = triage.detectedProfile || 'general';
+    const category = triage.category || 'normativa_consulta';
+
+    // ─── CAPA 2 · ESPECIALISTA ──────────────────────────────────────────
+    const specialistStart = Date.now();
+    const specialistFocus = SPECIALIST_FOCUS[regulatoryBody] || SPECIALIST_FOCUS.BCN;
+
+    let specialist = {};
+    try {
+      specialist = await base44.integrations.Core.InvokeLLM({
+        prompt: `${SPECIALIST_BASE}
+
+${specialistFocus}
+
+PERFIL DETECTADO: ${detectedProfile} — adapta el tono.
+URGENCIA: ${urgencyLevel}.
+
+CONSULTA:
 "${query}"
 
-Debes completar TODOS los campos del schema JSON. Especialmente:
-- "fact": diagnóstico de la situación en 1 oración (OBLIGATORIO, no vacío)
-- "translation": derecho aplicable + ley específica que protege al ciudadano (OBLIGATORIO)
-- "action": pasos concretos numerados en markdown (OBLIGATORIO)
-- "regulatoryBody": organismo competente (CMF, SERNAC, SII, CSIRT, BCN, FOGAPE, SERCOTEC, multiple)
-- "normativeModule": ley aplicable
-- "urgencyLevel": critical | high | medium | low | resolved
-- "lawsCited": array con leyes citadas (ej: ["Ley 19.496", "Art. 39 NCG 502 CMF"])
-- "legalDeadlineDays": días hábiles del plazo legal (0 si no aplica)
-- "verifierScore": tu confianza 0-100
-
-Responde SOLO con el JSON completo.`,
-        response_json_schema: RESPONSE_SCHEMA,
+Genera tu respuesta estructurada (fact / translation / action) y completa lawsCited con normativa real.`,
+        response_json_schema: SPECIALIST_SCHEMA,
       });
-    } catch (llmError) {
-      console.error('InvokeLLM failed:', llmError.message);
-      result = {};
+    } catch (e) {
+      console.error('specialist failed:', e.message);
     }
-    if (!result || typeof result !== 'object') result = {};
+    const specialistLatencyMs = Date.now() - specialistStart;
 
+    const fact = specialist.fact || 'Consulta procesada';
+    const translation = specialist.translation || '';
+    const action = specialist.action || '';
+    const lawsCited = specialist.lawsCited || [];
+    const legalDeadlineDays = specialist.legalDeadlineDays || 0;
+    const deadlineDescription = specialist.deadlineDescription || '';
+    const selfConfidence = specialist.selfConfidence || 75;
+
+    // ─── CAPA 3 · VERIFICADOR ───────────────────────────────────────────
+    let verification = {};
+    try {
+      verification = await base44.integrations.Core.InvokeLLM({
+        prompt: `${VERIFIER_PROMPT}
+
+CONSULTA ORIGINAL:
+"${query}"
+
+RESPUESTA DEL ESPECIALISTA:
+HECHO: ${fact}
+DERECHO: ${translation}
+ACCIÓN: ${action}
+LEYES CITADAS: ${JSON.stringify(lawsCited)}
+
+Audita y devuelve scores.`,
+        response_json_schema: VERIFIER_SCHEMA,
+      });
+    } catch (e) {
+      console.error('verifier failed:', e.message);
+    }
+
+    // verifierScore = promedio del verificador, fallback a self-confidence
+    const verifierScore = Math.round(verification.verifierScore || selfConfidence);
     const totalLatencyMs = Date.now() - startTime;
 
-    // Defensive: ensure all expected fields exist
-    const fact = result.fact || result.hecho || 'Consulta procesada';
-    const translation = result.translation || result.derecho || result.tu_derecho || '';
-    const action = result.action || result.accion || '';
-    const regulatoryBody = result.regulatoryBody || result.regulatory_body || 'SERNAC';
-    const normativeModule = result.normativeModule || result.normative_module || 'ley_19496_sernac';
-    const urgencyLevel = result.urgencyLevel || result.urgency_level || 'medium';
-    const detectedProfile = result.detectedProfile || result.detected_profile || 'general';
-    const lawsCited = result.lawsCited || result.laws_cited || [];
-    const legalDeadlineDays = result.legalDeadlineDays || result.legal_deadline_days || 0;
-    const deadlineDescription = result.deadlineDescription || result.deadline_description || '';
-    const verifierScore = result.verifierScore || result.verifier_score || 75;
-
-    // AgentTrace público para /Transparencia (anonimizado)
-    const trace = await base44.asServiceRole.entities.AgentTrace.create({
+    // ─── TRACE ÚNICO con pipeline completo ──────────────────────────────
+    const traceRecord = await base44.asServiceRole.entities.AgentTrace.create({
       sessionId,
       query: query.substring(0, 500),
-      category: mapToCategory(regulatoryBody, normativeModule),
+      category,
       pipelineStage: 'complete',
+      triageLatencyMs,
+      specialistLatencyMs,
       totalLatencyMs,
-      specialistLatencyMs: totalLatencyMs,
       verifierScore,
       lawsCited,
       responsePreview: `${fact} ${translation}`.substring(0, 200),
@@ -137,7 +235,7 @@ Responde SOLO con el JSON completo.`,
       isPublic: true,
     });
 
-    // Crear Caso si hay urgencia o derecho aplicable claro
+    // ─── CASE + DEADLINE ────────────────────────────────────────────────
     let caseId = null;
     let deadlineId = null;
     if (userEmail && urgencyLevel !== 'resolved' && regulatoryBody !== 'multiple') {
@@ -151,12 +249,11 @@ Responde SOLO con el JSON completo.`,
         urgencyLevel,
         userProfile: detectedProfile,
         channel,
-        agentTraceRef: trace.id,
+        agentTraceRef: traceRecord.id,
         verifierScore,
       });
       caseId = caso.id;
 
-      // LegalDeadline si aplica
       if (legalDeadlineDays > 0) {
         const deadlineDate = new Date();
         deadlineDate.setDate(deadlineDate.getDate() + legalDeadlineDays);
@@ -180,7 +277,7 @@ Responde SOLO con el JSON completo.`,
       success: true,
       caseId,
       deadlineId,
-      traceId: trace.id,
+      traceId: traceRecord.id,
       response: {
         fact,
         translation,
@@ -191,6 +288,22 @@ Responde SOLO con el JSON completo.`,
         legalDeadlineDays,
         verifierScore,
         latencyMs: totalLatencyMs,
+        // diagnóstico pipeline (consumible por /Transparencia)
+        pipeline: {
+          triageLatencyMs,
+          specialistLatencyMs,
+          totalLatencyMs,
+          routedTo: regulatoryBody,
+          routingReason: triage.routingReason || null,
+          verifierBreakdown: {
+            precision: verification.precisionNormativa,
+            accionabilidad: verification.accionabilidad,
+            claridad: verification.claridad,
+            sinAlucinacion: verification.ausenciaAlucinacion,
+            riesgos: verification.riesgosDetectados || [],
+            recomendacion: verification.recomendacionAprobacion,
+          },
+        },
       },
     });
   } catch (error) {
@@ -198,11 +311,3 @@ Responde SOLO con el JSON completo.`,
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
-
-function mapToCategory(body, module) {
-  if (module === 'ley_20009_fraude') return 'fraude_digital';
-  if (module === 'ley_21719_datos') return 'derechos_arco';
-  if (body === 'CMF' || body === 'SERNAC') return 'cobro_indebido';
-  if (body === 'SII') return 'normativa_consulta';
-  return 'normativa_consulta';
-}
