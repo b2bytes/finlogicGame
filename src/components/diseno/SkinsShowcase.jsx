@@ -19,20 +19,23 @@ const DEMO_RESPONSE = {
 };
 
 const SKIN_PREVIEW_STYLES = {
+  // Camila — dark móvil moderno con acento púrpura (Imagen 2)
   camila: {
-    bg: '#ffffff',
-    surface: '#fafafa',
-    text: '#0f172a',
-    accent: 'hsl(280 60% 55%)',
-    accentSoft: 'hsl(280 60% 96%)',
-    accentBorder: 'hsl(280 50% 85%)',
-    radius: '20px',
+    bg: '#0f0d1a',
+    surface: '#1a1729',
+    text: '#f5f5f7',
+    accent: 'hsl(280 70% 62%)',
+    accentSoft: 'hsl(280 50% 22%)',
+    accentBorder: 'hsl(280 60% 40%)',
+    radius: '18px',
     fontSize: '14px',
     fontFamily: 'Inter, sans-serif',
     voice: 'Rápida · joven',
     density: 'compact',
-    headerBg: 'linear-gradient(135deg, hsl(280 60% 96%), hsl(280 70% 92%))',
+    headerBg: 'linear-gradient(135deg, hsl(280 50% 18%), hsl(280 60% 12%))',
+    isDark: true,
   },
+  // Don Luis — claro, alto contraste, tipografía grande (mantenido como light)
   don_luis: {
     bg: '#ffffff',
     surface: '#fafafa',
@@ -46,34 +49,39 @@ const SKIN_PREVIEW_STYLES = {
     voice: 'Pausada · cálida',
     density: 'spacious',
     headerBg: 'linear-gradient(135deg, hsl(158 50% 94%), hsl(158 55% 88%))',
+    isDark: false,
   },
+  // María José — dark consultora pyme con badge naranja sobre superficie púrpura (Imagen 1)
   maria_jose: {
-    bg: '#fffbf5',
-    surface: '#fff',
-    text: '#1f2937',
-    accent: 'hsl(28 80% 50%)',
-    accentSoft: 'hsl(28 80% 96%)',
-    accentBorder: 'hsl(28 70% 80%)',
+    bg: '#0e0d1a',
+    surface: '#181530',
+    text: '#f5f5f7',
+    accent: 'hsl(28 85% 55%)',
+    accentSoft: 'hsl(280 40% 18%)',
+    accentBorder: 'hsl(280 30% 32%)',
     radius: '16px',
     fontSize: '14px',
     fontFamily: '"Plus Jakarta Sans", Inter, sans-serif',
     voice: 'Profesional · accionable',
     density: 'medium',
-    headerBg: 'linear-gradient(135deg, hsl(28 80% 96%), hsl(28 85% 90%))',
+    headerBg: 'linear-gradient(135deg, hsl(280 40% 18%), hsl(280 50% 12%))',
+    isDark: true,
   },
+  // Roberto — terminal DevOps con mint fluorescente (Imagen 3)
   roberto: {
-    bg: '#f8fafc',
-    surface: '#fff',
-    text: '#0f172a',
-    accent: 'hsl(220 60% 35%)',
-    accentSoft: 'hsl(220 60% 96%)',
-    accentBorder: 'hsl(220 50% 80%)',
-    radius: '10px',
+    bg: '#0a0e0c',
+    surface: '#0f1411',
+    text: '#e6f9ef',
+    accent: 'hsl(158 75% 50%)',
+    accentSoft: 'hsl(158 50% 12%)',
+    accentBorder: 'hsl(158 60% 30%)',
+    radius: '8px',
     fontSize: '13px',
     fontFamily: 'ui-monospace, "JetBrains Mono", monospace',
     voice: 'Directa · técnica',
     density: 'dense',
-    headerBg: 'linear-gradient(135deg, hsl(220 60% 96%), hsl(220 65% 90%))',
+    headerBg: 'linear-gradient(135deg, hsl(158 50% 8%), hsl(158 60% 5%))',
+    isDark: true,
   },
 };
 
@@ -81,6 +89,9 @@ function SkinCard({ skinKey, response, isActive, onClick }) {
   const meta = SKIN_META[skinKey];
   const s = SKIN_PREVIEW_STYLES[skinKey];
   const padding = s.density === 'spacious' ? '20px' : s.density === 'compact' ? '14px' : '16px';
+  // Opacidades adaptadas para dark vs light (en dark, "muted" debe quedar más visible)
+  const mutedOpacity = s.isDark ? 0.7 : 0.55;
+  const subtleOpacity = s.isDark ? 0.55 : 0.5;
 
   return (
     <motion.button
@@ -114,7 +125,7 @@ function SkinCard({ skinKey, response, isActive, onClick }) {
           <p className="font-bold truncate" style={{ color: s.text, fontSize: '15px' }}>
             {meta.label}
           </p>
-          <p className="text-[11px] truncate" style={{ color: s.text, opacity: 0.6 }}>
+          <p className="text-[11px] truncate" style={{ color: s.text, opacity: mutedOpacity }}>
             {meta.description}
           </p>
         </div>
@@ -135,12 +146,17 @@ function SkinCard({ skinKey, response, isActive, onClick }) {
         <div className="flex items-center gap-1.5 mb-2">
           <span
             className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-            style={{ background: s.accent, color: 'white' }}
+            style={{
+              background: skinKey === 'roberto' ? 'transparent' : s.accent,
+              color: skinKey === 'roberto' ? s.accent : 'white',
+              border: skinKey === 'roberto' ? `1px solid ${s.accent}` : 'none',
+              fontFamily: skinKey === 'roberto' ? 'ui-monospace, monospace' : 'inherit',
+            }}
           >
-            {response.regulatoryBody}
+            {skinKey === 'roberto' ? `[${response.regulatoryBody}]` : response.regulatoryBody}
           </span>
-          <span className="text-[10px]" style={{ color: s.text, opacity: 0.5 }}>·</span>
-          <span className="text-[10px]" style={{ color: s.text, opacity: 0.5 }}>Score 87/100</span>
+          <span className="text-[10px]" style={{ color: s.text, opacity: subtleOpacity }}>·</span>
+          <span className="text-[10px]" style={{ color: s.text, opacity: subtleOpacity }}>Score 87/100</span>
         </div>
 
         <p
@@ -177,7 +193,7 @@ function SkinCard({ skinKey, response, isActive, onClick }) {
             fontSize: skinKey === 'don_luis' ? '14px' : '12.5px',
             lineHeight: 1.55,
             color: s.text,
-            opacity: 0.85,
+            opacity: s.isDark ? 0.78 : 0.85,
           }}
         >
           {response.action}
@@ -198,7 +214,7 @@ function SkinCard({ skinKey, response, isActive, onClick }) {
           Resolver ahora
         </div>
 
-        <div className="flex items-center gap-3 mt-3 text-[10px]" style={{ color: s.text, opacity: 0.55 }}>
+        <div className="flex items-center gap-3 mt-3 text-[10px]" style={{ color: s.text, opacity: mutedOpacity }}>
           <span className="inline-flex items-center gap-1">
             <Mic className="w-3 h-3" /> {s.voice}
           </span>

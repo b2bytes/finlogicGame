@@ -235,18 +235,20 @@
       transition: none !important;
     }
   }
-  /* CAMILA — 22 Stgo · móvil-first · vibrante · acento púrpura */
+  /* CAMILA — 22 Stgo · móvil-first · vibrante · acento púrpura
+     Inspiración: dark mode app móvil moderna con grid 2x2 y micrófono prominente */
   html.skin-camila {
-    --primary: 280 60% 55%;
+    --primary: 280 70% 62%;
     --primary-foreground: 0 0% 100%;
-    --ring: 280 60% 55%;
-    --mint-500: 280 60% 55%;
-    --mint-600: 280 65% 47%;
-    --mint-700: 280 70% 38%;
+    --ring: 280 70% 62%;
+    --mint-500: 280 70% 62%;
+    --mint-600: 280 75% 54%;
+    --mint-700: 280 80% 44%;
     --mint-50: 280 60% 96%;
     --mint-100: 280 55% 90%;
     --mint-200: 280 50% 82%;
-    --mint-300: 280 55% 70%;
+    --mint-300: 280 60% 72%;
+    --mint-400: 280 65% 65%;
     --accent: 50 90% 92%;
     --radius: 1.25rem;
   }
@@ -280,39 +282,53 @@
   html.skin-don_luis .text-xs { font-size: 0.95rem; line-height: 1.5; }
   html.skin-don_luis .text-sm { font-size: 1.05rem; line-height: 1.6; }
 
-  /* MARÍA JOSÉ — 34 Tco · emprendedora · profesional + naranja pyme */
+  /* MARÍA JOSÉ — 34 Tco · emprendedora · profesional + naranja pyme
+     Inspiración Imagen 1: card púrpura con badge naranja "Régimen recomendado",
+     dual-pricing card, números mint grandes accionables */
   html.skin-maria_jose {
-    --primary: 28 80% 50%;
+    --primary: 28 85% 55%;
     --primary-foreground: 0 0% 100%;
-    --ring: 28 80% 50%;
-    --mint-500: 28 80% 50%;
-    --mint-600: 28 85% 42%;
-    --mint-700: 28 90% 34%;
-    --mint-50: 28 80% 96%;
-    --mint-100: 28 75% 88%;
-    --mint-200: 28 70% 80%;
-    --mint-300: 28 75% 65%;
-    --accent: 158 50% 92%;
+    --ring: 28 85% 55%;
+    --mint-500: 28 85% 55%;
+    --mint-600: 28 88% 47%;
+    --mint-700: 28 92% 38%;
+    --mint-50: 28 85% 96%;
+    --mint-100: 28 80% 88%;
+    --mint-200: 28 75% 80%;
+    --mint-300: 28 80% 65%;
+    --mint-400: 28 82% 60%;
+    --accent: 158 55% 92%;
     --radius: 1rem;
   }
 
-  /* ROBERTO — 45 Antof. · técnico · navy + mint · densidad alta */
+  /* ROBERTO — 45 Antof. · técnico · terminal mint fluorescente · densidad alta
+     Inspiración Imagen 3: estética DevOps/hacker, headlines con highlight verde mint
+     fluorescente, badges como tags monoespaciados [CODE_TAGS], paginación 01/03/04 */
   html.skin-roberto {
     --background: 220 25% 97%;
-    --primary: 220 60% 35%;
+    --primary: 158 75% 38%;
     --primary-foreground: 0 0% 100%;
-    --ring: 220 60% 35%;
-    --mint-500: 220 60% 35%;
-    --mint-600: 220 65% 28%;
-    --mint-700: 220 70% 22%;
-    --mint-50: 220 50% 96%;
-    --mint-200: 220 50% 80%;
-    --accent: 158 40% 90%;
-    --radius: 0.625rem;
+    --ring: 158 75% 38%;
+    --mint-500: 158 75% 38%;
+    --mint-600: 158 80% 30%;
+    --mint-700: 158 85% 24%;
+    --mint-50: 158 60% 95%;
+    --mint-100: 158 55% 88%;
+    --mint-200: 158 55% 78%;
+    --mint-300: 158 60% 65%;
+    --mint-400: 158 65% 52%;
+    --accent: 158 70% 90%;
+    --radius: 0.5rem;
   }
   html.skin-roberto h1,
   html.skin-roberto h2,
   html.skin-roberto h3 {
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    font-feature-settings: "ss01", "cv11", "tnum";
+  }
+  /* Roberto: code-style tags con tabular-nums para datos */
+  html.skin-roberto .text-xs,
+  html.skin-roberto code {
+    font-variant-numeric: tabular-nums;
   }
 }
