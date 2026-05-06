@@ -23,6 +23,9 @@ import PitchDeck from '@/pages/PitchDeck';
 import OperacionesDashboard from '@/pages/OperacionesDashboard';
 import Embajadores from '@/pages/Embajadores';
 import Insights from '@/pages/Insights';
+import Pro from '@/pages/Pro';
+import SystemMetrics from '@/pages/SystemMetrics';
+import AsistenteLya from '@/pages/AsistenteLya';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -67,6 +70,9 @@ const AuthenticatedApp = () => {
       <Route path="/OperacionesDashboard" element={<OperacionesDashboard />} />
       <Route path="/Embajadores" element={<Embajadores />} />
       <Route path="/Insights" element={<Insights />} />
+      <Route path="/Pro" element={<Pro />} />
+      <Route path="/Admin/SystemMetrics" element={<SystemMetrics />} />
+      <Route path="/AsistenteLya" element={<AsistenteLya />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
