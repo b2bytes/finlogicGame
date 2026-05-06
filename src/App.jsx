@@ -37,6 +37,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import PWAInstallBanner from '@/components/pwa/PWAInstallBanner';
 import QuickAdminPanel from '@/components/admin/QuickAdminPanel';
 import Rubrica from '@/pages/Rubrica';
+import Demo from '@/pages/Demo';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -96,6 +97,7 @@ const AuthenticatedApp = () => {
         <Route path="/Diseño" element={<Diseno />} />
         <Route path="/Rubrica" element={<Rubrica />} />
         <Route path="/Rúbrica" element={<Rubrica />} />
+        <Route path="/Demo" element={<Demo />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </ErrorBoundary>
