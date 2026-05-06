@@ -28,7 +28,9 @@ Deno.serve(async (req) => {
       .replace(/[⚖️📋⏰💚✅❌🔒📌🎯👤👴🏼👩🏽‍🎓👩🏽‍💼👨🏽‍🔧]/g, '') // emoji
       .replace(/\n{2,}/g, '. ') // párrafos → punto
       .replace(/\n/g, ' ')
+      .replace(/\.{2,}/g, '.') // puntos múltiples
       .replace(/\s{2,}/g, ' ')
+      .replace(/\s+([.,;:!?])/g, '$1') // espacios antes de puntuación
       .trim();
 
     // 2. Truncar al límite
@@ -42,8 +44,11 @@ Deno.serve(async (req) => {
       clean = lastPunct > maxChars * 0.7 ? truncated.slice(0, lastPunct + 1) : truncated + '...';
     }
 
-    // 3. Dividir en chunks por puntuación
-    const sentences = clean.match(/[^.!?]+[.!?]+/g) || [clean];
+    // 3. Dividir en chunks por puntuación (excluyendo punto entre dígitos: "21.521")
+    const protectedText = clean.replace(/(\d)\.(\d)/g, '$1__DOT__$2');
+    const sentences = (protectedText.match(/[^.!?]+[.!?]+/g) || [protectedText]).map((s) =>
+      s.replace(/__DOT__/g, '.'),
+    );
     const chunks = [];
     let current = '';
 
