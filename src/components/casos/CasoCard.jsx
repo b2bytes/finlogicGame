@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Clock, AlertTriangle, CheckCircle2, FileText, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Clock, AlertTriangle, CheckCircle2, FileText, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import GenerateDocDialog from './GenerateDocDialog';
 
@@ -25,7 +26,7 @@ export default function CasoCard({ caso, onUpdate }) {
   const isOverdue = typeof days === 'number' && days < 0;
 
   return (
-    <div className="bg-card rounded-3xl border border-border p-6 shadow-soft hover:shadow-soft-lg transition-shadow">
+    <div className="bg-card rounded-3xl border border-border p-6 shadow-soft hover:shadow-soft-lg hover:border-mint-200 transition-all group">
       <div className="flex items-start justify-between gap-3 mb-3">
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${status.cls}`}>
           {status.label}
@@ -35,9 +36,11 @@ export default function CasoCard({ caso, onUpdate }) {
         </span>
       </div>
 
-      <h3 className="font-display text-lg font-bold text-foreground leading-snug mb-2">
-        {caso.title}
-      </h3>
+      <Link to={`/MisCasos/${caso.id}`} className="block">
+        <h3 className="font-display text-lg font-bold text-foreground leading-snug mb-2 group-hover:text-mint-700 transition-colors">
+          {caso.title}
+        </h3>
+      </Link>
       <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
         {caso.description}
       </p>

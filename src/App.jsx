@@ -18,6 +18,8 @@ import Pyme from '@/pages/Pyme';
 import Pricing from '@/pages/Pricing';
 import FinancialDashboard from '@/pages/FinancialDashboard';
 import Marca from '@/pages/Marca';
+import CasoDetalle from '@/pages/CasoDetalle';
+import PitchDeck from '@/pages/PitchDeck';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -57,6 +59,8 @@ const AuthenticatedApp = () => {
       <Route path="/Pricing" element={<Pricing />} />
       <Route path="/FinancialDashboard" element={<FinancialDashboard />} />
       <Route path="/Marca" element={<Marca />} />
+      <Route path="/MisCasos/:id" element={<CasoDetalle />} />
+      <Route path="/PitchDeck" element={<PitchDeck />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
