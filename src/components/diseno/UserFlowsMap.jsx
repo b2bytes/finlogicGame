@@ -1,5 +1,6 @@
 import React from 'react';
 import { Workflow, User, Briefcase, Building2, Code2, Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
 import FlowDiagram from './FlowDiagram';
 
 // Estilos literales (Tailwind no admite dynamic class names)
@@ -106,9 +107,13 @@ export default function UserFlowsMap() {
         </div>
 
         <div className="space-y-6">
-          {FLOWS.map((flow) => (
-            <article
+          {FLOWS.map((flow, idx) => (
+            <motion.article
               key={flow.id}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.5, delay: idx * 0.05 }}
               className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-soft hover:shadow-soft-lg transition-shadow"
             >
               <header className="flex flex-wrap items-start justify-between gap-4 mb-5">
@@ -133,7 +138,7 @@ export default function UserFlowsMap() {
                 </span>
               </header>
               <FlowDiagram steps={flow.steps} accentColor={flow.color} />
-            </article>
+            </motion.article>
           ))}
         </div>
       </div>

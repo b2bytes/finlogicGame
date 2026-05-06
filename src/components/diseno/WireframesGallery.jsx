@@ -1,5 +1,6 @@
 import React from 'react';
 import { Frame, CheckCircle2, Circle, Construction } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 /**
  * Pantallas faltantes / por iterar — wireframes de alta fidelidad
@@ -76,22 +77,34 @@ export default function WireframesGallery() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {SCREENS.map((s) => {
+          {SCREENS.map((s, idx) => {
             const status = STATUS_MAP[s.status];
             return (
-              <article
+              <motion.article
                 key={s.route}
-                className="bg-card border border-border rounded-3xl overflow-hidden shadow-soft hover:shadow-soft-lg transition-shadow"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ delay: idx * 0.08, duration: 0.5 }}
+                whileHover={{ y: -4 }}
+                className="bg-card border border-border rounded-3xl overflow-hidden shadow-soft hover:shadow-soft-lg transition-shadow group"
               >
-                <div className="bg-gradient-to-br from-secondary/60 to-mint-50/40 p-6 border-b border-border">
-                  <div className="bg-card border border-border rounded-2xl shadow-soft overflow-hidden h-56 sm:h-64">
-                    {s.mock}
+                <div className="relative bg-gradient-to-br from-secondary/60 to-mint-50/40 p-5 sm:p-6 border-b border-border">
+                  {/* Mockup phone frame */}
+                  <div className="relative mx-auto w-48 sm:w-56">
+                    <div className="bg-foreground rounded-[20px] p-1.5 shadow-soft-lg">
+                      <div className="bg-card rounded-[14px] overflow-hidden h-56 sm:h-64">
+                        {s.mock}
+                      </div>
+                      {/* Notch */}
+                      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full bg-foreground/20" />
+                    </div>
                   </div>
                 </div>
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div>
-                      <h3 className="font-display text-lg font-bold text-foreground leading-tight">{s.title}</h3>
+                      <h3 className="font-display text-lg font-bold text-foreground leading-tight group-hover:text-mint-700 transition-colors">{s.title}</h3>
                       <code className="text-[10px] font-mono text-muted-foreground">{s.route}</code>
                     </div>
                     <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border ${status.cls} flex-shrink-0`}>
@@ -101,7 +114,7 @@ export default function WireframesGallery() {
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed">{s.description}</p>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
         </div>

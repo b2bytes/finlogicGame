@@ -1,5 +1,6 @@
-import React from 'react';
-import { Palette, Type, Square, Sparkles, MousePointerClick, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { Palette, Type, Square, Sparkles, MousePointerClick, ShieldCheck, Copy, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const COLORS = [
   { token: 'mint-500', label: 'Primary · Mint Wise', hex: '#34A57F', desc: 'Acción principal, confianza financiera' },
@@ -42,11 +43,61 @@ const COMPONENTS = [
   { label: 'Avatar', preview: <div className="w-9 h-9 rounded-full bg-mint-500 text-white flex items-center justify-center text-xs font-bold">CL</div> },
 ];
 
+function ColorChip({ color, index }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(color.hex);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <motion.button
+      onClick={handleCopy}
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.04 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className="text-left flex items-center gap-3 p-3 rounded-2xl bg-secondary/40 border border-border hover:border-mint-300 hover:bg-mint-50/30 transition-all group cursor-pointer"
+    >
+      <div
+        className="w-12 h-12 rounded-xl flex-shrink-0 border border-border/60 shadow-soft group-hover:scale-105 transition-transform"
+        style={{ backgroundColor: color.hex }}
+      />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <p className="text-sm font-semibold text-foreground truncate">{color.label}</p>
+          {copied ? (
+            <Check className="w-3 h-3 text-mint-600 flex-shrink-0" />
+          ) : (
+            <Copy className="w-3 h-3 text-muted-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+          )}
+        </div>
+        <p className="text-[11px] font-mono text-muted-foreground">{color.hex} · --{color.token}</p>
+        <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{color.desc}</p>
+      </div>
+    </motion.button>
+  );
+}
+
+const SectionHeader = ({ children, ...props }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 16 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: '-80px' }}
+    transition={{ duration: 0.5 }}
+    {...props}
+  >
+    {children}
+  </motion.div>
+);
+
 export default function DesignSystem() {
   return (
     <section id="system" className="py-20 md:py-28 bg-secondary/40 border-y border-border/40 scroll-mt-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-3xl mb-12">
+        <SectionHeader className="max-w-3xl mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-4">
             <Palette className="w-3.5 h-3.5 text-mint-700" />
             <span className="text-xs font-semibold text-mint-700">2 · Sistema de diseño</span>
@@ -56,10 +107,10 @@ export default function DesignSystem() {
             <span className="block text-mint-600">Premium pero cálido.</span>
           </h2>
           <p className="mt-4 text-base text-muted-foreground leading-relaxed">
-            Inspiración: Apple HIG · Wise · Mercado Pago. Radios grandes, sombras blandas, paleta cálida
-            que transmite confianza sin agredir.
+            Inspiración: <strong>Apple HIG · Wise · Mercado Pago</strong>. Radios grandes, sombras blandas, paleta cálida
+            que transmite confianza sin agredir. <span className="text-mint-700">Haz click en un color para copiarlo.</span>
           </p>
-        </div>
+        </SectionHeader>
 
         {/* Color tokens */}
         <div className="bg-card border border-border rounded-3xl p-6 md:p-8 mb-6 shadow-soft">
@@ -68,18 +119,8 @@ export default function DesignSystem() {
             <h3 className="font-display text-xl font-bold">Paleta · Tokens</h3>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {COLORS.map((c) => (
-              <div key={c.token} className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/40 border border-border">
-                <div
-                  className="w-12 h-12 rounded-xl flex-shrink-0 border border-border/60 shadow-soft"
-                  style={{ backgroundColor: c.hex }}
-                />
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-foreground truncate">{c.label}</p>
-                  <p className="text-[11px] font-mono text-muted-foreground">{c.hex} · --{c.token}</p>
-                  <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{c.desc}</p>
-                </div>
-              </div>
+            {COLORS.map((c, idx) => (
+              <ColorChip key={c.token} color={c} index={idx} />
             ))}
           </div>
         </div>

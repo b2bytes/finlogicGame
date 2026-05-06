@@ -3,6 +3,7 @@ import DesignHero from '@/components/diseno/DesignHero';
 import UserFlowsMap from '@/components/diseno/UserFlowsMap';
 import DesignSystem from '@/components/diseno/DesignSystem';
 import WireframesGallery from '@/components/diseno/WireframesGallery';
+import DesignGuideChat from '@/components/diseno/DesignGuideChat';
 import Footer from '@/components/home/Footer';
 
 /**
@@ -11,6 +12,7 @@ import Footer from '@/components/home/Footer';
  *   1. Mapa/diagrama de flujos de usuario
  *   2. Guía visual del diseño (sistema)
  *   3. Wireframes de pantallas faltantes
+ * + Agente conversacional "Guía de Diseño" flotante
  */
 export default function Diseno() {
   return (
@@ -22,6 +24,7 @@ export default function Diseno() {
         <WireframesGallery />
       </main>
       <Footer />
+      <DesignGuideChat />
     </div>
   );
 }
