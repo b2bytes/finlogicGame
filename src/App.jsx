@@ -38,6 +38,7 @@ import PWAInstallBanner from '@/components/pwa/PWAInstallBanner';
 import QuickAdminPanel from '@/components/admin/QuickAdminPanel';
 import Rubrica from '@/pages/Rubrica';
 import Demo from '@/pages/Demo';
+import Entregables from '@/pages/Entregables';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -98,6 +99,7 @@ const AuthenticatedApp = () => {
         <Route path="/Rubrica" element={<Rubrica />} />
         <Route path="/Rúbrica" element={<Rubrica />} />
         <Route path="/Demo" element={<Demo />} />
+        <Route path="/Entregables" element={<Entregables />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </ErrorBoundary>
