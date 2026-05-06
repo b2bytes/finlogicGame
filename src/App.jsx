@@ -17,6 +17,7 @@ import APICompliance from '@/pages/APICompliance';
 import Pyme from '@/pages/Pyme';
 import Pricing from '@/pages/Pricing';
 import FinancialDashboard from '@/pages/FinancialDashboard';
+import Marca from '@/pages/Marca';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
       <Route path="/Pyme" element={<Pyme />} />
       <Route path="/Pricing" element={<Pricing />} />
       <Route path="/FinancialDashboard" element={<FinancialDashboard />} />
+      <Route path="/Marca" element={<Marca />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

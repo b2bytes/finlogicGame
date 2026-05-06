@@ -1,0 +1,113 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "description": "Lead capturado en el flywheel de adquisici\u00f3n. Una fila por email/tel\u00e9fono \u00fanico. Tracking del funnel desde primera visita hasta conversi\u00f3n Pro o B2B.",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string",
+      "pattern": "^\\+56[0-9]{9}$",
+      "description": "WhatsApp formato +56XXXXXXXXX"
+    },
+    "segment": {
+      "type": "string",
+      "enum": [
+        "ciudadano",
+        "emprendedor",
+        "adulto_mayor",
+        "fintech_b2b",
+        "general"
+      ],
+      "default": "general"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "sernac",
+        "whatsapp_share",
+        "geo",
+        "paid_social",
+        "organic_seo",
+        "referral",
+        "casos_publicos",
+        "direct"
+      ],
+      "default": "direct",
+      "description": "Canal de origen del lead"
+    },
+    "utmCampaign": {
+      "type": "string"
+    },
+    "utmMedium": {
+      "type": "string"
+    },
+    "utmSource": {
+      "type": "string"
+    },
+    "firstQuery": {
+      "type": "string",
+      "description": "Primera consulta del usuario en lenguaje natural"
+    },
+    "firstVictoryAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp de primera resoluci\u00f3n exitosa (North Star Metric)"
+    },
+    "casesCount": {
+      "type": "number",
+      "default": 0
+    },
+    "proTriggerShownAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp en que se mostr\u00f3 el Momento Pro"
+    },
+    "convertedToPro": {
+      "type": "boolean",
+      "default": false
+    },
+    "convertedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "referralCode": {
+      "type": "string",
+      "description": "C\u00f3digo \u00fanico para tracking de referidos"
+    },
+    "referredBy": {
+      "type": "string",
+      "description": "referralCode del usuario que refiri\u00f3"
+    },
+    "lifecycleStage": {
+      "type": "string",
+      "enum": [
+        "visitor",
+        "activated",
+        "retained",
+        "converted",
+        "churned"
+      ],
+      "default": "visitor"
+    }
+  },
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,85 @@
+{
+  "name": "OperationalAlert",
+  "type": "object",
+  "description": "Alerta operacional del sistema FinLogic. Generada por monitorIntegrations, detectScoreAnomaly, checkLegalDeadlines. Visible en /OperacionesDashboard admin.",
+  "properties": {
+    "alertType": {
+      "type": "string",
+      "enum": [
+        "sla_breach",
+        "score_degradation",
+        "integration_failure",
+        "deadline_approaching",
+        "api_limit",
+        "normative_change",
+        "pipeline_latency"
+      ],
+      "default": "integration_failure"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "affectedEntity": {
+      "type": "string",
+      "description": "Nombre de la entity o servicio afectado"
+    },
+    "affectedId": {
+      "type": "string",
+      "description": "ID del registro afectado si aplica"
+    },
+    "metricValue": {
+      "type": "number",
+      "description": "Valor num\u00e9rico que dispar\u00f3 la alerta (latencia, score, etc.)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "acknowledged",
+        "resolved"
+      ],
+      "default": "open"
+    },
+    "acknowledgedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "resolvedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "alertType",
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    }
+  }
+}
