@@ -27,7 +27,7 @@ import Pro from '@/pages/Pro';
 import SystemMetrics from '@/pages/SystemMetrics';
 import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
-import MisSoporte from '@/pages/MisSoporte';
+import FloatingLyaCTA from '@/components/lya/FloatingLyaCTA';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -54,13 +54,13 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
+    <>
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/Consulta" element={<Consulta />} />
       <Route path="/Transparencia" element={<Transparencia />} />
       <Route path="/MisCasos" element={<MisCasos />} />
       <Route path="/Soporte" element={<Soporte />} />
-      <Route path="/MisSoporte" element={<MisSoporte />} />
       <Route path="/B2B/APIKeys" element={<B2BAPIKeys />} />
       <Route path="/Casos" element={<Casos />} />
       <Route path="/CasosResueltos" element={<Casos />} />
@@ -80,6 +80,8 @@ const AuthenticatedApp = () => {
       <Route path="/Admin/ContentStudio" element={<ContentStudio />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    <FloatingLyaCTA />
+    </>
   );
 };
 

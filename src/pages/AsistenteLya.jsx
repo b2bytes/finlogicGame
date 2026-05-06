@@ -97,7 +97,7 @@ export default function AsistenteLya() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <header className="sticky top-0 z-40 glass border-b border-border/40">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             to="/"
             className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -113,7 +113,7 @@ export default function AsistenteLya() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex flex-col">
+      <main className="flex-1 max-w-4xl mx-auto w-full px-4 md:px-6 py-6 md:py-8 flex flex-col">
         <div className="mb-6 animate-fade-up">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-3">
             <Sparkles className="w-3.5 h-3.5 text-mint-700" />
@@ -127,13 +127,13 @@ export default function AsistenteLya() {
         {/* Mensajes */}
         <div
           ref={scrollRef}
-          className="flex-1 bg-card/40 border border-border rounded-3xl p-4 sm:p-5 md:p-7 space-y-4 overflow-y-auto min-h-[320px] max-h-[55vh] sm:max-h-[60vh] mb-4"
+          className="flex-1 bg-card/40 border border-border rounded-3xl p-4 md:p-7 space-y-4 overflow-y-auto min-h-[300px] max-h-[55vh] md:max-h-[60vh] mb-4"
         >
           {messages.map((m, i) => (
             <div key={i}>
               <LyaMessage role={m.role} content={m.content} />
               {m.role === 'assistant' && m.sources && (
-                <div className="ml-10 sm:ml-11 mr-2">
+                <div className="ml-11 max-w-[85%]">
                   <LyaSources
                     sources={m.sources}
                     confidence={m.confidence}
