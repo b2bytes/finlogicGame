@@ -83,7 +83,7 @@ export default function DemoCheckTMC() {
           <div className="bg-card rounded-3xl border border-border shadow-soft-lg overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3 border-b border-border">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-destructive text-white tracking-wider">200 OK</span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-mint-600 text-white tracking-wider">200 OK</span>
                 <code className="text-xs font-mono text-muted-foreground">application/json</code>
               </div>
               <span className="text-xs text-muted-foreground">~340ms</span>
