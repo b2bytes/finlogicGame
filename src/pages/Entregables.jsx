@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Cpu, Mic, ExternalLink, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, FileText, Cpu, Mic, ExternalLink, ShieldCheck, Download, ChevronRight } from 'lucide-react';
 import Logo from '@/components/home/Logo';
-import EditorialHeading from '@/components/editorial/EditorialHeading';
-import LegalPill from '@/components/editorial/LegalPill';
 import CopyField from '@/components/entregables/CopyField';
 import SectionHeader from '@/components/entregables/SectionHeader';
 
@@ -133,14 +131,34 @@ const HERRAMIENTAS = [
   { name: 'Citations', used: true, why: 'Cada respuesta de Lya cita artículo + ley + sourceUrl recuperados desde Pinecone RAG. AgentTrace público en /Transparencia muestra trazabilidad completa.' },
   { name: 'Extended Thinking', used: true, why: 'Capa 3 verificador usa razonamiento extendido para auditar precisión normativa, accionabilidad y detectar alucinaciones antes de aprobar respuesta.' },
   { name: 'Files API', used: false, why: 'No usado — corpus normativo vive en Pinecone Serverless (mejor para semantic search multi-organismo).' },
-  { name: 'MCP', used: false, why: 'Roadmap Q3 2026 — exposer FinLogic como MCP server para Claude Desktop (compliance API).' },
+  { name: 'MCP', used: false, why: 'Roadmap Q3 2026 — exponer FinLogic como MCP server para Claude Desktop (compliance API).' },
   { name: 'Agent SDK', used: false, why: 'Usamos arquitectura propia con orquestación InvokeLLM + Pinecone RAG inline. Equivalente funcional ya en producción.' },
   { name: 'Computer Use', used: false, why: 'No aplica — Lya es asistente conversacional, no automatizador de UI.' },
 ];
 
 const REPO_URL = 'https://github.com/finlogic-cl/finlogic';
 
+// Tabs
+const TABS = [
+  { id: 'civica', label: 'Ficha Cívica', icon: FileText, count: 6 },
+  { id: 'tecnica', label: 'Entregable Técnico', icon: Cpu, count: 5 },
+  { id: 'pitch', label: 'Pitch 7 mayo', icon: Mic, count: 4 },
+];
+
 export default function Entregables() {
+  const [activeTab, setActiveTab] = useState('civica');
+
+  const downloadAll = () => {
+    const content = `═══ FICHA CÍVICA BENDI ═══\n\n[PROBLEMA]\n${PROBLEMA}\n\n[SEGMENTO]\n${SEGMENTO}\n\n[CANAL]\n${CANAL}\n\n[IMPACTO]\n${IMPACTO}\n\n[FUENTES]\n${FUENTES}\n\n[NORMATIVA]\n${NORMATIVA}\n\n═══ ENTREGABLE TÉCNICO ═══\n\n[SYSTEM PROMPT]\n${SYSTEM_PROMPT}\n\n[REPO]\n${REPO_URL}\n\n[HERRAMIENTAS]\n${HERRAMIENTAS.filter(h => h.used).map(h => `✓ ${h.name}: ${h.why}`).join('\n')}\n`;
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'finlogic-entregables-bendi.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -150,244 +168,220 @@ export default function Entregables() {
             <ArrowLeft className="w-4 h-4" /> Volver
           </Link>
           <Logo size="sm" />
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheck className="w-3.5 h-3.5 text-mint-600" />
-            Bendi-ready
-          </div>
+          <button
+            onClick={downloadAll}
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-mint-700 hover:text-mint-800"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Descargar todo
+          </button>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 lg:py-16">
         {/* Hero */}
-        <div className="mb-16">
+        <div className="mb-10">
           <div className="flex items-center gap-2 mb-4 text-xs font-mono-editorial text-mint-700 uppercase tracking-widest">
             <span className="w-1.5 h-1.5 rounded-full bg-mint-500 animate-pulse-soft" />
             Entregables Bendi · Claude Impact Lab Chile 2026
           </div>
-          <EditorialHeading size="xl">
+          <h1 className="font-display tracking-tight text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-[1.05]">
             Las 3 fichas listas<br />
-            <span className="text-mint-600">para copiar y pegar.</span>
-          </EditorialHeading>
-          <p className="mt-6 text-lg text-muted-foreground max-w-3xl">
-            Cada bloque cumple los criterios oficiales: chars dentro del límite, sin jerga,
-            URLs .gob.cl/.cl validadas, normativa literal del corpus FinLogic verificado en Pinecone.
+            <span className="text-mint-600">para copiar a Bendi.</span>
+          </h1>
+          <p className="mt-5 text-lg text-muted-foreground max-w-3xl">
+            Cada bloque cumple los criterios oficiales: chars dentro del límite, sin jerga, URLs .gob.cl/.cl validadas, normativa literal del corpus FinLogic verificado en Pinecone.
           </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <LegalPill variant="agent" size="sm">Ficha cívica · 6 campos</LegalPill>
-            <LegalPill variant="agent" size="sm">Entregable técnico · 5 campos</LegalPill>
-            <LegalPill variant="agent" size="sm">Pitch · 7 may</LegalPill>
-          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2 mb-10 sticky top-16 z-30 py-3 bg-background/80 backdrop-blur-md -mx-4 px-4 sm:-mx-6 sm:px-6 border-b border-border/40">
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                  active
+                    ? 'bg-foreground text-background shadow-soft'
+                    : 'bg-card border border-border text-foreground/70 hover:border-mint-300 hover:text-foreground'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+                <span className={`text-[10px] font-mono-editorial px-2 py-0.5 rounded-full ${
+                  active ? 'bg-mint-500/30 text-white' : 'bg-mint-50 text-mint-700'
+                }`}>
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* ═══ FICHA CÍVICA ═══ */}
-        <section id="civica" className="mb-20 scroll-mt-24">
-          <SectionHeader
-            eyebrow="01 · FICHA CÍVICA"
-            title="Pre-evaluación que lee Bendi"
-            description="6 campos obligatorios. Cada respuesta validada con datos reales del sistema y fuentes oficiales chilenas."
-          />
-
-          <div className="space-y-4">
-            <CopyField
-              label="Problema"
-              hint="Máx 300 caracteres · sin jerga · sin siglas sin explicar"
-              max={300}
-              value={PROBLEMA}
+        {activeTab === 'civica' && (
+          <section className="animate-fade-up">
+            <SectionHeader
+              eyebrow="01 · FICHA CÍVICA"
+              title="Pre-evaluación que lee Bendi"
+              description="6 campos obligatorios. Cada respuesta validada con datos reales del sistema y fuentes oficiales chilenas."
             />
 
-            <CopyField
-              label="Segmento ciudadano"
-              hint="Mínimo 2 dimensiones: edad + ubicación + condición socioeconómica"
-              value={SEGMENTO}
-            />
+            <div className="space-y-4">
+              <CopyField label="Problema" hint="Máx 300 caracteres · sin jerga · sin siglas sin explicar" max={300} value={PROBLEMA} />
+              <CopyField label="Segmento ciudadano" hint="Mínimo 2 dimensiones: edad + ubicación + condición socioeconómica" value={SEGMENTO} />
+              <CopyField label="Canal de adopción" hint="Canales concretos (no 'internet' o 'app móvil') + por qué llegan al segmento" value={CANAL} />
+              <CopyField label="Impacto cuantificado" hint="Números concretos con URL de fuente oficial .gob.cl / .cl" value={IMPACTO} />
+              <CopyField label="Fuentes regulatorias" hint="Mínimo 2 URLs oficiales · una por línea · 12 URLs reales del corpus FinLogic" value={FUENTES} mono />
+              <CopyField label="Normativa base (opcional)" hint="Bendi compara contra la Wiki Legal — citado literal evita marcado como alucinación" value={NORMATIVA} />
+            </div>
 
-            <CopyField
-              label="Canal de adopción"
-              hint="Canales concretos (no 'internet' o 'app móvil') + por qué llegan al segmento"
-              value={CANAL}
-            />
-
-            <CopyField
-              label="Impacto cuantificado"
-              hint="Números concretos con URL de fuente oficial .gob.cl / .cl"
-              value={IMPACTO}
-            />
-
-            <CopyField
-              label="Fuentes regulatorias"
-              hint="Mínimo 2 URLs oficiales · una por línea · 12 URLs reales del corpus FinLogic"
-              value={FUENTES}
-              mono
-            />
-
-            <CopyField
-              label="Normativa base (opcional)"
-              hint="Bendi compara contra la Wiki Legal — citado literal evita marcado como alucinación"
-              value={NORMATIVA}
-            />
-          </div>
-        </section>
+            <div className="mt-8 flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">Listo · pasa al siguiente</p>
+              <button onClick={() => setActiveTab('tecnica')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-mint-700 hover:text-mint-800">
+                Entregable técnico <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* ═══ FICHA TÉCNICA ═══ */}
-        <section id="tecnica" className="mb-20 scroll-mt-24">
-          <SectionHeader
-            eyebrow="02 · ENTREGABLE TÉCNICO"
-            title="Demo + system prompt + evidencias"
-            description="System prompt principal (Lya orquestadora) + herramientas Anthropic usadas + repo público."
-          />
-
-          <div className="space-y-4">
-            {/* Demo video */}
-            <div className="bg-card border border-orange-200 rounded-2xl p-5">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-4 h-4 text-orange-700" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-foreground">Demo video (3-5 min)</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Pendiente de grabación. Guion canónico, shot list y specs broadcast están en{' '}
-                    <Link to="/Demo" className="text-mint-700 hover:text-mint-800 font-semibold underline underline-offset-2">
-                      /Demo
-                    </Link>{' '}
-                    listos para ejecutar. Cuando subas la URL allí, también se registra automáticamente.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Screenshot consola Claude */}
-            <div className="bg-card border border-orange-200 rounded-2xl p-5">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                  <Cpu className="w-4 h-4 text-orange-700" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-foreground">Screenshot consola Anthropic</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Acción manual: ingresa a{' '}
-                    <a href="https://console.anthropic.com/dashboard" target="_blank" rel="noreferrer" className="text-mint-700 hover:text-mint-800 font-semibold inline-flex items-center gap-1">
-                      console.anthropic.com/dashboard <ExternalLink className="w-3 h-3" />
-                    </a>{' '}
-                    · filtra ventana 6-7 mayo 2026 · screenshot mostrando llamadas, modelo claude-sonnet-4-6 y tokens consumidos. Súbela al campo de Bendi.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* System prompt */}
-            <CopyField
-              label="System prompt principal (Lya · agente orquestador)"
-              hint="Máx 10.000 caracteres · pegar en el campo de texto de Bendi"
-              max={10000}
-              value={SYSTEM_PROMPT}
-              mono
+        {activeTab === 'tecnica' && (
+          <section className="animate-fade-up">
+            <SectionHeader
+              eyebrow="02 · ENTREGABLE TÉCNICO"
+              title="Demo + system prompt + evidencias"
+              description="System prompt principal (Lya orquestadora) + herramientas Anthropic usadas + repo público."
             />
 
-            {/* Repo */}
-            <CopyField
-              label="Repo público (suma bonus)"
-              hint="GitHub repo con código fuente FinLogic"
-              value={REPO_URL}
-              multiline={false}
-            />
-
-            {/* Herramientas */}
-            <div className="bg-card border border-border rounded-2xl overflow-hidden">
-              <div className="px-4 py-3 border-b border-border bg-muted/30">
-                <p className="font-semibold text-sm text-foreground">Herramientas Anthropic usadas</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Marca en Bendi solo las que dicen "✓ Usada"</p>
-              </div>
-              <div className="divide-y divide-border">
-                {HERRAMIENTAS.map((h) => (
-                  <div key={h.name} className="px-4 py-3 flex items-start gap-3">
-                    <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${
-                      h.used ? 'bg-mint-500 text-white' : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {h.used ? '✓' : '—'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold text-sm text-foreground">{h.name}</p>
-                        <span className={`text-[10px] font-mono-editorial px-2 py-0.5 rounded-full ${
-                          h.used ? 'bg-mint-50 text-mint-700' : 'bg-muted text-muted-foreground'
-                        }`}>
-                          {h.used ? 'USADA' : 'NO'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{h.why}</p>
-                    </div>
+            <div className="space-y-4">
+              <div className="bg-card border border-amber-200 rounded-2xl p-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <FileText className="w-4 h-4 text-amber-700" />
                   </div>
-                ))}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-foreground">Demo video (3-5 min)</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Pendiente de grabación. Guion canónico, shot list y specs broadcast están en{' '}
+                      <Link to="/Demo" className="text-mint-700 hover:text-mint-800 font-semibold underline underline-offset-2">/Demo</Link>{' '}
+                      listos para ejecutar. Cuando subas la URL allí, también queda registrada.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-card border border-amber-200 rounded-2xl p-5">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <Cpu className="w-4 h-4 text-amber-700" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-foreground">Screenshot consola Anthropic</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Acción manual: ingresa a{' '}
+                      <a href="https://console.anthropic.com/dashboard" target="_blank" rel="noreferrer" className="text-mint-700 hover:text-mint-800 font-semibold inline-flex items-center gap-1">
+                        console.anthropic.com/dashboard <ExternalLink className="w-3 h-3" />
+                      </a>{' '}
+                      · filtra ventana 6-7 mayo 2026 · screenshot mostrando llamadas, modelo claude-sonnet-4-6 y tokens consumidos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <CopyField
+                label="System prompt principal (Lya · agente orquestador)"
+                hint="Máx 10.000 caracteres · pegar en el campo de texto de Bendi"
+                max={10000}
+                value={SYSTEM_PROMPT}
+                mono
+              />
+
+              <CopyField label="Repo público (suma bonus)" hint="GitHub repo con código fuente FinLogic" value={REPO_URL} multiline={false} />
+
+              <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="px-4 py-3 border-b border-border bg-muted/30">
+                  <p className="font-semibold text-sm text-foreground">Herramientas Anthropic usadas</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Marca en Bendi solo las que dicen "✓ USADA"</p>
+                </div>
+                <div className="divide-y divide-border">
+                  {HERRAMIENTAS.map((h) => (
+                    <div key={h.name} className="px-4 py-3 flex items-start gap-3">
+                      <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${
+                        h.used ? 'bg-mint-500 text-white' : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {h.used ? '✓' : '—'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold text-sm text-foreground">{h.name}</p>
+                          <span className={`text-[10px] font-mono-editorial px-2 py-0.5 rounded-full ${
+                            h.used ? 'bg-mint-50 text-mint-700' : 'bg-muted text-muted-foreground'
+                          }`}>
+                            {h.used ? 'USADA' : 'NO'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{h.why}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+
+            <div className="mt-8 flex justify-between items-center">
+              <button onClick={() => setActiveTab('civica')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground">
+                <ChevronRight className="w-4 h-4 rotate-180" /> Ficha cívica
+              </button>
+              <button onClick={() => setActiveTab('pitch')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-mint-700 hover:text-mint-800">
+                Pitch 7 mayo <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* ═══ PITCH ═══ */}
-        <section id="pitch" className="mb-20 scroll-mt-24">
-          <SectionHeader
-            eyebrow="03 · PITCH EN VIVO"
-            title="7 de mayo 2026"
-            description="Material de apoyo listo para subir. PitchDeck completo navegable y optimizado para ronda en vivo."
-          />
+        {activeTab === 'pitch' && (
+          <section className="animate-fade-up">
+            <SectionHeader
+              eyebrow="03 · PITCH EN VIVO"
+              title="7 de mayo 2026"
+              description="Material de apoyo listo para subir. PitchDeck completo navegable y optimizado para ronda en vivo."
+            />
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Link to="/PitchDeck" className="bg-card border border-border rounded-2xl p-6 hover:border-mint-300 hover:shadow-soft transition-all group">
-              <div className="w-10 h-10 rounded-full bg-mint-100 flex items-center justify-center mb-4">
-                <Mic className="w-5 h-5 text-mint-700" />
-              </div>
-              <h3 className="font-display font-bold text-lg text-foreground">PitchDeck navegable</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                12 slides editorial Apple-style. Listo para presentar en vivo o exportar a PDF.
-              </p>
-              <p className="mt-4 text-xs font-mono-editorial text-mint-700 group-hover:underline">
-                /PitchDeck →
-              </p>
-            </Link>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { to: '/PitchDeck', icon: Mic, title: 'PitchDeck navegable', desc: '12 slides editorial Apple-style. Listo para presentar en vivo o exportar a PDF.' },
+                { to: '/Demo', icon: FileText, title: 'Workflow video demo', desc: 'Guion canónico 3 min, shot list, prompts y specs broadcast 4K/60fps.' },
+                { to: '/Rubrica', icon: ShieldCheck, title: 'Rúbrica auto-validada', desc: '12 criterios oficiales validados en vivo contra el sistema. 95+/100 técnico.' },
+                { to: '/Transparencia', icon: Cpu, title: 'AgentTrace público', desc: 'Cada respuesta de Lya con su pipeline IA auditable. Diferenciador único.' },
+              ].map((c) => {
+                const Icon = c.icon;
+                return (
+                  <Link key={c.to} to={c.to} className="bg-card border border-border rounded-2xl p-6 hover:border-mint-300 hover:shadow-soft transition-all group">
+                    <div className="w-10 h-10 rounded-full bg-mint-100 flex items-center justify-center mb-4">
+                      <Icon className="w-5 h-5 text-mint-700" />
+                    </div>
+                    <h3 className="font-display font-bold text-lg text-foreground">{c.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-2">{c.desc}</p>
+                    <p className="mt-4 text-xs font-mono-editorial text-mint-700 group-hover:underline">{c.to} →</p>
+                  </Link>
+                );
+              })}
+            </div>
 
-            <Link to="/Demo" className="bg-card border border-border rounded-2xl p-6 hover:border-mint-300 hover:shadow-soft transition-all group">
-              <div className="w-10 h-10 rounded-full bg-mint-100 flex items-center justify-center mb-4">
-                <FileText className="w-5 h-5 text-mint-700" />
-              </div>
-              <h3 className="font-display font-bold text-lg text-foreground">Workflow video demo</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                Guion canónico 3 min, shot list, prompts y specs broadcast 4K/60fps.
-              </p>
-              <p className="mt-4 text-xs font-mono-editorial text-mint-700 group-hover:underline">
-                /Demo →
-              </p>
-            </Link>
+            <div className="mt-8 flex justify-start">
+              <button onClick={() => setActiveTab('tecnica')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground">
+                <ChevronRight className="w-4 h-4 rotate-180" /> Entregable técnico
+              </button>
+            </div>
+          </section>
+        )}
 
-            <Link to="/Rubrica" className="bg-card border border-border rounded-2xl p-6 hover:border-mint-300 hover:shadow-soft transition-all group">
-              <div className="w-10 h-10 rounded-full bg-mint-100 flex items-center justify-center mb-4">
-                <ShieldCheck className="w-5 h-5 text-mint-700" />
-              </div>
-              <h3 className="font-display font-bold text-lg text-foreground">Rúbrica auto-validada</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                12 criterios oficiales validados en vivo contra el sistema. 95+/100 técnico.
-              </p>
-              <p className="mt-4 text-xs font-mono-editorial text-mint-700 group-hover:underline">
-                /Rubrica →
-              </p>
-            </Link>
-
-            <Link to="/Transparencia" className="bg-card border border-border rounded-2xl p-6 hover:border-mint-300 hover:shadow-soft transition-all group">
-              <div className="w-10 h-10 rounded-full bg-mint-100 flex items-center justify-center mb-4">
-                <Cpu className="w-5 h-5 text-mint-700" />
-              </div>
-              <h3 className="font-display font-bold text-lg text-foreground">AgentTrace público</h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                Cada respuesta de Lya con su pipeline IA auditable. Diferenciador único.
-              </p>
-              <p className="mt-4 text-xs font-mono-editorial text-mint-700 group-hover:underline">
-                /Transparencia →
-              </p>
-            </Link>
-          </div>
-        </section>
-
-        {/* Footer compacto */}
+        {/* Footer */}
         <div className="mt-16 pt-8 border-t border-border text-center">
           <p className="text-xs text-muted-foreground font-mono-editorial">
             FinLogic Solutions · Claude Impact Lab Chile 2026 · 6-7 mayo
