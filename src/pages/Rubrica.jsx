@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Award, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, Award, Sparkles, Loader2, ShieldCheck, ExternalLink } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/home/Logo';
 import RubricaGroup from '@/components/rubrica/RubricaGroup.jsx';
+
+// Fuentes oficiales del corpus Pinecone — verificables manualmente por el jurado
+const OFFICIAL_SOURCES = [
+  { law: 'Ley 20.009', org: 'CSIRT', url: 'https://www.bcn.cl/leychile/navegar?idNorma=235182', domain: 'bcn.cl' },
+  { law: 'Ley 19.496', org: 'SERNAC', url: 'https://www.bcn.cl/leychile/navegar?idNorma=61438', domain: 'bcn.cl' },
+  { law: 'Ley 20.555', org: 'SERNAC', url: 'https://www.bcn.cl/leychile/navegar?idNorma=1031940', domain: 'bcn.cl' },
+  { law: 'Ley 21.521', org: 'CMF', url: 'https://www.bcn.cl/leychile/navegar?idNorma=1192828', domain: 'bcn.cl' },
+  { law: 'Ley 21.713', org: 'SII', url: 'https://www.bcn.cl/leychile/navegar?idNorma=1208416', domain: 'bcn.cl' },
+  { law: 'Ley 21.719', org: 'BCN', url: 'https://www.bcn.cl/leychile/navegar?idNorma=1208091', domain: 'bcn.cl' },
+  { law: 'Ley 21.663', org: 'CSIRT', url: 'https://www.bcn.cl/leychile/navegar?idNorma=1204357', domain: 'bcn.cl' },
+  { law: 'NCG 502', org: 'CMF', url: 'https://www.cmfchile.cl/portal/principal/613/w3-propertyvalue-18564.html', domain: 'cmfchile.cl' },
+];
 
 /**
  * /Rubrica — Validación agentic de la rúbrica del jurado.
@@ -164,16 +176,24 @@ export default function Rubrica() {
         {/* Hero */}
         <div className="mb-10 animate-fade-up">
           <p className="text-xs font-mono-editorial text-mint-600 mb-2 tracking-widest uppercase">
-            Validación Agentic · Jurado Bendi
+            Validación Agentic · Jurado Bendi · 6-7 mayo 2026
           </p>
           <h1 className="font-editorial text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.05]">
-            Rúbrica FinLogic
+            Rúbrica FinLogic.
+            <span className="block text-mint-600 italic">Sin tomar nuestra palabra.</span>
           </h1>
-          <p className="mt-3 text-muted-foreground max-w-2xl">
-            Cada criterio se valida en vivo contra el sistema: Pinecone RAG,
-            pipeline <code className="font-mono-editorial text-xs px-1.5 py-0.5 bg-muted rounded">processConsultation</code>,
-            corpus AgentTrace y URLs oficiales chilenas.
+          <p className="mt-4 text-muted-foreground max-w-2xl leading-relaxed">
+            Cada criterio se valida en vivo contra el sistema productivo: Pinecone RAG (34 chunks normativos), pipeline <code className="font-mono-editorial text-xs px-1.5 py-0.5 bg-muted rounded">processConsultation</code>, corpus AgentTrace y URLs oficiales chilenas (<code className="font-mono-editorial text-xs px-1.5 py-0.5 bg-muted rounded">.gob.cl</code>, <code className="font-mono-editorial text-xs px-1.5 py-0.5 bg-muted rounded">bcn.cl</code>, <code className="font-mono-editorial text-xs px-1.5 py-0.5 bg-muted rounded">cmfchile.cl</code>).
           </p>
+
+          {/* Compromiso anti-alucinación */}
+          <div className="mt-6 inline-flex items-start gap-3 bg-mint-50 border border-mint-200 rounded-2xl px-4 py-3 max-w-2xl">
+            <ShieldCheck className="w-5 h-5 text-mint-700 flex-shrink-0 mt-0.5" />
+            <div className="text-xs text-mint-800 leading-relaxed">
+              <strong className="font-semibold block mb-1">Compromiso anti-alucinación.</strong>
+              Si un criterio no pasa, el botón muestra rojo y la evidencia exacta. Cero números inventados, cero leyes ficticias.
+            </div>
+          </div>
         </div>
 
         {/* Score card global */}
@@ -227,12 +247,51 @@ export default function Rubrica() {
           ))}
         </div>
 
+        {/* Fuentes oficiales — verificables uno por uno por el jurado */}
+        <section className="mt-16">
+          <div className="flex items-end justify-between gap-4 pb-2 border-b border-border mb-5">
+            <div>
+              <p className="text-xs font-mono-editorial text-mint-600 uppercase tracking-widest mb-1">
+                Auditoría · Fuentes en RAG
+              </p>
+              <h2 className="font-display text-2xl font-bold text-foreground tracking-tight">
+                Cada ley que Lya cita, existe.
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+                Estas son las URLs oficiales que indexamos en Pinecone. Click para verificar en BCN/CMF directamente.
+              </p>
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {OFFICIAL_SOURCES.map((s) => (
+              <a
+                key={s.law}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between gap-3 bg-card border border-border rounded-2xl px-4 py-3 hover:border-mint-300 hover:bg-mint-50/40 transition-colors"
+              >
+                <div className="min-w-0">
+                  <p className="font-mono-editorial text-xs text-mint-700 font-semibold">{s.law}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    {s.org} · {s.domain}
+                  </p>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-mint-600 flex-shrink-0" />
+              </a>
+            ))}
+          </div>
+        </section>
+
         <footer className="mt-16 text-center text-xs text-muted-foreground">
           <p>
             Validador agentic · usa{' '}
             <code className="font-mono-editorial px-1.5 py-0.5 bg-muted rounded">validateRubrica</code>{' '}
             como backend · cada test corre contra el sistema productivo en{' '}
             <code className="font-mono-editorial px-1.5 py-0.5 bg-muted rounded">finlogic.one</code>.
+          </p>
+          <p className="mt-2">
+            Equipo FinLogic · Gabriel S · Diego B2BYTES · Paula Garcés · Martín Campos · Claude Impact Lab Chile 2026
           </p>
         </footer>
       </main>

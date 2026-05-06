@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { ArrowRight, Eye } from 'lucide-react';
+import { ArrowRight, Eye, Award, Sparkles } from 'lucide-react';
 import Logo from '@/components/home/Logo';
 import Eyebrow from '@/components/editorial/Eyebrow';
 import LegalPill from '@/components/editorial/LegalPill';
@@ -386,6 +386,33 @@ export default function PitchDeck() {
             );
           })}
         </div>
+
+        {/* Acceso destacado a la rúbrica del jurado — validable en vivo */}
+        <Link
+          to="/Rubrica"
+          className="group mt-10 block bg-gradient-to-br from-mint-600 to-mint-700 hover:from-mint-700 hover:to-mint-700 text-white rounded-3xl p-7 sm:p-9 shadow-soft-lg transition-all hover:shadow-mint"
+        >
+          <div className="flex items-start justify-between gap-6 flex-wrap">
+            <div className="flex-1 min-w-[280px]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-mint-50 text-[11px] font-mono-editorial uppercase tracking-widest mb-4">
+                <Award className="w-3.5 h-3.5" />
+                Rúbrica jurado · Bendi
+              </div>
+              <h3 className="font-display tracking-tight text-2xl sm:text-3xl font-bold leading-tight">
+                Valida nuestra postulación<br />
+                <span className="text-mint-200">en vivo, sin tomar nuestra palabra.</span>
+              </h3>
+              <p className="mt-4 text-sm text-mint-50/85 max-w-2xl leading-relaxed">
+                Cada criterio (problema sin jerga, fuentes oficiales, cero alucinaciones, system prompts, JSON schemas, mensajes Claude) se valida agentic-amente contra Pinecone RAG, AgentTrace y URLs <code className="font-mono-editorial text-[11px] px-1.5 py-0.5 bg-white/10 rounded">.gob.cl</code> reales.
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-white text-mint-700 h-12 px-6 font-bold text-sm shadow-soft group-hover:scale-[1.03] transition-transform">
+              <Sparkles className="w-4 h-4" />
+              Abrir validador
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </div>
+        </Link>
       </SlideSection>
 
       {/* === SLIDE 12 — CIERRE === */}
