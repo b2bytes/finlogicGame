@@ -24,7 +24,7 @@ export default function CTASection() {
               </h2>
 
               <p className="mt-5 text-base md:text-lg text-white/85 max-w-xl leading-relaxed">
-                5 millones de chilenos no pueden entender sus derechos financieros. Nosotros los traducimos a acción. Sin abogado. Gratis.
+                5 millones de ciudadanos, 1.8 millones de pymes y cada fintech regulada — todos bajo el mismo motor IA. Sin abogado. Sin contador. Sin letra chica.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -41,6 +41,18 @@ export default function CTASection() {
                 >
                   <Mic className="w-4 h-4" />
                   Hablar por voz
+                </Link>
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/75">
+                <Link to="/Pyme" className="inline-flex items-center gap-1 hover:text-white transition-colors underline-offset-4 hover:underline">
+                  ¿Tienes pyme? Diagnóstico SII
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+                <span className="text-white/30">·</span>
+                <Link to="/api-compliance" className="inline-flex items-center gap-1 hover:text-white transition-colors underline-offset-4 hover:underline">
+                  ¿Eres fintech? Compliance API
+                  <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
 

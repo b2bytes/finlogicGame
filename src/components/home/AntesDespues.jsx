@@ -2,19 +2,19 @@ import React from 'react';
 import { X, Check, Clock, FileX, Languages, Wallet, ShieldOff } from 'lucide-react';
 
 const antes = [
-  { icon: Clock, text: 'Esperar 30 días una respuesta' },
-  { icon: FileX, text: 'Cartas que nadie entiende' },
-  { icon: Languages, text: 'Lenguaje técnico imposible' },
-  { icon: Wallet, text: 'Pagar abogado $200.000+' },
+  { icon: Clock, text: 'Esperar 30 días por una respuesta' },
+  { icon: FileX, text: 'Cartas y formularios incomprensibles' },
+  { icon: Languages, text: 'Tecnicismos legales y tributarios' },
+  { icon: Wallet, text: 'Pagar abogado o contador $200.000+' },
   { icon: ShieldOff, text: 'No saber tus derechos reales' },
 ];
 
 const despues = [
-  { text: 'Respuesta en menos de 60 segundos' },
-  { text: 'Carta lista para enviar al banco' },
+  { text: 'Respuesta accionable en menos de 60 segundos' },
+  { text: 'Documento listo: carta ARCO, reclamo SERNAC, F29 o denuncia CSIRT' },
   { text: 'En tu idioma. En tus palabras.' },
-  { text: 'Gratis. Siempre gratis para ciudadanos.' },
-  { text: '12 normativas chilenas trabajando para ti' },
+  { text: 'Gratis para ciudadanos. Para siempre.' },
+  { text: '12 leyes chilenas vivas trabajando para ti' },
 ];
 
 export default function AntesDespues() {
