@@ -6,11 +6,13 @@ import Logo from '@/components/home/Logo';
 import TraceCard from '@/components/transparencia/TraceCard';
 import TraceDetail from '@/components/transparencia/TraceDetail';
 import TransparenciaStats from '@/components/transparencia/TransparenciaStats';
+import ViewToggle from '@/components/transparencia/ViewToggle.jsx';
 
 export default function Transparencia() {
   const [traces, setTraces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTrace, setSelectedTrace] = useState(null);
+  const [viewMode, setViewMode] = useState('citizen');
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -60,6 +62,9 @@ export default function Transparencia() {
           <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
             Ningún modelo opaco. Aquí ves cómo el pipeline llegó a cada solución: qué leyes citó, cuánto tardó, qué modelo lo respondió y con qué nivel de confianza.
           </p>
+          <div className="mt-6">
+            <ViewToggle value={viewMode} onChange={setViewMode} />
+          </div>
         </div>
 
         {loading ? (
@@ -99,6 +104,7 @@ export default function Transparencia() {
 
       <TraceDetail
         trace={selectedTrace}
+        viewMode={viewMode}
         open={!!selectedTrace}
         onOpenChange={(open) => !open && setSelectedTrace(null)}
       />

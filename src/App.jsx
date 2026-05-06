@@ -15,6 +15,8 @@ import B2BAPIKeys from '@/pages/B2BAPIKeys';
 import Casos from '@/pages/Casos';
 import APICompliance from '@/pages/APICompliance';
 import Pyme from '@/pages/Pyme';
+import Pricing from '@/pages/Pricing';
+import FinancialDashboard from '@/pages/FinancialDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -51,6 +53,8 @@ const AuthenticatedApp = () => {
       <Route path="/Casos" element={<Casos />} />
       <Route path="/api-compliance" element={<APICompliance />} />
       <Route path="/Pyme" element={<Pyme />} />
+      <Route path="/Pricing" element={<Pricing />} />
+      <Route path="/FinancialDashboard" element={<FinancialDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

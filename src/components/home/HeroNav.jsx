@@ -29,6 +29,9 @@ export default function HeroNav() {
           <Link to="/api-compliance" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             API B2B
           </Link>
+          <Link to="/Pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Precios
+          </Link>
           <Link to="/Transparencia" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Transparencia
           </Link>
