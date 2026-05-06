@@ -101,6 +101,11 @@ Responde como Lya:`;
             type: 'string',
             enum: ['CMF', 'SERNAC', 'SII', 'CSIRT', 'BCN', 'multiple', 'ninguno'],
           },
+          detectedProfile: {
+            type: 'string',
+            enum: ['camila', 'don_luis', 'maria_jose', 'roberto', 'general'],
+            description: 'Perfil ciudadano detectado para Skin Adaptativo',
+          },
         },
         required: ['response', 'suggestedAction'],
       },
@@ -114,6 +119,7 @@ Responde como Lya:`;
       confidence: llmResponse.confidence ?? 0.85,
       suggestedAction: llmResponse.suggestedAction,
       regulatoryBody: llmResponse.regulatoryBody || 'ninguno',
+      detectedProfile: llmResponse.detectedProfile || userProfile || 'general',
       modulesUsed: detectedModules,
       latencyMs,
     });

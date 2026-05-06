@@ -11,6 +11,8 @@ import LyaVoiceControls from '@/components/lya/LyaVoiceControls';
 import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
 import { useLyaNavigator } from '@/lib/useLyaNavigator.jsx';
 import { useLyaActions } from '@/lib/useLyaActions.jsx';
+import { useSkin } from '@/lib/SkinContext.jsx';
+import SkinSwitcher from '@/components/skins/SkinSwitcher.jsx';
 
 const SUGERENCIAS = [
   '¿Cuánto vale la UF hoy?',
@@ -46,6 +48,7 @@ export default function AsistenteLya() {
   const voice = useLyaVoice();
   const { tryNavigate } = useLyaNavigator();
   const { tryAction } = useLyaActions();
+  const { setSkin } = useSkin();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -136,6 +139,10 @@ export default function AsistenteLya() {
       });
 
       const finalContent = data?.response || 'No pude procesar tu consulta.';
+      // Skin Adaptativo: aplica perfil detectado (no sobreescribe selección manual)
+      if (data?.detectedProfile) {
+        setSkin(data.detectedProfile, { auto: true });
+      }
       setMessages((prev) => [
         ...prev,
         {
@@ -176,9 +183,12 @@ export default function AsistenteLya() {
             <span className="hidden sm:inline">Volver</span>
           </Link>
           <Logo size="sm" />
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-mint-50 border border-mint-200">
-            <ShieldCheck className="w-3 h-3 text-mint-700" />
-            <span className="text-[10px] font-semibold text-mint-700">Ley 21.521</span>
+          <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-full bg-mint-50 border border-mint-200">
+              <ShieldCheck className="w-3 h-3 text-mint-700" />
+              <span className="text-[10px] font-semibold text-mint-700">Ley 21.521</span>
+            </div>
+            <SkinSwitcher />
           </div>
         </div>
       </header>
