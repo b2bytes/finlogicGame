@@ -89,16 +89,16 @@ export default function CapasFinLogic() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[220px] gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {CAPAS.map((c) => {
             const Icon = c.icon;
             return (
               <Link
                 key={c.n}
                 to={c.to}
-                className={`group relative rounded-[28px] border ${c.accent} ${c.span || ''} p-6 md:p-7 flex flex-col justify-between hover:-translate-y-1 hover:shadow-soft-lg transition-all duration-300`}
+                className={`group relative rounded-[28px] border ${c.accent} ${c.span || ''} p-6 md:p-7 flex flex-col hover:-translate-y-1 hover:shadow-soft-lg transition-all duration-300 min-h-[260px] overflow-hidden`}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between mb-6">
                   <div className={`w-11 h-11 rounded-2xl ${c.icon_bg} flex items-center justify-center`}>
                     <Icon className="w-5 h-5" strokeWidth={2.2} />
                   </div>
@@ -107,22 +107,41 @@ export default function CapasFinLogic() {
                   </span>
                 </div>
 
-                <div className="mt-6">
+                <div>
                   <p className={`text-[10px] font-bold tracking-wider uppercase mb-2 ${c.dark ? 'text-mint-300' : 'text-mint-700'}`}>
                     {c.eyebrow}
                   </p>
-                  <h3 className={`font-display ${c.big ? 'text-2xl md:text-3xl' : 'text-lg md:text-xl'} font-bold tracking-tight leading-tight ${c.dark ? 'text-background' : 'text-foreground'}`}>
+                  <h3 className={`font-display ${c.big ? 'text-3xl md:text-4xl lg:text-5xl' : 'text-lg md:text-xl'} font-bold tracking-tight leading-[1.05] ${c.dark ? 'text-background' : 'text-foreground'}`}>
                     {c.title}
                   </h3>
-                  <p className={`text-sm mt-2 leading-relaxed ${c.dark ? 'text-background/70' : 'text-muted-foreground'}`}>
+                  <p className={`${c.big ? 'text-base mt-3' : 'text-sm mt-2'} leading-relaxed ${c.dark ? 'text-background/70' : 'text-muted-foreground'}`}>
                     {c.desc}
                   </p>
 
-                  <div className={`mt-4 inline-flex items-center gap-1 text-xs font-semibold ${c.dark ? 'text-mint-300' : 'text-mint-700'} group-hover:gap-2 transition-all`}>
+                  <div className={`${c.big ? 'mt-5' : 'mt-4'} inline-flex items-center gap-1 ${c.big ? 'text-sm' : 'text-xs'} font-semibold ${c.dark ? 'text-mint-300' : 'text-mint-700'} group-hover:gap-2 transition-all`}>
                     {c.cta}
-                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    <ArrowUpRight className={c.big ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
                   </div>
                 </div>
+
+                {/* Decoración visual para la card grande Capa 1 — llena el espacio */}
+                {c.big && (
+                  <div aria-hidden className="hidden lg:block mt-auto pt-8">
+                    <div className="flex items-end justify-between gap-2">
+                      {[
+                        { h: 'h-16', label: 'Ley 21.521', tone: 'bg-mint-100 text-mint-700 border-mint-200' },
+                        { h: 'h-24', label: 'Ley 19.496', tone: 'bg-mint-200/60 text-mint-700 border-mint-300' },
+                        { h: 'h-20', label: 'Ley 21.713', tone: 'bg-mint-100 text-mint-700 border-mint-200' },
+                        { h: 'h-28', label: 'Ley 20.009', tone: 'bg-mint-300/70 text-mint-700 border-mint-300' },
+                        { h: 'h-16', label: 'Ley 21.719', tone: 'bg-mint-100 text-mint-700 border-mint-200' },
+                      ].map((b) => (
+                        <div key={b.label} className={`flex-1 min-w-0 ${b.h} rounded-2xl border ${b.tone} flex items-end justify-center pb-1.5 transition-all group-hover:scale-[1.02] group-hover:-translate-y-0.5`}>
+                          <span className="text-[8.5px] font-mono font-semibold whitespace-nowrap px-1">{b.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </Link>
             );
           })}

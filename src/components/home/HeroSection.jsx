@@ -39,7 +39,8 @@ export default function HeroSection() {
           <div className="animate-fade-up">
             {/* Eyebrow editorial deck v11 */}
             <Eyebrow size="md" className="mb-5">
-              Registrada CMF · Ley Fintech 21.521 · Pipeline IA en vivo
+              <span className="hidden sm:inline">Registrada CMF · Ley Fintech 21.521 · Pipeline IA en vivo</span>
+              <span className="sm:hidden">Registrada CMF · Pipeline IA en vivo</span>
             </Eyebrow>
 
             <h1 className="font-editorial text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-foreground leading-[0.98]">
@@ -66,7 +67,7 @@ export default function HeroSection() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && goToConsulta(query)}
-                placeholder="Cuéntanos qué pasa con tus finanzas…"
+                placeholder="Cuéntanos qué pasa…"
                 className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground/70 outline-none py-2 min-w-0"
               />
               <button
@@ -78,10 +79,10 @@ export default function HeroSection() {
               </button>
               <button
                 onClick={() => goToConsulta(query)}
-                className="h-10 px-3 sm:px-5 rounded-full bg-mint-600 hover:bg-mint-700 text-white text-xs sm:text-sm font-semibold transition-colors inline-flex items-center gap-1.5 flex-shrink-0"
+                aria-label="Consultar"
+                className="h-10 px-4 sm:px-5 rounded-full bg-mint-600 hover:bg-mint-700 text-white text-sm font-semibold transition-colors inline-flex items-center gap-1.5 flex-shrink-0"
               >
-                <span className="hidden xs:inline sm:inline">Consultar</span>
-                <span className="xs:hidden sm:hidden">Ir</span>
+                <span>Consultar</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

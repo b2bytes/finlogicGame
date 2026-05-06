@@ -26,12 +26,14 @@ export default function SFAUrgencyBanner() {
             <Calendar className="w-3.5 h-3.5 text-mint-300" />
           </div>
           <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-mint-300">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-mint-300 flex-shrink-0">
               SFA · {days} días
             </span>
-            <span className="text-xs sm:text-sm text-background/85 truncate">
-              Sistema de Finanzas Abiertas entra en vigencia el{' '}
-              <span className="font-semibold text-background">4 jul 2026</span>. Tu fintech tiene una ventana única.
+            <span className="text-xs sm:text-sm text-background/85">
+              <span className="hidden sm:inline">Sistema de Finanzas Abiertas entra en vigencia el </span>
+              <span className="sm:hidden">SFA vigente </span>
+              <span className="font-semibold text-background">4 jul 2026</span>
+              <span className="hidden md:inline">. Tu fintech tiene una ventana única.</span>
             </span>
           </div>
           <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-mint-300 group-hover:gap-2 transition-all flex-shrink-0">

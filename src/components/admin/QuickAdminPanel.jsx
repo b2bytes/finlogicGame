@@ -162,7 +162,7 @@ export default function QuickAdminPanel() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
-        className="fixed bottom-20 sm:bottom-5 left-4 sm:left-5 z-[60] h-10 sm:h-11 pl-3 pr-3 sm:pr-4 rounded-full bg-foreground/90 backdrop-blur-md text-background shadow-soft-lg flex items-center gap-1.5 sm:gap-2 text-xs font-semibold hover:bg-foreground transition-colors group border border-background/10"
+        className="fixed bottom-4 sm:bottom-5 left-4 sm:left-5 z-[60] h-9 sm:h-10 pl-2.5 pr-2.5 sm:pr-3.5 rounded-full bg-foreground/85 backdrop-blur-md text-background shadow-soft flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold hover:bg-foreground transition-colors group border border-background/10 opacity-70 hover:opacity-100"
         aria-label="Abrir panel del equipo (atajo Cmd+K)"
         title="Panel del equipo (⌘K)"
       >

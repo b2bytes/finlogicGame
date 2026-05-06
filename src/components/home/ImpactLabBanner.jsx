@@ -48,13 +48,14 @@ export default function ImpactLabBanner() {
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
           <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-mint-700">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-mint-700 flex-shrink-0">
               EN VIVO · Claude Impact Lab
             </span>
-            <span className="text-xs sm:text-sm text-foreground/85 truncate">
-              Estamos presentando FinLogic hoy.{' '}
+            <span className="text-xs sm:text-sm text-foreground/85">
+              <span className="hidden md:inline">Estamos presentando FinLogic hoy. </span>
               <span className="font-semibold text-foreground">
-                {stats.casos} consultas · score {stats.score}/100 · {stats.integraciones} integraciones cero mocks.
+                {stats.casos} consultas · {stats.score}/100
+                <span className="hidden lg:inline"> · {stats.integraciones} integraciones cero mocks</span>
               </span>
             </span>
           </div>
