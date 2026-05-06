@@ -1,6 +1,9 @@
-// lyaKnowledgeQuery — Lya conversacional con RAG Pinecone.
-// Mandato §3 Lya Integration · ahora compartiendo el mismo corpus que processConsultation.
-// Retorna { response, sources, confidence, suggestedAction }.
+// lyaKnowledgeQuery — Lya conversacional con RAG Pinecone + verificador anti-alucinación.
+// Mandato §3 Lya Integration · pipeline robusto en 3 capas:
+//   1. RAG: recupera chunks normativos verificados de Pinecone
+//   2. LLM: genera respuesta SOLO sobre el contexto RAG (grounded generation)
+//   3. Verificador: audita citas legales y detecta alucinaciones antes de responder
+// Retorna { response, sources, confidence, verifierScore, hallucinationRisk, suggestedAction }.
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
@@ -19,6 +22,16 @@ const NORMATIVA_MAP = {
   csirt: 'CSIRT · alertas · patrones de fraude',
 };
 
+// Whitelist de leyes/normativas conocidas y verificadas en el corpus FinLogic.
+// Si Lya menciona una ley fuera de este set Y no está en los chunks RAG → es alucinación.
+const KNOWN_LAWS = new Set([
+  '18.010', '19.496', '20.009', '20.318', '20.555', '21.234', '21.398',
+  '21.521', '21.663', '21.713', '21.719', // Leyes
+  'NCG 461', 'NCG 502', // CMF
+  'F22', 'F29', // SII
+  'LIR', 'LPC', 'CP', // Códigos
+]);
+
 const SISTEMA_LYA = `Eres Lya, asistente IA de FinLogic. Hablas como una amiga abogada chilena: cálida, directa, sin tecnicismos.
 
 CÓMO HABLAS:
@@ -27,8 +40,12 @@ CÓMO HABLAS:
 - Cero burocracia. Nada de "el suscrito", "se hace presente", "la normativa señala".
 - Las leyes se mencionan al final como respaldo, no al principio.
 
-REGLAS DURAS:
-- NUNCA inventes artículos legales. Solo cita lo que está en el CONTEXTO RAG.
+REGLAS DURAS ANTI-ALUCINACIÓN:
+- ⚠️ SOLO puedes citar leyes/artículos que aparezcan EXPLÍCITAMENTE en el CONTEXTO RAG provisto.
+- ⚠️ Si el contexto RAG está vacío o no cubre la consulta, NO inventes. Di: "Para darte la cita exacta necesito verificar X en [organismo]".
+- ⚠️ NUNCA inventes números de artículos, montos UF/UTM, tasas TMC ni plazos.
+- ⚠️ NUNCA recomiendes instituciones financieras específicas (bancos, AFP, aseguradoras).
+- ⚠️ Si no estás 100% seguro de la ruta exacta en un portal oficial, di "ingresa a sii.cl/sernac.cl con tu clave y busca la sección X".
 - Termina SIEMPRE con UN solo paso concreto que pueda hacer hoy.
 - Máximo 220 palabras (texto). 800 caracteres (voz).
 
@@ -47,7 +64,136 @@ La idea central en lenguaje simple. Una frase. **Negritas** en lo importante.
 **Plazo**
 Una línea con el plazo legal si aplica (ej: "Tienes 5 días hábiles desde hoy").
 
-_Ley 20.009 · Ley 19.496_  ← solo al final, en cursiva, separadas por ·`;
+_Ley 20.009 · Ley 19.496_  ← solo al final, en cursiva, separadas por · (SOLO leyes que estén en el RAG)`;
+
+// ─── Verificador anti-alucinación ─────────────────────────────────────────
+// Extrae las leyes citadas en la respuesta y las contrasta con:
+//   1. Las leyes presentes en los chunks RAG (verificadas)
+//   2. La whitelist KNOWN_LAWS (conocidas pero no en RAG → riesgo medio)
+//   3. Si una ley no está en ninguna → ALUCINACIÓN (riesgo alto)
+function extractCitedLaws(text) {
+  if (!text) return [];
+  const found = new Set();
+  // Patrones: "Ley 21.521", "Ley N° 19.496", "Ley Nº 20.009"
+  const lawPattern = /Ley\s+(?:N[°º]\s*)?(\d{1,2}\.\d{3})/gi;
+  // Patrones: "NCG 502", "NCG N° 461"
+  const ncgPattern = /NCG\s+(?:N[°º]\s*)?(\d{2,4})/gi;
+  // Artículos: "Art. 16", "Artículo 5°"
+  const artPattern = /(?:Art\.?|Artículo)\s*(\d+)/gi;
+
+  let m;
+  while ((m = lawPattern.exec(text)) !== null) found.add(m[1]);
+  while ((m = ncgPattern.exec(text)) !== null) found.add(`NCG ${m[1]}`);
+  while ((m = artPattern.exec(text)) !== null) found.add(`Art. ${m[1]}`);
+  return [...found];
+}
+
+function verifyCitations(responseText, ragChunks) {
+  const cited = extractCitedLaws(responseText);
+  if (cited.length === 0) {
+    return { verifierScore: 90, hallucinationRisk: 'none', verified: [], unverified: [], cited: [] };
+  }
+
+  // Construir set de leyes verificadas desde RAG (lawReference + content)
+  const ragText = ragChunks.map(c => `${c.lawReference || ''} ${c.title || ''} ${c.content || ''}`).join(' ');
+  const verified = [];
+  const unverified = [];
+  const articles = cited.filter(c => c.startsWith('Art.'));
+  const lawNumbers = cited.filter(c => !c.startsWith('Art.'));
+
+  for (const law of lawNumbers) {
+    const inRag = ragText.includes(law);
+    const inWhitelist = KNOWN_LAWS.has(law);
+    // ESTRICTO: si RAG tiene contenido pero la ley no aparece allí, es no-verificada
+    // aunque esté en whitelist (el RAG es la fuente de verdad para esta consulta).
+    if (inRag) verified.push(law);
+    else if (inWhitelist && ragChunks.length === 0) verified.push(law); // RAG vacío + whitelist = ok con riesgo low
+    else unverified.push(law);
+  }
+  // Artículos: validar que aparezcan literalmente en algún chunk
+  for (const art of articles) {
+    if (ragText.includes(art)) verified.push(art);
+    else unverified.push(art);
+  }
+
+  let hallucinationRisk = 'none';
+  let verifierScore = 100;
+  if (unverified.length > 0) {
+    hallucinationRisk = unverified.length >= 2 ? 'high' : 'medium';
+    verifierScore = Math.max(40, 100 - unverified.length * 25);
+  } else if (verified.length > 0 && ragChunks.length === 0) {
+    // Citó leyes pero RAG vacío → confiamos en whitelist pero advertimos
+    hallucinationRisk = 'low';
+    verifierScore = 75;
+  }
+
+  return { verifierScore, hallucinationRisk, verified, unverified, cited };
+}
+
+// Detecta jerga prohibida en respuestas (debe ser ciudadana)
+function detectJargon(text) {
+  if (!text) return [];
+  const jargon = [
+    'el suscrito', 'se hace presente', 'la normativa señala',
+    'tenga a bien', 'cúmplase', 'sírvase', 'por la presente',
+  ];
+  return jargon.filter(j => text.toLowerCase().includes(j));
+}
+
+// ─── RAG INLINE · Pinecone direct (evita overhead + bug de invoke 403) ────
+const PINECONE_INDEX = 'finlogic-knowledge';
+const PINECONE_NAMESPACE = 'finlogic-prod';
+const PINECONE_EMBED_MODEL = 'multilingual-e5-large';
+let _cachedHost = null;
+
+async function pineconeRagSearch(query, topK = 5, minScore = 0.3) {
+  const apiKey = Deno.env.get('PINECONE_API_KEY');
+  if (!apiKey) return [];
+  try {
+    if (!_cachedHost) {
+      const idxRes = await fetch(`https://api.pinecone.io/indexes/${PINECONE_INDEX}`, {
+        headers: { 'Api-Key': apiKey, 'X-Pinecone-API-Version': '2024-10' },
+      });
+      if (!idxRes.ok) return [];
+      const idxData = await idxRes.json();
+      _cachedHost = idxData.host;
+    }
+    const embedRes = await fetch('https://api.pinecone.io/embed', {
+      method: 'POST',
+      headers: { 'Api-Key': apiKey, 'Content-Type': 'application/json', 'X-Pinecone-API-Version': '2024-10' },
+      body: JSON.stringify({
+        model: PINECONE_EMBED_MODEL,
+        inputs: [{ text: query.substring(0, 4000) }],
+        parameters: { input_type: 'query', truncate: 'END' },
+      }),
+    });
+    if (!embedRes.ok) return [];
+    const embedData = await embedRes.json();
+    const vector = embedData.data[0].values;
+    const qRes = await fetch(`https://${_cachedHost}/query`, {
+      method: 'POST',
+      headers: { 'Api-Key': apiKey, 'Content-Type': 'application/json', 'X-Pinecone-API-Version': '2024-10' },
+      body: JSON.stringify({ namespace: PINECONE_NAMESPACE, vector, topK: Math.min(topK, 20), includeMetadata: true }),
+    });
+    if (!qRes.ok) return [];
+    const qData = await qRes.json();
+    return (qData.matches || [])
+      .filter(m => m.score >= minScore)
+      .map(m => ({
+        id: m.id,
+        score: m.score,
+        title: m.metadata?.title || '',
+        content: m.metadata?.content || '',
+        lawReference: m.metadata?.lawReference || '',
+        module: m.metadata?.module || '',
+        regulatoryBody: m.metadata?.regulatoryBody || '',
+        sourceUrl: m.metadata?.sourceUrl || '',
+      }));
+  } catch (e) {
+    console.error('pineconeRagSearch failed:', e.message);
+    return [];
+  }
+}
 
 Deno.serve(async (req) => {
   try {
@@ -64,24 +210,13 @@ Deno.serve(async (req) => {
 
     const startTime = Date.now();
 
-    // ─── RAG · Pinecone (compartido con processConsultation) ─────────────
-    let ragChunks = [];
-    let ragLatencyMs = 0;
+    // ─── RAG · Pinecone INLINE (evita 403 de invoke entre funciones) ─────
     const ragStart = Date.now();
-    try {
-      const ragRes = await base44.functions.invoke('vectorSearch', {
-        query,
-        topK: 4,
-        minScore: 0.25,
-        diversify: true,
-      });
-      if (ragRes.data?.success) ragChunks = ragRes.data.chunks || [];
-    } catch (e) {
-      console.error('Lya RAG failed:', e.message);
-    }
-    ragLatencyMs = Date.now() - ragStart;
+    const ragChunks = await pineconeRagSearch(query, 5, 0.3);
+    const ragLatencyMs = Date.now() - ragStart;
+    console.log(`[Lya RAG] chunks=${ragChunks.length} latency=${ragLatencyMs}ms`);
 
-    // Si RAG vacío, fallback heurístico para mantener experiencia
+    // Heurística de módulos para fallback (si RAG vacío)
     let modulesUsed = ragChunks.map(c => c.module).filter(Boolean);
     if (modulesUsed.length === 0) {
       const queryLower = query.toLowerCase();
@@ -93,7 +228,7 @@ Deno.serve(async (req) => {
       if (/cyber|ciber|phishing|csirt/.test(queryLower)) modulesUsed.push('csirt');
       if (/sii|impuesto|tribut|iva|f29/.test(queryLower)) modulesUsed.push('ley_21713_tributaria');
       if (/cripto|bitcoin|ethereum/.test(queryLower)) modulesUsed.push('tributacion_cripto');
-      if (modulesUsed.length === 0) modulesUsed = ['ley_19496_sernac', 'ley_fintech_21521'];
+      if (modulesUsed.length === 0) modulesUsed = ['ley_19496_sernac'];
     }
     modulesUsed = [...new Set(modulesUsed)];
 
@@ -101,9 +236,10 @@ Deno.serve(async (req) => {
       ? ragChunks.map(c => `${c.lawReference} — ${c.title}`)
       : modulesUsed.map(k => NORMATIVA_MAP[k]).filter(Boolean);
 
+    // ─── Construcción del CONTEXTO RAG con fuentes claramente delimitadas
     const ragContext = ragChunks.length > 0
-      ? `\n\n═══ NORMATIVA VERIFICADA (corpus FinLogic) ═══\n${ragChunks.map((c, i) => `[${i + 1}] ${c.lawReference} — ${c.title}\n${c.content}`).join('\n\n')}\n═══════════════════════════════════════════════════════`
-      : `\n\nNORMATIVA RELEVANTE DETECTADA: ${modulesUsed.map(k => NORMATIVA_MAP[k]).filter(Boolean).join(' · ')}`;
+      ? `\n\n═══ NORMATIVA VERIFICADA (corpus FinLogic · ÚNICA fuente válida para citar) ═══\n${ragChunks.map((c, i) => `[${i + 1}] ${c.lawReference} — ${c.title}\n${c.content}`).join('\n\n')}\n═══════════════════════════════════════════════════════\n\nIMPORTANTE: SOLO puedes citar leyes/artículos que aparezcan ARRIBA. Si la consulta requiere normativa que no está en este contexto, dilo honestamente y deriva al organismo correspondiente.`
+      : `\n\n⚠️ SIN CONTEXTO RAG DISPONIBLE\nNo cites artículos específicos ni números de leyes. Da orientación general y deriva al organismo competente (sernac.cl, cmfchile.cl, sii.cl, csirt.gob.cl) para verificación normativa exacta.`;
 
     // Profile-tuned tone
     const profileTone = {
@@ -152,12 +288,34 @@ Responde como Lya:`;
       },
     });
 
+    let responseText = llmResponse.response || '';
+
+    // ─── VERIFICADOR ANTI-ALUCINACIÓN ────────────────────────────────────
+    const verification = verifyCitations(responseText, ragChunks);
+    const jargonDetected = detectJargon(responseText);
+
+    // Si hay riesgo ALTO de alucinación, agregar disclaimer transparente
+    if (verification.hallucinationRisk === 'high') {
+      console.warn(`[Lya] Alucinación detectada — leyes no verificadas: ${verification.unverified.join(', ')}`);
+      responseText += `\n\n_⚠️ Algunas referencias legales en esta respuesta no pude verificarlas en mi corpus. Te recomiendo confirmarlas en ${
+        llmResponse.regulatoryBody === 'SII' ? 'sii.cl' :
+        llmResponse.regulatoryBody === 'CMF' ? 'cmfchile.cl' :
+        llmResponse.regulatoryBody === 'CSIRT' ? 'csirt.gob.cl' :
+        'sernac.cl'
+      } o leychile.cl antes de actuar._`;
+    }
+
     const latencyMs = Date.now() - startTime;
 
     return Response.json({
-      response: llmResponse.response,
+      response: responseText,
       sources,
-      confidence: llmResponse.confidence ?? (ragChunks.length > 0 ? 0.92 : 0.78),
+      confidence: llmResponse.confidence ?? (ragChunks.length > 0 ? 0.92 : 0.7),
+      verifierScore: verification.verifierScore,
+      hallucinationRisk: verification.hallucinationRisk,
+      citationsVerified: verification.verified,
+      citationsUnverified: verification.unverified,
+      jargonDetected,
       suggestedAction: llmResponse.suggestedAction,
       regulatoryBody: llmResponse.regulatoryBody || 'ninguno',
       detectedProfile: llmResponse.detectedProfile || userProfile || 'general',
