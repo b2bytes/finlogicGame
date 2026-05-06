@@ -60,6 +60,12 @@ export default class ErrorBoundary extends React.Component {
   render() {
     if (!this.state.hasError) return this.props.children;
 
+    // Variante silenciosa: widgets no críticos (chat, banners, toasts).
+    // Si fallan, simplemente NO se renderizan — la app principal sigue viva.
+    if (this.props.variant === 'silent') {
+      return null;
+    }
+
     // Variante compacta para widgets / secciones (no toma full screen)
     if (this.props.variant === 'inline') {
       return (

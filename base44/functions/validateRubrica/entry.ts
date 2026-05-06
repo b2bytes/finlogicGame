@@ -131,8 +131,9 @@ async function runCriterion(base44, criterionId) {
       const allUrls = new Set();
       for (const q of probeQueries) {
         try {
-          const r = await base44.functions.invoke('vectorSearch', { query: q, topK: 5 });
-          (r.data?.chunks || []).forEach((c) => {
+          const r = await base44.asServiceRole.functions.invoke('vectorSearch', { query: q, topK: 5 });
+          const chunks = r?.data?.chunks || r?.chunks || [];
+          chunks.forEach((c) => {
             if (c.sourceUrl) allUrls.add(c.sourceUrl);
           });
         } catch (_) {}
@@ -154,15 +155,16 @@ async function runCriterion(base44, criterionId) {
       let lawsCitedInResponse = [];
       let lawsInRag = new Set();
       try {
-        const consultation = await base44.functions.invoke('processConsultation', {
+        const consultation = await base44.asServiceRole.functions.invoke('processConsultation', {
           query: testQuery,
         });
-        lawsCitedInResponse = consultation.data?.response?.lawsCited || [];
-        const ragRes = await base44.functions.invoke('vectorSearch', {
+        lawsCitedInResponse = consultation?.data?.response?.lawsCited || consultation?.response?.lawsCited || [];
+        const ragRes = await base44.asServiceRole.functions.invoke('vectorSearch', {
           query: testQuery,
           topK: 5,
         });
-        (ragRes.data?.chunks || []).forEach((c) => {
+        const ragChunks = ragRes?.data?.chunks || ragRes?.chunks || [];
+        ragChunks.forEach((c) => {
           if (c.lawReference) lawsInRag.add(c.lawReference);
         });
       } catch (e) {

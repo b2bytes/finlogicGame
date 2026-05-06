@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { AccessibilityProvider } from '@/lib/AccessibilityContext';
@@ -29,16 +29,17 @@ import SystemMetrics from '@/pages/SystemMetrics';
 import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
 import LyaChatWidget from '@/components/lya/LyaChatWidget';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import SkinAutoDetectToast from '@/components/skins/SkinAutoDetectToast.jsx';
 import EmbedLya from '@/pages/EmbedLya';
 import Diseno from '@/pages/Diseno';
-import Rubrica from '@/pages/Rubrica';
 import ScrollToTop from '@/components/ScrollToTop';
 import PWAInstallBanner from '@/components/pwa/PWAInstallBanner';
 import QuickAdminPanel from '@/components/admin/QuickAdminPanel';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const location = useLocation();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -60,44 +61,49 @@ const AuthenticatedApp = () => {
     }
   }
 
-  // Render the main app
+  // Render the main app — cada zona aislada en su propio ErrorBoundary
+  // para que un crash en una página NO tumbe el chat ni el resto del shell.
   return (
     <>
     <ScrollToTop />
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/Consulta" element={<Consulta />} />
-      <Route path="/Transparencia" element={<Transparencia />} />
-      <Route path="/MisCasos" element={<MisCasos />} />
-      <Route path="/Soporte" element={<Soporte />} />
-      <Route path="/B2B/APIKeys" element={<B2BAPIKeys />} />
-      <Route path="/Casos" element={<Casos />} />
-      <Route path="/CasosResueltos" element={<Casos />} />
-      <Route path="/api-compliance" element={<APICompliance />} />
-      <Route path="/Pyme" element={<Pyme />} />
-      <Route path="/Pricing" element={<Pricing />} />
-      <Route path="/FinancialDashboard" element={<FinancialDashboard />} />
-      <Route path="/Marca" element={<Marca />} />
-      <Route path="/MisCasos/:id" element={<CasoDetalle />} />
-      <Route path="/PitchDeck" element={<PitchDeck />} />
-      <Route path="/OperacionesDashboard" element={<OperacionesDashboard />} />
-      <Route path="/Embajadores" element={<Embajadores />} />
-      <Route path="/Insights" element={<Insights />} />
-      <Route path="/Pro" element={<Pro />} />
-      <Route path="/Admin/SystemMetrics" element={<SystemMetrics />} />
-      <Route path="/AsistenteLya" element={<AsistenteLya />} />
-      <Route path="/Admin/ContentStudio" element={<ContentStudio />} />
-      <Route path="/Embed/Lya" element={<EmbedLya />} />
-      <Route path="/Diseno" element={<Diseno />} />
-      <Route path="/Diseño" element={<Diseno />} />
-      <Route path="/Rubrica" element={<Rubrica />} />
-      <Route path="/Rúbrica" element={<Rubrica />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
-    <LyaChatWidget />
-    <SkinAutoDetectToast />
-    <PWAInstallBanner />
-    <QuickAdminPanel />
+    <ErrorBoundary scope="routes" key={location?.pathname || 'routes'}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/Consulta" element={<Consulta />} />
+        <Route path="/Transparencia" element={<Transparencia />} />
+        <Route path="/MisCasos" element={<MisCasos />} />
+        <Route path="/Soporte" element={<Soporte />} />
+        <Route path="/B2B/APIKeys" element={<B2BAPIKeys />} />
+        <Route path="/Casos" element={<Casos />} />
+        <Route path="/CasosResueltos" element={<Casos />} />
+        <Route path="/api-compliance" element={<APICompliance />} />
+        <Route path="/Pyme" element={<Pyme />} />
+        <Route path="/Pricing" element={<Pricing />} />
+        <Route path="/FinancialDashboard" element={<FinancialDashboard />} />
+        <Route path="/Marca" element={<Marca />} />
+        <Route path="/MisCasos/:id" element={<CasoDetalle />} />
+        <Route path="/PitchDeck" element={<PitchDeck />} />
+        <Route path="/OperacionesDashboard" element={<OperacionesDashboard />} />
+        <Route path="/Embajadores" element={<Embajadores />} />
+        <Route path="/Insights" element={<Insights />} />
+        <Route path="/Pro" element={<Pro />} />
+        <Route path="/Admin/SystemMetrics" element={<SystemMetrics />} />
+        <Route path="/AsistenteLya" element={<AsistenteLya />} />
+        <Route path="/Admin/ContentStudio" element={<ContentStudio />} />
+        <Route path="/Embed/Lya" element={<EmbedLya />} />
+        <Route path="/Diseno" element={<Diseno />} />
+        <Route path="/Diseño" element={<Diseno />} />
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+    </ErrorBoundary>
+    <ErrorBoundary scope="lya-widget" variant="silent">
+      <LyaChatWidget />
+    </ErrorBoundary>
+    <ErrorBoundary scope="shell" variant="silent">
+      <SkinAutoDetectToast />
+      <PWAInstallBanner />
+      <QuickAdminPanel />
+    </ErrorBoundary>
     </>
   );
 };
@@ -106,18 +112,20 @@ const AuthenticatedApp = () => {
 function App() {
 
   return (
-    <AuthProvider>
-      <AccessibilityProvider>
-        <SkinProvider>
-          <QueryClientProvider client={queryClientInstance}>
-            <Router>
-              <AuthenticatedApp />
-            </Router>
-            <Toaster />
-          </QueryClientProvider>
-        </SkinProvider>
-      </AccessibilityProvider>
-    </AuthProvider>
+    <ErrorBoundary scope="root">
+      <AuthProvider>
+        <AccessibilityProvider>
+          <SkinProvider>
+            <QueryClientProvider client={queryClientInstance}>
+              <Router>
+                <AuthenticatedApp />
+              </Router>
+              <Toaster />
+            </QueryClientProvider>
+          </SkinProvider>
+        </AccessibilityProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
 

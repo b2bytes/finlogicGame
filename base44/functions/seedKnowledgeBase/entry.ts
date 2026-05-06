@@ -523,6 +523,7 @@ Deno.serve(async (req) => {
       indexName: INDEX_NAME,
       indexHost: host,
       indexCreated: created,
+      purged,
       namespace: NAMESPACE,
       embedModel: EMBED_MODEL,
       dimension: EMBED_DIM,
