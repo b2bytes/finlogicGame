@@ -45,6 +45,7 @@ export default function AsistenteLya() {
   const [handsFree, setHandsFree] = useState(false);
   const scrollRef = useRef(null);
   const handsFreeRef = useRef(false);
+  const sessionIdRef = useRef(null);
 
   const voice = useLyaVoice();
   const { tryNavigate } = useLyaNavigator();
@@ -133,11 +134,24 @@ export default function AsistenteLya() {
       }
 
       // 2. Pipeline normativo completo
+      // Historial: últimos turnos (user + assistant) para que Lya entienda follow-ups.
+      // sessionId: persistido entre turnos para agrupar la conversación en /Transparencia.
+      const priorHistory = messages
+        .filter((m) => (m.role === 'user' || m.role === 'assistant') && m.content)
+        .slice(-6)
+        .map((m) => ({ role: m.role, content: m.content }));
+
       const { data } = await base44.functions.invoke('lyaKnowledgeQuery', {
         query: q,
         mode: 'text',
         userProfile: 'general',
+        history: priorHistory,
+        sessionId: sessionIdRef.current || undefined,
       });
+
+      if (data?.sessionId && !sessionIdRef.current) {
+        sessionIdRef.current = data.sessionId;
+      }
 
       const finalContent = data?.response || 'No pude procesar tu consulta.';
       // Skin Adaptativo: aplica perfil detectado (no sobreescribe selección manual)
