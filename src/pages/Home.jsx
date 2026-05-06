@@ -24,7 +24,6 @@ export default function Home() {
   useReferralCapture();
   return (
     <div className="min-h-screen bg-background">
-      <ImpactLabBanner />
       <HeroNav />
       <main>
         <ImpactLabBanner />
