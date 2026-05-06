@@ -3,23 +3,21 @@ import { useEffect, useState, useCallback } from 'react';
 /**
  * usePWA — Maneja el ciclo PWA: registro de service worker, prompt de instalación
  * y permisos de notificaciones (Web Notifications API local + push si hay subscripción).
- *
- * Nota: las push remotas requieren VAPID keys del servidor. Aquí soportamos:
- *  · Notificaciones LOCALES (registration.showNotification) → siempre disponibles
- *  · Suscripción push remota → opt-in vía requestPushSubscription(vapidKey)
  */
 export function usePWA() {
   const [isInstallable, setIsInstallable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [installPrompt, setInstallPrompt] = useState(null);
   const [notifPermission, setNotifPermission] = useState(
-    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+    typeof window !== 'undefined' && 'Notification' in window
+      ? Notification.permission
+      : 'default'
   );
   const [swReady, setSwReady] = useState(false);
 
   // Registro del Service Worker
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
     navigator.serviceWorker
       .register('/sw.js', { scope: '/' })
       .then(() => setSwReady(true))
@@ -28,6 +26,7 @@ export function usePWA() {
 
   // Detectar standalone (instalada)
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const standalone =
       window.matchMedia?.('(display-mode: standalone)').matches ||
       window.navigator.standalone === true;
@@ -36,6 +35,7 @@ export function usePWA() {
 
   // Capturar el evento beforeinstallprompt (Chrome/Edge/Android)
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const onPrompt = (e) => {
       e.preventDefault();
       setInstallPrompt(e);
@@ -63,12 +63,10 @@ export function usePWA() {
     return choice;
   }, [installPrompt]);
 
-  // Pedir permiso de notificaciones
   const requestNotifications = useCallback(async () => {
-    if (!('Notification' in window)) return 'unsupported';
+    if (typeof window === 'undefined' || !('Notification' in window)) return 'unsupported';
     const result = await Notification.requestPermission();
     setNotifPermission(result);
-    // Notificación de bienvenida si concede
     if (result === 'granted' && 'serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.ready;
       reg.showNotification('🎉 Notificaciones activadas', {
@@ -80,8 +78,8 @@ export function usePWA() {
     return result;
   }, []);
 
-  // Disparar notificación local (útil para alertas in-app, ej: plazo próximo)
   const showLocalNotification = useCallback(async (title, options = {}) => {
+    if (typeof window === 'undefined' || !('Notification' in window)) return false;
     if (Notification.permission !== 'granted') return false;
     if (!('serviceWorker' in navigator)) return false;
     const reg = await navigator.serviceWorker.ready;
