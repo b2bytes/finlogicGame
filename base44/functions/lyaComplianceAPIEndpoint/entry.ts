@@ -36,11 +36,21 @@ Deno.serve(async (req) => {
 
     // Buscar la key por hash
     const keyHash = await sha256(apiKey);
+    console.log('[lya-api] hash computed:', keyHash, 'len:', keyHash.length);
     const matches = await base44.asServiceRole.entities.ComplianceAPIKey.filter({ apiKeyHash: keyHash });
+    console.log('[lya-api] matches found:', matches?.length || 0);
     const keyRecord = matches?.[0];
 
     if (!keyRecord) {
-      return Response.json({ error: 'API key inválida', code: 'INVALID_KEY' }, { status: 401 });
+      // Fallback: list all & match in memory (por si el filter por hash no indexa)
+      const allKeys = await base44.asServiceRole.entities.ComplianceAPIKey.list('-created_date', 200);
+      console.log('[lya-api] total keys in DB:', allKeys?.length || 0);
+      const fallback = (allKeys || []).find(k => k.apiKeyHash === keyHash);
+      if (!fallback) {
+        return Response.json({ error: 'API key inválida', code: 'INVALID_KEY' }, { status: 401 });
+      }
+      // continuar con fallback
+      return await processWithRecord(base44, fallback, endpoint, payload);
     }
     if (keyRecord.status !== 'active' && keyRecord.status !== 'trialing') {
       return Response.json({ error: `API key ${keyRecord.status}`, code: 'KEY_DISABLED' }, { status: 403 });
@@ -52,27 +62,30 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Límite mensual alcanzado', code: 'QUOTA_EXCEEDED' }, { status: 429 });
     }
 
-    // Procesar endpoint con LLM
-    const start = Date.now();
-    const result = await processEndpoint(base44, endpoint, payload);
-    const latencyMs = Date.now() - start;
-
-    // Incrementar contador
-    await base44.asServiceRole.entities.ComplianceAPIKey.update(keyRecord.id, {
-      callsUsedThisMonth: (keyRecord.callsUsedThisMonth || 0) + 1,
-    });
-
-    return Response.json({
-      success: true,
-      endpoint,
-      latencyMs,
-      callsRemaining: keyRecord.monthlyCallLimit - keyRecord.callsUsedThisMonth - 1,
-      data: result,
-    });
+    return await processWithRecord(base44, keyRecord, endpoint, payload);
   } catch (error) {
+    console.error('[lya-api] error:', error);
     return Response.json({ error: error.message, code: 'INTERNAL_ERROR' }, { status: 500 });
   }
 });
+
+async function processWithRecord(base44, keyRecord, endpoint, payload) {
+  const start = Date.now();
+  const result = await processEndpoint(base44, endpoint, payload);
+  const latencyMs = Date.now() - start;
+
+  await base44.asServiceRole.entities.ComplianceAPIKey.update(keyRecord.id, {
+    callsUsedThisMonth: (keyRecord.callsUsedThisMonth || 0) + 1,
+  });
+
+  return Response.json({
+    success: true,
+    endpoint,
+    latencyMs,
+    callsRemaining: keyRecord.monthlyCallLimit - keyRecord.callsUsedThisMonth - 1,
+    data: result,
+  });
+}
 
 async function processEndpoint(base44, endpoint, payload) {
   const prompts = {
