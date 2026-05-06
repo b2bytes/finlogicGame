@@ -78,27 +78,61 @@ Deno.serve(async (req) => {
     }
 
     // Llamada al especialista (Claude Sonnet 4.6 vía InvokeLLM)
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `${SYSTEM_PROMPT}\n\nCONSULTA DEL CIUDADANO:\n"${query}"\n\nResponde en JSON estricto siguiendo el schema.`,
-      response_json_schema: RESPONSE_SCHEMA,
-      model: 'claude_sonnet_4_6',
-    });
+    let result;
+    try {
+      result = await base44.integrations.Core.InvokeLLM({
+        prompt: `${SYSTEM_PROMPT}
+
+CONSULTA DEL CIUDADANO:
+"${query}"
+
+Debes completar TODOS los campos del schema JSON. Especialmente:
+- "fact": diagnóstico de la situación en 1 oración (OBLIGATORIO, no vacío)
+- "translation": derecho aplicable + ley específica que protege al ciudadano (OBLIGATORIO)
+- "action": pasos concretos numerados en markdown (OBLIGATORIO)
+- "regulatoryBody": organismo competente (CMF, SERNAC, SII, CSIRT, BCN, FOGAPE, SERCOTEC, multiple)
+- "normativeModule": ley aplicable
+- "urgencyLevel": critical | high | medium | low | resolved
+- "lawsCited": array con leyes citadas (ej: ["Ley 19.496", "Art. 39 NCG 502 CMF"])
+- "legalDeadlineDays": días hábiles del plazo legal (0 si no aplica)
+- "verifierScore": tu confianza 0-100
+
+Responde SOLO con el JSON completo.`,
+        response_json_schema: RESPONSE_SCHEMA,
+      });
+    } catch (llmError) {
+      console.error('InvokeLLM failed:', llmError.message);
+      result = {};
+    }
+    if (!result || typeof result !== 'object') result = {};
 
     const totalLatencyMs = Date.now() - startTime;
-    const verifierScore = result.verifierScore || 75;
+
+    // Defensive: ensure all expected fields exist
+    const fact = result.fact || result.hecho || 'Consulta procesada';
+    const translation = result.translation || result.derecho || result.tu_derecho || '';
+    const action = result.action || result.accion || '';
+    const regulatoryBody = result.regulatoryBody || result.regulatory_body || 'SERNAC';
+    const normativeModule = result.normativeModule || result.normative_module || 'ley_19496_sernac';
+    const urgencyLevel = result.urgencyLevel || result.urgency_level || 'medium';
+    const detectedProfile = result.detectedProfile || result.detected_profile || 'general';
+    const lawsCited = result.lawsCited || result.laws_cited || [];
+    const legalDeadlineDays = result.legalDeadlineDays || result.legal_deadline_days || 0;
+    const deadlineDescription = result.deadlineDescription || result.deadline_description || '';
+    const verifierScore = result.verifierScore || result.verifier_score || 75;
 
     // AgentTrace público para /Transparencia (anonimizado)
     const trace = await base44.asServiceRole.entities.AgentTrace.create({
       sessionId,
       query: query.substring(0, 500),
-      category: mapToCategory(result.regulatoryBody, result.normativeModule),
+      category: mapToCategory(regulatoryBody, normativeModule),
       pipelineStage: 'complete',
       totalLatencyMs,
       specialistLatencyMs: totalLatencyMs,
       verifierScore,
-      lawsCited: result.lawsCited || [],
-      responsePreview: `${result.fact} ${result.translation}`.substring(0, 200),
-      citizenSummary: result.fact,
+      lawsCited,
+      responsePreview: `${fact} ${translation}`.substring(0, 200),
+      citizenSummary: fact,
       modelUsed: 'sonnet',
       isPublic: true,
     });
@@ -106,16 +140,16 @@ Deno.serve(async (req) => {
     // Crear Caso si hay urgencia o derecho aplicable claro
     let caseId = null;
     let deadlineId = null;
-    if (userEmail && result.urgencyLevel !== 'resolved' && result.regulatoryBody !== 'multiple') {
+    if (userEmail && urgencyLevel !== 'resolved' && regulatoryBody !== 'multiple') {
       const caso = await base44.asServiceRole.entities.MisCasos.create({
-        title: result.fact.substring(0, 100),
+        title: fact.substring(0, 100),
         description: query,
-        regulatoryBody: result.regulatoryBody,
-        normativeModule: result.normativeModule || 'ley_19496_sernac',
+        regulatoryBody,
+        normativeModule,
         status: 'abierto',
-        priority: result.urgencyLevel === 'critical' ? 'alta' : result.urgencyLevel === 'high' ? 'alta' : 'media',
-        urgencyLevel: result.urgencyLevel,
-        userProfile: result.detectedProfile || 'general',
+        priority: urgencyLevel === 'critical' || urgencyLevel === 'high' ? 'alta' : 'media',
+        urgencyLevel,
+        userProfile: detectedProfile,
         channel,
         agentTraceRef: trace.id,
         verifierScore,
@@ -123,18 +157,18 @@ Deno.serve(async (req) => {
       caseId = caso.id;
 
       // LegalDeadline si aplica
-      if (result.legalDeadlineDays && result.legalDeadlineDays > 0) {
+      if (legalDeadlineDays > 0) {
         const deadlineDate = new Date();
-        deadlineDate.setDate(deadlineDate.getDate() + result.legalDeadlineDays);
+        deadlineDate.setDate(deadlineDate.getDate() + legalDeadlineDays);
         const deadline = await base44.asServiceRole.entities.LegalDeadline.create({
           casoRef: caseId,
-          normativeRef: result.normativeModule || 'ley_19496_sernac',
-          description: result.deadlineDescription || `Plazo legal de ${result.legalDeadlineDays} días`,
+          normativeRef: normativeModule,
+          description: deadlineDescription || `Plazo legal de ${legalDeadlineDays} días`,
           deadlineDate: deadlineDate.toISOString().split('T')[0],
-          daysLimit: result.legalDeadlineDays,
+          daysLimit: legalDeadlineDays,
           dayType: 'habiles',
-          organism: result.regulatoryBody === 'multiple' ? 'SERNAC' : result.regulatoryBody,
-          legalBasis: (result.lawsCited || [])[0] || 'Normativa vigente',
+          organism: regulatoryBody,
+          legalBasis: lawsCited[0] || 'Normativa vigente',
           consequence: 'Pérdida del derecho a reclamo si vence',
           status: 'pendiente',
         });
@@ -148,13 +182,13 @@ Deno.serve(async (req) => {
       deadlineId,
       traceId: trace.id,
       response: {
-        fact: result.fact,
-        translation: result.translation,
-        action: result.action,
-        regulatoryBody: result.regulatoryBody,
-        urgencyLevel: result.urgencyLevel,
-        lawsCited: result.lawsCited || [],
-        legalDeadlineDays: result.legalDeadlineDays || 0,
+        fact,
+        translation,
+        action,
+        regulatoryBody,
+        urgencyLevel,
+        lawsCited,
+        legalDeadlineDays,
         verifierScore,
         latencyMs: totalLatencyMs,
       },
