@@ -6,12 +6,12 @@ import Logo from './Logo';
 import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
 
 const navItems = [
+  { label: 'Lya IA', to: '/AsistenteLya' },
   { label: 'Casos', to: '/Casos' },
   { label: 'Pyme', to: '/Pyme' },
   { label: 'API B2B', to: '/api-compliance' },
   { label: 'Precios', to: '/Pricing' },
   { label: 'Transparencia', to: '/Transparencia' },
-  { label: 'Mis casos', to: '/MisCasos' },
 ];
 
 export default function HeroNav() {

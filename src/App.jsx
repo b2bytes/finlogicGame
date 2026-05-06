@@ -26,6 +26,7 @@ import Insights from '@/pages/Insights';
 import Pro from '@/pages/Pro';
 import SystemMetrics from '@/pages/SystemMetrics';
 import AsistenteLya from '@/pages/AsistenteLya';
+import ContentStudio from '@/pages/ContentStudio';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -73,6 +74,7 @@ const AuthenticatedApp = () => {
       <Route path="/Pro" element={<Pro />} />
       <Route path="/Admin/SystemMetrics" element={<SystemMetrics />} />
       <Route path="/AsistenteLya" element={<AsistenteLya />} />
+      <Route path="/Admin/ContentStudio" element={<ContentStudio />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

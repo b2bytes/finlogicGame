@@ -1,0 +1,89 @@
+{
+  "name": "FAQInteraction",
+  "type": "object",
+  "description": "Interacci\u00f3n de un usuario con una FAQ del centro de soporte. Permite tracking de auto-resoluci\u00f3n (KPI 65% D+90), feedback \u00fatil/no \u00fatil, y escalamiento. Mandato \u00a7SupportAgent.",
+  "properties": {
+    "faqId": {
+      "type": "string",
+      "description": "ID o slug de la FAQ (ej: 'faq-precio-pro')"
+    },
+    "questionText": {
+      "type": "string",
+      "description": "Texto de la pregunta vista por el usuario"
+    },
+    "userProfileType": {
+      "type": "string",
+      "enum": [
+        "camila",
+        "don_luis",
+        "maria_jose",
+        "roberto",
+        "b2b_fintech",
+        "general"
+      ],
+      "default": "general"
+    },
+    "wasHelpful": {
+      "type": "boolean",
+      "description": "Feedback del usuario al cierre"
+    },
+    "escalatedAfterFAQ": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si abri\u00f3 un ticket despu\u00e9s de leer la FAQ"
+    },
+    "viewCount": {
+      "type": "number",
+      "default": 1
+    },
+    "deflectionSuccess": {
+      "type": "boolean",
+      "default": false,
+      "description": "True si la FAQ resolvi\u00f3 sin escalaci\u00f3n a humano"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "web",
+        "whatsapp",
+        "telegram",
+        "email",
+        "voz"
+      ],
+      "default": "web"
+    }
+  },
+  "required": [
+    "faqId"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    }
+  }
+}
