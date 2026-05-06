@@ -40,9 +40,27 @@ import Rubrica from '@/pages/Rubrica';
 import Demo from '@/pages/Demo';
 import Entregables from '@/pages/Entregables';
 
+// Rutas 100% públicas — no requieren auth ni redirigen al login.
+// Visitantes externos (jurado, prensa, fintechs) pueden entrar directo.
+const PUBLIC_ROUTES = [
+  '/PitchDeck',
+  '/Demo',
+  '/Rubrica',
+  '/Rúbrica',
+  '/Marca',
+  '/Diseno',
+  '/Diseño',
+  '/Entregables',
+  '/Embed/Lya',
+];
+
+const isPublicRoute = (pathname) =>
+  PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'));
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const location = useLocation();
+  const publicRoute = isPublicRoute(location?.pathname || '');
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -53,8 +71,8 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
-  if (authError) {
+  // Handle authentication errors — saltar para rutas públicas
+  if (authError && !publicRoute) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
