@@ -32,6 +32,7 @@ import LyaChatWidget from '@/components/lya/LyaChatWidget';
 import SkinAutoDetectToast from '@/components/skins/SkinAutoDetectToast.jsx';
 import EmbedLya from '@/pages/EmbedLya';
 import Diseno from '@/pages/Diseno';
+import Rubrica from '@/pages/Rubrica';
 import ScrollToTop from '@/components/ScrollToTop';
 import PWAInstallBanner from '@/components/pwa/PWAInstallBanner';
 import QuickAdminPanel from '@/components/admin/QuickAdminPanel';
@@ -89,6 +90,8 @@ const AuthenticatedApp = () => {
       <Route path="/Embed/Lya" element={<EmbedLya />} />
       <Route path="/Diseno" element={<Diseno />} />
       <Route path="/Diseño" element={<Diseno />} />
+      <Route path="/Rubrica" element={<Rubrica />} />
+      <Route path="/Rúbrica" element={<Rubrica />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     <LyaChatWidget />

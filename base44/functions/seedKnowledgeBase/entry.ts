@@ -432,6 +432,20 @@ async function upsertVectors(apiKey, host, vectors) {
   return res.json();
 }
 
+// Borra TODO el namespace (idempotente: si está vacío no falla)
+async function deleteAllVectors(apiKey, host) {
+  const res = await pineconeFetch(apiKey, `https://${host}/vectors/delete`, {
+    method: 'POST',
+    body: JSON.stringify({ namespace: NAMESPACE, deleteAll: true }),
+  });
+  // 200 ok, 404 si namespace vacío — ambos son aceptables
+  if (!res.ok && res.status !== 404) {
+    const err = await res.text();
+    console.warn(`Pinecone deleteAll warning: ${res.status} ${err}`);
+  }
+  return true;
+}
+
 // ─── Handler ────────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
   try {
@@ -447,10 +461,22 @@ Deno.serve(async (req) => {
     }
 
     const startTime = Date.now();
+    const { force = false } = await req.json().catch(() => ({}));
 
     // 1. Asegurar que el índice existe
     const { host, created } = await ensureIndex(apiKey);
     console.log(`Índice ${INDEX_NAME} ${created ? 'CREADO' : 'ya existía'}, host: ${host}`);
+
+    // 1.5. Si force=true, limpiar namespace para garantizar idempotencia
+    // (evita vectores huérfanos cuando cambian IDs entre versiones del corpus)
+    let purged = false;
+    if (force && !created) {
+      await deleteAllVectors(apiKey, host);
+      // Pequeña espera para que Pinecone propague la eliminación
+      await new Promise(r => setTimeout(r, 1500));
+      purged = true;
+      console.log('Namespace purgado antes de re-seed');
+    }
 
     // 2. Generar embeddings batch (auto-chunked en 96)
     const texts = CORPUS.map(c => `${c.title}\n${c.lawReference}\n${c.content}`);

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, Send, ArrowUpRight, Loader2, ShieldCheck } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
 
 /**
@@ -328,7 +329,56 @@ function ChatBubble({ message }) {
             : 'bg-card border-border text-foreground/90'
         }`}
       >
-        <div className="whitespace-pre-wrap">{message.content}</div>
+        {message.error ? (
+          <div className="whitespace-pre-wrap">{message.content}</div>
+        ) : (
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => (
+                <p className="mb-2.5 last:mb-0 text-foreground/90">{children}</p>
+              ),
+              strong: ({ children }) => (
+                <strong className="font-semibold text-foreground block mt-3 first:mt-0 text-[13px]">
+                  {children}
+                </strong>
+              ),
+              ul: ({ children }) => (
+                <ul className="my-2 space-y-1.5 pl-0 list-none">{children}</ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="my-2 space-y-1.5 pl-0 list-none counter-reset-[step]">{children}</ol>
+              ),
+              li: ({ children }) => (
+                <li className="flex gap-2 text-foreground/85">
+                  <span className="text-mint-600 font-bold leading-relaxed flex-shrink-0">·</span>
+                  <span className="flex-1">{children}</span>
+                </li>
+              ),
+              em: ({ children }) => (
+                <em className="not-italic text-[11px] font-mono-editorial text-mint-700 inline-block mt-2 px-2 py-0.5 rounded-full bg-mint-50 border border-mint-100">
+                  {children}
+                </em>
+              ),
+              a: ({ children, href }) => (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-mint-700 underline underline-offset-2 hover:text-mint-800"
+                >
+                  {children}
+                </a>
+              ),
+              code: ({ children }) => (
+                <code className="px-1.5 py-0.5 rounded bg-mint-50 text-mint-700 text-[12px] font-mono-editorial">
+                  {children}
+                </code>
+              ),
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
+        )}
       </div>
 
       {/* Sources (RAG) */}
