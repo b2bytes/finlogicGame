@@ -102,12 +102,23 @@ REGLAS:
       model: 'claude_sonnet_4_6',
     });
 
+    // Validación robusta: el LLM puede devolver content vacío en raros casos
+    const safeContent = llmResult?.content?.trim();
+    const safeTitle = llmResult?.title?.trim() || template.title;
+    if (!safeContent || safeContent.length < 50) {
+      console.error('LLM returned empty/short content:', JSON.stringify(llmResult).substring(0, 300));
+      return Response.json(
+        { error: 'No pudimos redactar el documento. Intenta nuevamente.' },
+        { status: 502 }
+      );
+    }
+
     // Persistir documento
     const doc = await base44.entities.GeneratedDocument.create({
       casoRef: casoId,
       documentType,
-      title: llmResult.title || template.title,
-      content: llmResult.content,
+      title: safeTitle,
+      content: safeContent,
       isPrivate: true,
       normativeModule: caso.normativeModule || 'ley_19496_sernac',
       addressedTo: customAddressee || template.addressedTo,
