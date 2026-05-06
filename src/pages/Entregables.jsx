@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Cpu, Mic, ExternalLink, ShieldCheck, Download, ChevronRight } from 'lucide-react';
+import { ArrowLeft, FileText, Cpu, Mic, ExternalLink, ShieldCheck, Download, ChevronRight, FileDown } from 'lucide-react';
 import Logo from '@/components/home/Logo';
 import CopyField from '@/components/entregables/CopyField';
 import SectionHeader from '@/components/entregables/SectionHeader';
+import { downloadFichaCivicaPDF } from '@/lib/generateFichaCivicaPDF';
 
 // ─── FICHA CÍVICA ──────────────────────────────────────────────────────────
 const PROBLEMA = `Cada año más de 500.000 personas en Chile presentan un reclamo financiero sin saber qué dice la ley. Un abogado cuesta más de $200.000, un reclamo demora 28 días promedio y los 4 organismos competentes (CMF, SERNAC, SII, CSIRT) hablan idiomas distintos.`;
@@ -229,6 +230,41 @@ export default function Entregables() {
               title="Pre-evaluación que lee Bendi"
               description="6 campos obligatorios. Cada respuesta validada con datos reales del sistema y fuentes oficiales chilenas."
             />
+
+            {/* CTA Premium · descarga PDF editorial */}
+            <div className="mb-8 bg-gradient-to-br from-mint-500 to-mint-700 text-white rounded-3xl p-6 sm:p-8 shadow-soft-lg overflow-hidden relative">
+              <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-white/10 blur-2xl" />
+              <div className="relative flex items-start gap-5 flex-wrap sm:flex-nowrap">
+                <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center flex-shrink-0">
+                  <FileDown className="w-6 h-6" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-mono-editorial uppercase tracking-widest text-mint-100 mb-1">
+                    · ENTREGA OFICIAL · A4 · 8 PÁGINAS
+                  </p>
+                  <h3 className="font-display text-2xl sm:text-3xl font-bold leading-tight">
+                    Descarga la Ficha Cívica en PDF
+                  </h3>
+                  <p className="text-sm text-mint-50/95 mt-2 max-w-md leading-relaxed">
+                    Diseño editorial FinLogic. Una página por campo, portada institucional, página de validación. Listo para adjuntar al campo "PDF/Notion" de Bendi.
+                  </p>
+                </div>
+                <button
+                  onClick={() => downloadFichaCivicaPDF({
+                    problema: PROBLEMA,
+                    segmento: SEGMENTO,
+                    canal: CANAL,
+                    impacto: IMPACTO,
+                    fuentes: FUENTES,
+                    normativa: NORMATIVA,
+                  })}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white text-mint-700 font-semibold text-sm shadow-soft hover:shadow-soft-lg active:scale-95 transition-all flex-shrink-0"
+                >
+                  <Download className="w-4 h-4" />
+                  Descargar PDF
+                </button>
+              </div>
+            </div>
 
             <div className="space-y-4">
               <CopyField label="Problema" hint="Máx 300 caracteres · sin jerga · sin siglas sin explicar" max={300} value={PROBLEMA} />
