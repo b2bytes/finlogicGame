@@ -295,13 +295,14 @@ Deno.serve(async (req) => {
       // zero-login: continúa sin usuario autenticado
     }
 
-    // ─── CAPA 1 · TRIAGE ────────────────────────────────────────────────
+    // ─── CAPA 1 · TRIAGE (GPT-5 mini, rápido) ──────────────────────────
     const triageStart = Date.now();
     let triage = {};
     try {
       triage = await base44.integrations.Core.InvokeLLM({
         prompt: `${TRIAGE_PROMPT}\n\nCONSULTA:\n"${query}"\n\nResponde SOLO con el JSON.`,
         response_json_schema: TRIAGE_SCHEMA,
+        model: 'gpt_5_mini',
       });
     } catch (e) {
       console.error('triage failed:', e.message);
@@ -314,7 +315,27 @@ Deno.serve(async (req) => {
     const detectedProfile = triage.detectedProfile || 'general';
     const category = triage.category || 'normativa_consulta';
 
-    // ─── CAPA 2 · ESPECIALISTA ──────────────────────────────────────────
+    // ─── CAPA RAG · BÚSQUEDA VECTORIAL EN KnowledgeChunk ────────────────
+    const ragStart = Date.now();
+    let ragChunks = [];
+    try {
+      const ragRes = await base44.functions.invoke('vectorSearch', {
+        query,
+        topK: 5,
+        regulatoryBody: regulatoryBody !== 'multiple' ? regulatoryBody : null,
+        minScore: 0.25,
+      });
+      if (ragRes.data?.success) ragChunks = ragRes.data.chunks || [];
+    } catch (e) {
+      console.error('RAG search failed:', e.message);
+    }
+    const ragLatencyMs = Date.now() - ragStart;
+
+    const ragContext = ragChunks.length > 0
+      ? `\n\n═══ CONTEXTO RAG (top ${ragChunks.length} chunks normativos relevantes, similitud coseno) ═══\n${ragChunks.map((c, i) => `[${i + 1}] ${c.title} (score: ${c.score.toFixed(3)})\nReferencia: ${c.lawReference}\n${c.content}`).join('\n\n')}\n═══════════════════════════════════════════════════════════════════`
+      : '';
+
+    // ─── CAPA 2 · ESPECIALISTA (Claude Sonnet 4.6, análisis profundo) ──
     const specialistStart = Date.now();
     const specialistFocus = SPECIALIST_FOCUS[regulatoryBody] || SPECIALIST_FOCUS.BCN;
 
@@ -324,6 +345,7 @@ Deno.serve(async (req) => {
         prompt: `${SPECIALIST_BASE}
 
 ${specialistFocus}
+${ragContext}
 
 PERFIL DETECTADO: ${detectedProfile} — adapta el tono (Camila=cercano joven; Don Luis=respetuoso simple; María José=práctico pyme; Roberto=técnico directo; general=balanceado).
 URGENCIA: ${urgencyLevel}.
@@ -333,20 +355,19 @@ CONSULTA DEL CIUDADANO:
 
 INSTRUCCIONES DE EJECUCIÓN:
 1. Aplica los 5 PASOS de la metodología de análisis profundo.
-2. Si necesitas datos vigentes (TMC actual, plazos modificados, montos UF/UTM 2026, programas SERCOTEC/FOGAPE abiertos), USA tu acceso a internet para verificar antes de citar.
+2. Usa el CONTEXTO RAG arriba como fuente PRIMARIA verificada (corpus FinLogic). Cita textual cuando corresponda.
 3. Genera la respuesta estructurada (fact / translation / action) con profundidad senior, no respuestas genéricas.
 4. lawsCited debe contener REFERENCIAS PRECISAS: número de ley + artículo cuando aplique (ej: "Ley 19.496 Art. 21", "NCG 502 CMF Art. 15").
 5. Si hay plazo legal, completa legalDeadlineDays + deadlineDescription con la consecuencia exacta del vencimiento.`,
         response_json_schema: SPECIALIST_SCHEMA,
-        add_context_from_internet: true,
-        model: 'gemini_3_1_pro',
+        model: 'claude_sonnet_4_6',
       });
     } catch (e) {
-      console.error('specialist failed:', e.message);
-      // Fallback sin internet con modelo por defecto si gemini falla
+      console.error('specialist (sonnet) failed:', e.message);
+      // Fallback al modelo por defecto si Sonnet falla
       try {
         specialist = await base44.integrations.Core.InvokeLLM({
-          prompt: `${SPECIALIST_BASE}\n\n${specialistFocus}\n\nPERFIL: ${detectedProfile}. URGENCIA: ${urgencyLevel}.\n\nCONSULTA:\n"${query}"\n\nResponde estructurado con profundidad senior.`,
+          prompt: `${SPECIALIST_BASE}\n\n${specialistFocus}${ragContext}\n\nPERFIL: ${detectedProfile}. URGENCIA: ${urgencyLevel}.\n\nCONSULTA:\n"${query}"\n\nResponde estructurado con profundidad senior.`,
           response_json_schema: SPECIALIST_SCHEMA,
         });
       } catch (e2) {
@@ -363,7 +384,7 @@ INSTRUCCIONES DE EJECUCIÓN:
     const deadlineDescription = specialist.deadlineDescription || '';
     const selfConfidence = specialist.selfConfidence || 75;
 
-    // ─── CAPA 3 · VERIFICADOR ───────────────────────────────────────────
+    // ─── CAPA 3 · VERIFICADOR (Claude Opus 4.7, auditoría estricta) ────
     let verification = {};
     try {
       verification = await base44.integrations.Core.InvokeLLM({
@@ -378,11 +399,23 @@ DERECHO: ${translation}
 ACCIÓN: ${action}
 LEYES CITADAS: ${JSON.stringify(lawsCited)}
 
-Audita y devuelve scores.`,
+CONTEXTO RAG DISPONIBLE (usa para verificar precisión normativa):
+${ragChunks.map(c => `- ${c.lawReference}: ${c.title}`).join('\n') || '(sin chunks RAG)'}
+
+Audita con rigor senior y devuelve scores.`,
         response_json_schema: VERIFIER_SCHEMA,
+        model: 'claude_opus_4_7',
       });
     } catch (e) {
-      console.error('verifier failed:', e.message);
+      console.error('verifier (opus) failed:', e.message);
+      try {
+        verification = await base44.integrations.Core.InvokeLLM({
+          prompt: `${VERIFIER_PROMPT}\n\nCONSULTA: "${query}"\nHECHO: ${fact}\nDERECHO: ${translation}\nACCIÓN: ${action}\nLEYES: ${JSON.stringify(lawsCited)}\n\nAudita.`,
+          response_json_schema: VERIFIER_SCHEMA,
+        });
+      } catch (e2) {
+        console.error('verifier fallback failed:', e2.message);
+      }
     }
 
     // verifierScore = promedio del verificador, fallback a self-confidence
@@ -396,6 +429,7 @@ Audita y devuelve scores.`,
       category,
       pipelineStage: 'complete',
       triageLatencyMs,
+      ragLatencyMs,
       specialistLatencyMs,
       totalLatencyMs,
       verifierScore,
@@ -463,10 +497,19 @@ Audita y devuelve scores.`,
         // diagnóstico pipeline (consumible por /Transparencia)
         pipeline: {
           triageLatencyMs,
+          ragLatencyMs,
           specialistLatencyMs,
           totalLatencyMs,
           routedTo: regulatoryBody,
           routingReason: triage.routingReason || null,
+          ragChunksFound: ragChunks.length,
+          ragSources: ragChunks.map(c => ({ lawReference: c.lawReference, score: c.score })),
+          modelsUsed: {
+            triage: 'gpt_5_mini',
+            specialist: 'claude_sonnet_4_6',
+            verifier: 'claude_opus_4_7',
+            embeddings: 'text-embedding-3-small',
+          },
           verifierBreakdown: {
             precision: verification.precisionNormativa,
             accionabilidad: verification.accionabilidad,
