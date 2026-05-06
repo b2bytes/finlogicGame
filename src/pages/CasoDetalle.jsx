@@ -6,6 +6,7 @@ import { ArrowLeft, FileText, Eye, Download, Share2, Sparkles } from 'lucide-rea
 import Logo from '@/components/home/Logo';
 import CasoTimeline from '@/components/casos/CasoTimeline';
 import CasoDeadlineCard from '@/components/casos/CasoDeadlineCard';
+import CasoOutcomeStats from '@/components/casos/CasoOutcomeStats';
 import GenerateDocDialog from '@/components/casos/GenerateDocDialog';
 
 const moduleLabels = {
@@ -109,6 +110,7 @@ export default function CasoDetalle() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Columna izq: timeline */}
           <div className="lg:col-span-2 space-y-6">
+            <CasoOutcomeStats caso={caso} />
             <CasoDeadlineCard days={days} deadline={deadline} />
 
             {/* Documento generado */}
