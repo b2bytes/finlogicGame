@@ -12,12 +12,13 @@ export default function MisCasos() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
+  const load = async () => {
+    const data = await base44.entities.MisCasos.list('-created_date', 50);
+    setCasos(data || []);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const load = async () => {
-      const data = await base44.entities.MisCasos.list('-created_date', 50);
-      setCasos(data || []);
-      setLoading(false);
-    };
     load();
   }, []);
 
@@ -86,7 +87,7 @@ export default function MisCasos() {
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
             {filtered.map((caso) => (
-              <CasoCard key={caso.id} caso={caso} />
+              <CasoCard key={caso.id} caso={caso} onUpdate={load} />
             ))}
           </div>
         )}

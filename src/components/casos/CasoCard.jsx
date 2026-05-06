@@ -1,5 +1,7 @@
-import React from 'react';
-import { Clock, AlertTriangle, CheckCircle2, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, AlertTriangle, CheckCircle2, FileText, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import GenerateDocDialog from './GenerateDocDialog';
 
 const statusConfig = {
   abierto: { label: 'Abierto', cls: 'bg-mint-50 text-mint-700 border-mint-200' },
@@ -15,7 +17,8 @@ const organismLabels = {
   FOGAPE: 'FOGAPE', SERCOTEC: 'SERCOTEC', multiple: 'Múltiples',
 };
 
-export default function CasoCard({ caso }) {
+export default function CasoCard({ caso, onUpdate }) {
+  const [docOpen, setDocOpen] = useState(false);
   const status = statusConfig[caso.status] || statusConfig.abierto;
   const days = caso.daysRemaining;
   const isUrgent = typeof days === 'number' && days >= 0 && days <= 3;
@@ -58,13 +61,30 @@ export default function CasoCard({ caso }) {
           </div>
         )}
 
-        {caso.generatedDocRef && (
+        {caso.generatedDocRef ? (
           <div className="flex items-center gap-1 text-xs text-mint-700 font-medium">
             <FileText className="w-3.5 h-3.5" />
             Documento
           </div>
+        ) : (
+          <Button
+            onClick={() => setDocOpen(true)}
+            size="sm"
+            variant="ghost"
+            className="h-8 px-3 text-xs font-semibold text-mint-700 hover:text-mint-700 hover:bg-mint-50 rounded-full"
+          >
+            <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+            Generar documento
+          </Button>
         )}
       </div>
+
+      <GenerateDocDialog
+        caso={caso}
+        open={docOpen}
+        onOpenChange={setDocOpen}
+        onGenerated={onUpdate}
+      />
     </div>
   );
 }
