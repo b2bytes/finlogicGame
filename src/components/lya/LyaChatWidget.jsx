@@ -125,7 +125,11 @@ export default function LyaChatWidget() {
             transition={{ type: 'spring', stiffness: 380, damping: 22 }}
             onClick={() => setOpen(true)}
             aria-label="Abrir chat con Lya"
-            className="fixed bottom-5 right-4 md:bottom-6 md:right-6 z-50 group"
+            style={{
+              bottom: 'max(1.25rem, env(safe-area-inset-bottom))',
+              right: 'max(1rem, env(safe-area-inset-right))',
+            }}
+            className="fixed md:!bottom-6 md:!right-6 z-50 group"
           >
             {/* Halo animado */}
             <span className="absolute inset-0 rounded-full bg-mint-400/40 blur-xl scale-110 group-hover:scale-125 transition-transform" />
@@ -180,9 +184,15 @@ export default function LyaChatWidget() {
               transition={{ type: 'spring', stiffness: 320, damping: 28 }}
               role="dialog"
               aria-label="Chat con Lya"
+              style={{
+                // Mobile: usa svh (small viewport height) que ya excluye barras de browser
+                // y deja respiro arriba. Desktop: alto fluido con cap.
+                paddingBottom: 'env(safe-area-inset-bottom)',
+              }}
               className="fixed z-50 bg-card border border-border shadow-soft-lg overflow-hidden flex flex-col
-                         bottom-0 right-0 left-0 h-[85vh] rounded-t-3xl
-                         md:bottom-6 md:right-6 md:left-auto md:h-[620px] md:w-[400px] md:rounded-3xl"
+                         inset-x-0 bottom-0 top-auto h-[88svh] max-h-[88svh] rounded-t-3xl
+                         md:inset-auto md:bottom-6 md:right-6 md:left-auto md:top-auto
+                         md:w-[400px] md:h-auto md:max-h-[min(640px,calc(100vh-4rem))] md:rounded-3xl"
             >
               {/* Header */}
               <div className="relative px-4 md:px-5 py-3.5 bg-gradient-to-br from-mint-500 to-mint-700 text-white flex items-center gap-3">
@@ -211,7 +221,7 @@ export default function LyaChatWidget() {
               {/* Body messages */}
               <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto px-4 md:px-5 py-4 space-y-3.5 bg-background/50"
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3.5 md:px-5 py-4 space-y-3.5 bg-background/50"
               >
                 {messages.length === 0 && (
                   <motion.div
@@ -298,7 +308,7 @@ function ChatBubble({ message }) {
         animate={{ opacity: 1, y: 0 }}
         className="flex justify-end"
       >
-        <div className="max-w-[82%] rounded-2xl rounded-tr-md bg-mint-600 text-white px-4 py-2.5 text-sm shadow-soft">
+        <div className="max-w-[82%] rounded-2xl rounded-tr-md bg-mint-600 text-white px-4 py-2.5 text-sm shadow-soft break-words [overflow-wrap:anywhere]">
           {message.content}
         </div>
       </motion.div>
@@ -309,10 +319,10 @@ function ChatBubble({ message }) {
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col gap-2 max-w-[88%]"
+      className="flex flex-col gap-2 max-w-[92%] min-w-0"
     >
       <div
-        className={`rounded-2xl rounded-tl-md px-4 py-3 text-sm leading-relaxed shadow-soft border ${
+        className={`rounded-2xl rounded-tl-md px-4 py-3 text-sm leading-relaxed shadow-soft border break-words [overflow-wrap:anywhere] ${
           message.error
             ? 'bg-destructive/5 border-destructive/20 text-destructive'
             : 'bg-card border-border text-foreground/90'
@@ -323,11 +333,11 @@ function ChatBubble({ message }) {
 
       {/* Sources (RAG) */}
       {message.sources && message.sources.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pl-1">
+        <div className="flex flex-wrap gap-1.5 pl-1 max-w-full">
           {message.sources.slice(0, 3).map((src, i) => (
             <span
               key={i}
-              className="text-[10px] px-2 py-0.5 rounded-full bg-mint-50 text-mint-700 border border-mint-200 font-mono-editorial"
+              className="text-[10px] px-2 py-0.5 rounded-full bg-mint-50 text-mint-700 border border-mint-200 font-mono-editorial max-w-full truncate"
             >
               {src.length > 42 ? `${src.substring(0, 42)}…` : src}
             </span>
@@ -339,12 +349,14 @@ function ChatBubble({ message }) {
       {message.suggestedAction && (
         <Link
           to="/Consulta"
-          className="self-start inline-flex items-center gap-1.5 text-[11px] text-mint-700 hover:text-mint-800 font-medium px-2.5 py-1 rounded-full bg-mint-50 border border-mint-200 transition-colors"
+          className="self-start inline-flex items-center gap-1.5 text-[11px] text-mint-700 hover:text-mint-800 font-medium px-2.5 py-1 rounded-full bg-mint-50 border border-mint-200 transition-colors max-w-full"
         >
-          <Sparkles className="w-3 h-3" />
-          {message.suggestedAction.length > 60
-            ? `${message.suggestedAction.substring(0, 60)}…`
-            : message.suggestedAction}
+          <Sparkles className="w-3 h-3 flex-shrink-0" />
+          <span className="truncate">
+            {message.suggestedAction.length > 60
+              ? `${message.suggestedAction.substring(0, 60)}…`
+              : message.suggestedAction}
+          </span>
         </Link>
       )}
     </motion.div>
