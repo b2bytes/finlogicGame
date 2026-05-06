@@ -9,15 +9,12 @@ import { downloadFichaCivicaPDF } from '@/lib/generateFichaCivicaPDF';
 // ─── FICHA CÍVICA ──────────────────────────────────────────────────────────
 const PROBLEMA = `Cada año más de 500.000 personas en Chile presentan un reclamo financiero sin saber qué dice la ley. Un abogado cuesta más de $200.000, un reclamo demora 28 días promedio y los 4 organismos competentes (CMF, SERNAC, SII, CSIRT) hablan idiomas distintos.`;
 
-const SEGMENTO = `4 arquetipos validados con datos demográficos INE 2024:
+const SEGMENTO = `4 arquetipos INE 2024 (edad + región + condición socioeconómica):
 
-1. CAMILA — 22 años, Santiago RM, estudiante universitaria con tarjeta prepago e ingreso bajo (<$400.000). Vive en redes y WhatsApp.
-
-2. DON LUIS — 68 años, Valparaíso, pensionado AFP con ingreso medio-bajo ($350.000). Acceso digital limitado, requiere accesibilidad WCAG AA.
-
-3. MARÍA JOSÉ — 34 años, Temuco región Araucanía, emprendedora pyme EIRL con facturación mensual <$3M. Necesita régimen tributario óptimo.
-
-4. ROBERTO — 45 años, Antofagasta, trabajador minería con ingreso medio-alto ($1.5M). Víctima frecuente de phishing bancario y fraude tarjeta.`;
+CAMILA · 22a · Santiago RM · estudiante, tarjeta prepago, ingreso <$400K.
+DON LUIS · 68a · Valparaíso · pensionado AFP, $350K, accesibilidad WCAG AA.
+MARÍA JOSÉ · 34a · Temuco · pyme EIRL, facturación <$3M, busca Pro-Pyme.
+ROBERTO · 45a · Antofagasta · minero, $1.5M, víctima phishing recurrente.`;
 
 const CANAL = `4 canales reales, sin "internet" genérico:
 
