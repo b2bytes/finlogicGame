@@ -2,6 +2,7 @@ import React from 'react';
 import HeroNav from '@/components/home/HeroNav';
 import HeroSection from '@/components/home/HeroSection';
 import MediaLogos from '@/components/home/MediaLogos';
+import LiveTicker from '@/components/home/LiveTicker';
 import StatsBar from '@/components/home/StatsBar';
 import RecentCasos from '@/components/home/RecentCasos';
 import HowItWorks from '@/components/home/HowItWorks';
@@ -22,6 +23,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <MediaLogos />
+        <LiveTicker />
         <StatsBar />
         <HowItWorks />
         <RecentCasos />
