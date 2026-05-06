@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, Send, ArrowUpRight, Loader2, ShieldCheck } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
+import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
 
 /**
  * LyaChatWidget — widget de chat flotante global de Lya (FinLogic).
@@ -320,9 +321,17 @@ export default function LyaChatWidget() {
                   </motion.div>
                 )}
 
-                {messages.map((m, i) => (
-                  <ChatBubble key={i} message={m} />
-                ))}
+                {messages.map((m, i) => {
+                  // El último mensaje del usuario es el que produjo la respuesta más reciente de Lya.
+                  const lastUserBefore = messages.slice(0, i).reverse().find((x) => x.role === 'user');
+                  return (
+                    <ChatBubble
+                      key={i}
+                      message={m}
+                      userQuery={lastUserBefore?.content}
+                    />
+                  );
+                })}
 
                 {loading && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground pl-1">
@@ -371,7 +380,7 @@ export default function LyaChatWidget() {
 }
 
 // ─── Burbuja de mensaje ───────────────────────────────────────────────
-function ChatBubble({ message }) {
+function ChatBubble({ message, userQuery }) {
   const isUser = message.role === 'user';
 
   if (isUser) {
@@ -465,6 +474,15 @@ function ChatBubble({ message }) {
             </span>
           ))}
         </div>
+      )}
+
+      {/* Compartir respuesta por WhatsApp (viralidad ciudadana §SocialMedia) */}
+      {!message.error && message.content && userQuery && (
+        <LyaShareWhatsApp
+          query={userQuery}
+          response={message.content}
+          sources={message.sources || []}
+        />
       )}
 
       {/* Suggested action */}

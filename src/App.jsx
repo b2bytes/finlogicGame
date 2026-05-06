@@ -12,6 +12,7 @@ import Consulta from '@/pages/Consulta';
 import Transparencia from '@/pages/Transparencia';
 import MisCasos from '@/pages/MisCasos';
 import Soporte from '@/pages/Soporte';
+import MisSoporte from '@/pages/MisSoporte';
 import B2BAPIKeys from '@/pages/B2BAPIKeys';
 import Casos from '@/pages/Casos';
 import APICompliance from '@/pages/APICompliance';
@@ -73,6 +74,7 @@ const AuthenticatedApp = () => {
         <Route path="/Transparencia" element={<Transparencia />} />
         <Route path="/MisCasos" element={<MisCasos />} />
         <Route path="/Soporte" element={<Soporte />} />
+        <Route path="/MisSoporte" element={<MisSoporte />} />
         <Route path="/B2B/APIKeys" element={<B2BAPIKeys />} />
         <Route path="/Casos" element={<Casos />} />
         <Route path="/CasosResueltos" element={<Casos />} />
