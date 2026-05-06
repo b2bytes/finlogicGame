@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Mic, ArrowRight } from 'lucide-react';
 import HeroIllustration from './HeroIllustration';
 import HeroTrustStrip from './HeroTrustStrip';
+import Eyebrow from '@/components/editorial/Eyebrow';
+import LegalPill from '@/components/editorial/LegalPill';
 
 const QUICK_PILLS = [
   { label: 'Cobro indebido', query: 'Tengo un cobro que no reconozco en mi tarjeta' },
@@ -35,24 +37,28 @@ export default function HeroSection() {
         <div className="grid lg:grid-cols-[1.05fr_1fr] gap-8 lg:gap-12 items-center">
           {/* Left — Title + input + trust */}
           <div className="animate-fade-up">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-7">
-              <span className="relative flex w-2 h-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mint-500 opacity-60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-mint-600" />
-              </span>
-              <span className="text-[11px] sm:text-xs font-semibold text-mint-700">
-                Registrada CMF · Ley Fintech 21.521 · Pipeline IA en vivo
-              </span>
-            </div>
+            {/* Eyebrow editorial deck v11 */}
+            <Eyebrow size="md" className="mb-5">
+              Registrada CMF · Ley Fintech 21.521 · Pipeline IA en vivo
+            </Eyebrow>
 
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-bold tracking-tight text-foreground leading-[1.02]">
-              Tu derecho financiero,<br />
-              <span className="text-mint-600">en tu idioma. Ahora.</span>
+            <h1 className="font-editorial text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-foreground leading-[0.98]">
+              Tu derecho<br />financiero,<br />
+              <span className="text-mint-600">en tu idioma.</span><br />
+              Ahora.
             </h1>
 
-            <p className="mt-5 text-base md:text-lg text-muted-foreground max-w-xl leading-relaxed">
+            <p className="mt-6 text-base md:text-lg text-muted-foreground max-w-xl leading-relaxed">
               Banco, SII, fraude, cripto, datos personales o pyme. Cuéntanos qué te pasa: nuestra IA lo traduce a la ley chilena, identifica tu derecho y genera la carta. <span className="font-semibold text-foreground">Gratis. En menos de 60 segundos.</span>
             </p>
+
+            {/* Pills de leyes — patrón distintivo deck v11 */}
+            <div className="mt-5 flex flex-wrap gap-2">
+              <LegalPill variant="law" size="sm">Ley 21.521</LegalPill>
+              <LegalPill variant="law" size="sm">Ley 19.496</LegalPill>
+              <LegalPill variant="law" size="sm">Ley 21.713</LegalPill>
+              <LegalPill variant="law" size="sm">Ley 21.719</LegalPill>
+            </div>
 
             {/* Inline input row — pill estilo mockup */}
             <div className="mt-7 sm:mt-8 flex items-center gap-1.5 sm:gap-2 bg-card rounded-full border border-border shadow-soft p-1.5 pl-4 sm:pl-5 max-w-xl">
