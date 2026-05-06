@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ShieldCheck } from 'lucide-react';
 import Logo from './Logo';
+import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
 
 export default function HeroNav() {
   return (
@@ -38,6 +39,7 @@ export default function HeroNav() {
             <ShieldCheck className="w-3.5 h-3.5 text-mint-600" />
             <span>Ley 21.521</span>
           </div>
+          <AccessibilityToggle />
           <Button asChild size="sm" className="rounded-full bg-foreground hover:bg-foreground/90 text-background h-9 px-4 font-medium">
             <Link to="/Consulta">Consultar gratis</Link>
           </Button>

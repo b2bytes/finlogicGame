@@ -150,4 +150,33 @@
     @apply backdrop-blur-xl bg-white/70;
     -webkit-backdrop-filter: blur(24px);
   }
+
+  /* Modo Accesibilidad Don Luis: texto +25%, contraste alto, áreas táctiles ≥48px */
+  html.a11y-mode {
+    font-size: 18.75px; /* base 16 → 18.75 = +120% efectivo en cuerpo */
+  }
+  html.a11y-mode body {
+    font-weight: 500;
+  }
+  html.a11y-mode {
+    --foreground: 220 40% 8%;
+    --muted-foreground: 220 25% 30%;
+    --border: 220 20% 70%;
+    --primary: 158 70% 30%;
+    --mint-700: 158 80% 22%;
+  }
+  html.a11y-mode button,
+  html.a11y-mode a[role="button"],
+  html.a11y-mode [type="button"],
+  html.a11y-mode [type="submit"] {
+    min-height: 48px;
+  }
+  html.a11y-mode .text-xs {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  html.a11y-mode .text-sm {
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
 }

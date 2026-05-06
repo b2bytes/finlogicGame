@@ -2,8 +2,9 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Scale, Clock, CheckCircle2, ShieldCheck } from 'lucide-react';
 import UrgencyBadge from './UrgencyBadge';
+import ShareWhatsApp from './ShareWhatsApp';
 
-export default function ResponseCard({ response, traceId }) {
+export default function ResponseCard({ response, traceId, query }) {
   if (!response) return null;
   const { fact, translation, action, lawsCited = [], legalDeadlineDays, verifierScore, urgencyLevel } = response;
 
@@ -61,6 +62,9 @@ export default function ResponseCard({ response, traceId }) {
           </p>
         </div>
       )}
+
+      {/* Compartir WhatsApp — loop viral */}
+      <ShareWhatsApp response={response} query={query} />
 
       {traceId && (
         <p className="text-xs text-center text-muted-foreground">

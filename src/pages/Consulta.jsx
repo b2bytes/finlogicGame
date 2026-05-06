@@ -7,6 +7,7 @@ import { ArrowLeft, Send, ShieldCheck, AlertTriangle } from 'lucide-react';
 import Logo from '@/components/home/Logo';
 import PipelineLoader from '@/components/consulta/PipelineLoader';
 import ResponseCard from '@/components/consulta/ResponseCard';
+import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
 
 export default function Consulta() {
   const [query, setQuery] = useState('');
@@ -64,9 +65,12 @@ export default function Consulta() {
             Volver
           </Link>
           <Logo size="sm" />
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheck className="w-3.5 h-3.5 text-mint-600" />
-            Sin login
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
+              <ShieldCheck className="w-3.5 h-3.5 text-mint-600" />
+              Sin login
+            </div>
+            <AccessibilityToggle />
           </div>
         </div>
       </header>
@@ -142,7 +146,7 @@ export default function Consulta() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tu consulta</p>
               {query}
             </div>
-            <PipelineLoader />
+            <PipelineLoader onRetry={handleSubmit} />
           </div>
         )}
 
@@ -152,7 +156,7 @@ export default function Consulta() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tu consulta</p>
               {query}
             </div>
-            <ResponseCard response={response} traceId={traceId} />
+            <ResponseCard response={response} traceId={traceId} query={query} />
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button
                 onClick={handleReset}

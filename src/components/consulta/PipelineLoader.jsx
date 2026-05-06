@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, RotateCw, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const STAGES = [
   { label: 'Identificando tu situación…', t: 0 },
@@ -9,15 +10,45 @@ const STAGES = [
   { label: 'Verificando antes de entregártela…', t: 38000 },
 ];
 
-export default function PipelineLoader() {
+const TIMEOUT_MS = 90000;
+
+export default function PipelineLoader({ onRetry }) {
   const [stage, setStage] = useState(0);
+  const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
-    const timers = STAGES.map((s, i) =>
-      setTimeout(() => setStage(i), s.t)
-    );
-    return () => timers.forEach(clearTimeout);
+    const timers = STAGES.map((s, i) => setTimeout(() => setStage(i), s.t));
+    const timeoutTimer = setTimeout(() => setTimedOut(true), TIMEOUT_MS);
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(timeoutTimer);
+    };
   }, []);
+
+  if (timedOut) {
+    return (
+      <div className="bg-card rounded-3xl border-2 border-destructive/30 p-6 shadow-soft">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-9 h-9 rounded-full bg-destructive/10 flex items-center justify-center">
+            <AlertCircle className="w-4 h-4 text-destructive" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">Esto está tardando más de lo normal</p>
+            <p className="text-xs text-muted-foreground">El pipeline no respondió en 90s. No es tu culpa.</p>
+          </div>
+        </div>
+        {onRetry && (
+          <Button
+            onClick={onRetry}
+            className="w-full mt-2 rounded-full bg-foreground hover:bg-foreground/90 text-background min-h-[48px] font-semibold"
+          >
+            <RotateCw className="w-4 h-4 mr-2" />
+            Reintentar consulta
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card rounded-3xl border border-border p-6 shadow-soft">
