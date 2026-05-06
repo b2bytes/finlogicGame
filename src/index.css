@@ -182,14 +182,13 @@
     font-feature-settings: "tnum", "zero";
     letter-spacing: 0.01em;
   }
-  /* Cifra-héroe: serif bold gigante con tabular-nums (estilo "$732.000", "1.847") */
+  /* Cifra-héroe: display bold gigante con tabular-nums (estilo "$732.000", "1.847") */
   .hero-number {
-    font-family: 'Fraunces', 'Tiempos Headline', Georgia, serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.035em;
     line-height: 0.95;
-    font-optical-sizing: auto;
   }
 }
 

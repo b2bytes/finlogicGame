@@ -43,7 +43,7 @@ export default function HeroSection() {
               <span className="sm:hidden">Registrada CMF · Pipeline IA en vivo</span>
             </Eyebrow>
 
-            <h1 className="font-editorial text-5xl sm:text-6xl md:text-7xl lg:text-[80px] font-bold text-foreground leading-[0.98]">
+            <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold text-foreground leading-[1.02] tracking-tight">
               Tu derecho<br />financiero,<br />
               <span className="text-mint-600">en tu idioma.</span><br />
               Ahora.

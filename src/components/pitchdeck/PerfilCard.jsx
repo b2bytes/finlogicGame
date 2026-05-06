@@ -29,14 +29,14 @@ export default function PerfilCard({
         {emoji}
       </div>
 
-      <h3 className="font-editorial text-2xl font-bold text-foreground">
+      <h3 className="font-display tracking-tight text-2xl font-bold text-foreground">
         {name} <span className="text-foreground/60">· {age}</span>
       </h3>
       <p className="text-sm text-muted-foreground mt-1">
         {region} · {role}
       </p>
 
-      <p className="mt-5 text-[15px] text-foreground/85 leading-relaxed font-editorial-italic">
+      <p className="mt-5 text-[15px] text-foreground/85 leading-relaxed italic">
         "{quote}"
       </p>
 

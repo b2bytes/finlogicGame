@@ -19,9 +19,13 @@ export default function ROICalculator() {
     const annualCost = monthlyCost * 12;
     const multaClp = MULTA_REFERENCIAL_UF * UF_VALUE_CLP;
     const expectedLoss = multaClp * risk;
-    const savings = expectedLoss - annualCost;
+    const savings = Math.max(0, expectedLoss - annualCost);
+    // ROI = (ahorro neto / costo anual) × 100. Refleja retorno real sobre la inversión.
     const roi = annualCost > 0 ? (savings / annualCost) * 100 : 0;
-    return { monthlyCost, annualCost, multaClp, expectedLoss, savings, roi };
+    // Factor de protección: cuántas veces el costo de la API cubre la pérdida esperada.
+    const protectionFactor = annualCost > 0 ? expectedLoss / annualCost : 0;
+    const extraMonthlyClp = monthlyCost - BASE_MONTHLY_CLP;
+    return { monthlyCost, annualCost, multaClp, expectedLoss, savings, roi, protectionFactor, extraMonthlyClp };
   }, [calls, risk]);
 
   const fmt = (n) => '$' + Math.round(n).toLocaleString('es-CL');
@@ -100,15 +104,25 @@ export default function ROICalculator() {
                     <span className="font-medium text-foreground">{fmt(BASE_MONTHLY_CLP)}/mes</span>
                   </div>
                   <div className="flex justify-between text-sm mb-1.5">
-                    <span className="text-muted-foreground">Llamadas extra</span>
-                    <span className="font-medium text-foreground">
-                      {fmt(data.monthlyCost - BASE_MONTHLY_CLP)}/mes
+                    <span className="text-muted-foreground">
+                      Llamadas extra
+                      {calls > INCLUDED_CALLS && (
+                        <span className="text-[11px] text-muted-foreground/80 ml-1">
+                          ({(calls - INCLUDED_CALLS).toLocaleString('es-CL')} × $0,008 USD)
+                        </span>
+                      )}
+                    </span>
+                    <span className="font-medium text-foreground tabular-nums">
+                      {fmt(data.extraMonthlyClp)}/mes
                     </span>
                   </div>
                   <div className="flex justify-between font-semibold pt-2 border-t border-border mt-2">
-                    <span className="text-foreground">Total anual</span>
-                    <span className="text-foreground">{fmt(data.annualCost)}</span>
+                    <span className="text-foreground">Total anual <span className="text-[11px] font-normal text-muted-foreground">(CLP)</span></span>
+                    <span className="text-foreground tabular-nums">{fmt(data.annualCost)}</span>
                   </div>
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    Tipo de cambio referencial: 1 USD = ${USD_CLP.toLocaleString('es-CL')} CLP. Todos los montos en pesos chilenos.
+                  </p>
                 </div>
               </div>
             </div>
@@ -116,36 +130,39 @@ export default function ROICalculator() {
             {/* Resultado */}
             <div className="p-8 md:p-10 bg-foreground text-background">
               <p className="text-xs font-semibold uppercase tracking-wide opacity-70 mb-2">
-                Tu ahorro esperado
+                Tu ahorro esperado anual <span className="opacity-60">· CLP</span>
               </p>
               <div className="flex items-baseline gap-2 mb-6">
                 <TrendingUp className="w-7 h-7 text-mint-300" strokeWidth={2.5} />
-                <span className="font-display text-4xl md:text-5xl font-bold text-mint-300">
+                <span className="font-display text-4xl md:text-5xl font-bold text-mint-300 tabular-nums">
                   {fmt(data.savings)}
                 </span>
               </div>
-              <p className="text-sm opacity-80 leading-relaxed mb-8">
-                ROI: <span className="font-bold text-mint-300">{Math.round(data.roi).toLocaleString('es-CL')}%</span> sobre el costo anual de la API.
+              <p className="text-sm opacity-80 leading-relaxed mb-2">
+                ROI: <span className="font-bold text-mint-300 tabular-nums">{Math.round(data.roi).toLocaleString('es-CL')}%</span> sobre el costo anual de la API.
+              </p>
+              <p className="text-xs opacity-60 leading-relaxed mb-8">
+                La API te protege <span className="font-semibold opacity-80">{data.protectionFactor.toFixed(1)}×</span> el monto que cuesta operarla.
               </p>
 
               <div className="space-y-3 text-sm border-t border-white/10 pt-6">
                 <div className="flex justify-between">
                   <span className="opacity-70">Multa CMF referencial</span>
-                  <span className="font-medium">{fmt(data.multaClp)}</span>
+                  <span className="font-medium tabular-nums">{fmt(data.multaClp)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="opacity-70">Pérdida esperada (sin API)</span>
-                  <span className="font-medium">{fmt(data.expectedLoss)}</span>
+                  <span className="font-medium tabular-nums">{fmt(data.expectedLoss)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="opacity-70">Costo API anual</span>
-                  <span className="font-medium">{fmt(data.annualCost)}</span>
+                  <span className="font-medium tabular-nums">{fmt(data.annualCost)}</span>
                 </div>
               </div>
 
               <p className="mt-8 text-xs opacity-60 leading-relaxed">
-                Multa referencial: 5.000 UF (~{fmt(data.multaClp)}). Cálculo conservador asumiendo
-                un solo evento/año. La pérdida real puede incluir reputacional, suspensión y costos legales.
+                Multa referencial: 5.000 UF (~{fmt(data.multaClp)} CLP). Cálculo conservador asumiendo
+                un solo evento/año. La pérdida real puede incluir daño reputacional, suspensión operativa y costos legales.
               </p>
             </div>
           </div>

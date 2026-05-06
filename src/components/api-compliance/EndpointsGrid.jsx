@@ -58,13 +58,16 @@ export default function EndpointsGrid() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {endpoints.map((ep) => {
+        {/* 5 cards: 3 arriba + 2 centradas abajo en desktop. Mobile: 1 col. Tablet: 2 col. */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-6 gap-4">
+          {endpoints.map((ep, idx) => {
+            // Primeras 3 ocupan 2 cols cada una (6/3=2). Últimas 2 ocupan 3 cols cada una y se centran (6/2=3).
+            const span = idx < 3 ? 'lg:col-span-2' : 'lg:col-span-3';
             const Icon = ep.icon;
             return (
               <article
                 key={ep.path}
-                className="bg-card rounded-3xl border border-border p-6 shadow-soft hover:shadow-soft-lg hover:border-mint-200 transition-all"
+                className={`bg-card rounded-3xl border border-border p-6 shadow-soft hover:shadow-soft-lg hover:border-mint-200 transition-all ${span}`}
               >
                 <div className="w-11 h-11 rounded-2xl bg-mint-50 flex items-center justify-center mb-4">
                   <Icon className="w-5 h-5 text-mint-700" strokeWidth={2.2} />

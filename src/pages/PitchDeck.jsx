@@ -109,7 +109,7 @@ export default function PitchDeck() {
           <div className="lg:col-span-3 animate-fade-up">
             <Logo size="md" />
 
-            <h1 className="mt-10 font-editorial font-bold text-foreground leading-[0.96] text-5xl sm:text-7xl lg:text-[96px]">
+            <h1 className="mt-10 font-display tracking-tight font-bold text-foreground leading-[0.96] text-5xl sm:text-7xl lg:text-[96px]">
               Tu derecho<br />
               financiero,<br />
               <span className="text-mint-600">en tu idioma.</span><br />
@@ -305,7 +305,7 @@ export default function PitchDeck() {
           <Eyebrow size="sm" className="mb-3">Precio</Eyebrow>
           <div className="flex items-baseline gap-3 flex-wrap">
             <span className="hero-number text-foreground text-5xl sm:text-7xl">$490.000</span>
-            <span className="font-editorial-italic text-2xl text-muted-foreground">CLP/mes</span>
+            <span className="italic font-display text-2xl text-muted-foreground">CLP/mes</span>
           </div>
           <p className="mt-4 text-xs font-mono-editorial uppercase tracking-wider text-muted-foreground">
             10K llamadas + $0,008 USD c/u
@@ -353,9 +353,9 @@ export default function PitchDeck() {
             return (
               <div key={m.name} className="bg-background rounded-3xl border border-border p-7 sm:p-8 shadow-soft hover:shadow-soft-lg transition-all">
                 <div className={`w-14 h-14 rounded-full ${bgs[m.bg]} flex items-center justify-center mb-5`}>
-                  <span className="font-editorial font-bold text-xl text-foreground">{m.initial}</span>
+                  <span className="font-display tracking-tight font-bold text-xl text-foreground">{m.initial}</span>
                 </div>
-                <h3 className="font-editorial text-2xl font-bold text-foreground">{m.name}</h3>
+                <h3 className="font-display tracking-tight text-2xl font-bold text-foreground">{m.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{m.role}</p>
                 <p className="mt-4 text-sm text-foreground/85 leading-relaxed">{m.desc}</p>
               </div>
@@ -372,7 +372,7 @@ export default function PitchDeck() {
         </div>
 
         <div className="max-w-5xl mx-auto w-full text-center">
-          <h2 className="font-editorial font-bold text-foreground leading-[0.95] text-5xl sm:text-7xl lg:text-[112px]">
+          <h2 className="font-display tracking-tight font-bold text-foreground leading-[0.95] text-5xl sm:text-7xl lg:text-[112px]">
             Tu derecho.<br />
             En tu idioma.<br />
             <span className="text-mint-600">Ahora.</span>
@@ -385,12 +385,12 @@ export default function PitchDeck() {
           <div className="mt-12 grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto text-left">
             <div className="bg-card rounded-3xl border border-border p-7 shadow-soft">
               <Eyebrow size="sm" className="mb-3">Necesitamos</Eyebrow>
-              <p className="font-editorial font-bold text-foreground text-2xl">3 fintechs piloto</p>
+              <p className="font-display tracking-tight font-bold text-foreground text-2xl">3 fintechs piloto</p>
               <p className="mt-2 text-sm text-muted-foreground">Para validar la API antes del 4 jul.</p>
             </div>
             <div className="bg-card rounded-3xl border border-border p-7 shadow-soft">
               <Eyebrow size="sm" className="mb-3">Necesitamos</Eyebrow>
-              <p className="font-editorial font-bold text-foreground text-2xl">Convenio CMF</p>
+              <p className="font-display tracking-tight font-bold text-foreground text-2xl">Convenio CMF</p>
               <p className="mt-2 text-sm text-muted-foreground">Para datos verificados en tiempo real.</p>
             </div>
           </div>

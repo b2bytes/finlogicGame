@@ -40,7 +40,7 @@ export default function EditorialHeading({
   if (children) {
     return (
       <Tag
-        className={`font-editorial font-bold leading-[1.05] text-foreground ${sizes[size]} ${aligns[align]} ${className}`}
+        className={`font-display font-bold leading-[1.05] tracking-tight text-foreground ${sizes[size]} ${aligns[align]} ${className}`}
       >
         {children}
       </Tag>
@@ -49,7 +49,7 @@ export default function EditorialHeading({
 
   return (
     <Tag
-      className={`font-editorial font-bold leading-[1.05] text-foreground ${sizes[size]} ${aligns[align]} ${className}`}
+      className={`font-display font-bold leading-[1.05] tracking-tight text-foreground ${sizes[size]} ${aligns[align]} ${className}`}
     >
       {before && <span>{before}</span>}
       {before && accent && <br />}

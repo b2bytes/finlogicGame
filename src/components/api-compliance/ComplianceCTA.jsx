@@ -41,8 +41,8 @@ export default function ComplianceCTA() {
           </Button>
         </div>
 
-        <p className="mt-10 text-xs opacity-50">
-          b2b@finlogic.one · Documentación técnica disponible bajo NDA
+        <p className="mt-10 text-xs opacity-60">
+          b2b@finlogic.one · <a href="#endpoints" className="underline hover:text-mint-300 transition-colors">Documentación pública de endpoints</a> · OpenAPI 3.1 disponible
         </p>
       </div>
     </section>
