@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 
 const fallback = {
-  consultas: 45,
+  consultas: 8,
   documentos: 8,
   recuperados: 8164990,
-  score: 80,
+  score: 89,
 };
 
 export default function StatsBar() {
@@ -23,7 +23,6 @@ export default function StatsBar() {
       const consultas = Math.max(tracesArr.length, casosArr.length) || fallback.consultas;
       const recuperados = casosArr.reduce((s, c) => s + (c.amountInvolved || 0), 0) || fallback.recuperados;
 
-      // Score: prioriza traces, fallback a casos
       const traceScores = tracesArr.filter(t => typeof t.verifierScore === 'number').map(t => t.verifierScore);
       const casoScores = casosArr.filter(c => typeof c.verifierScore === 'number').map(c => c.verifierScore);
       const allScores = [...traceScores, ...casoScores];
@@ -44,55 +43,52 @@ export default function StatsBar() {
     {
       value: stats.consultas.toLocaleString('es-CL'),
       label: 'consultas resueltas',
-      emoji: '⚖️',
-      bg: 'bg-gradient-to-br from-mint-300 via-mint-400 to-mint-500',
+      icon: '⚖️',
+      bg: 'bg-[#C5E8D5]',
+      iconBg: 'bg-white/60',
     },
     {
       value: stats.documentos.toLocaleString('es-CL'),
       label: 'documentos legales',
-      emoji: '📄',
-      bg: 'bg-gradient-to-br from-purple-200 via-purple-300 to-purple-400',
+      icon: '📄',
+      bg: 'bg-[#DCC9F0]',
+      iconBg: 'bg-white/60',
     },
     {
       value: `$${(stats.recuperados / 1000000).toFixed(1)}M`,
       label: 'CLP recuperados',
-      emoji: '💰',
-      bg: 'bg-gradient-to-br from-emerald-300 via-teal-400 to-cyan-500',
+      icon: '💰',
+      bg: 'bg-[#FFD4B0]',
+      iconBg: 'bg-white/60',
     },
     {
       value: `${stats.score}/100`,
       label: 'score verificador IA',
-      emoji: '🛡️',
-      bg: 'bg-gradient-to-br from-orange-200 via-amber-300 to-amber-400',
+      icon: '🛡️',
+      bg: 'bg-[#FFE08A]',
+      iconBg: 'bg-white/60',
     },
   ];
 
   return (
-    <section className="py-12 md:py-16">
+    <section className="py-8 md:py-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-baseline justify-between flex-wrap gap-2 mb-8">
-          <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-            Datos en producción
-          </h2>
-          <p className="text-xs text-muted-foreground font-mono">
-            actualizado en vivo · cero mocks
-          </p>
-        </div>
+        <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-6">
+          Datos en producción
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
           {items.map((stat) => (
             <div
               key={stat.label}
-              className={`relative ${stat.bg} rounded-3xl p-6 md:p-7 overflow-hidden hover:shadow-soft-lg transition-all duration-300 min-h-[160px] flex items-center gap-4`}
+              className={`${stat.bg} rounded-[28px] p-6 md:p-7 hover:shadow-soft-lg transition-all duration-300`}
             >
-              <div className="text-4xl md:text-5xl flex-shrink-0">
-                {stat.emoji}
+              <div className={`w-12 h-12 rounded-2xl ${stat.iconBg} flex items-center justify-center text-2xl mb-4`}>
+                {stat.icon}
               </div>
-              <div className="min-w-0">
-                <div className="font-display text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-sm leading-none">
-                  {stat.value}
-                </div>
-                <p className="mt-1.5 text-sm font-medium text-white/90">{stat.label}</p>
+              <div className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground leading-none tabular-nums">
+                {stat.value}
               </div>
+              <p className="mt-2 text-sm font-medium text-foreground/70">{stat.label}</p>
             </div>
           ))}
         </div>
