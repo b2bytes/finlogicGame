@@ -1,0 +1,122 @@
+{
+  "name": "ConsultationHistory",
+  "type": "object",
+  "description": "Historial conversacional persistente de cada consulta ciudadana. Una fila por turno (mensaje usuario + respuesta agente). Vinculada a AgentTrace y MisCasos.",
+  "properties": {
+    "sessionId": {
+      "type": "string",
+      "description": "ID de sesi\u00f3n de conversaci\u00f3n"
+    },
+    "userMessage": {
+      "type": "string",
+      "description": "Mensaje original del ciudadano"
+    },
+    "agentResponse": {
+      "type": "string",
+      "description": "Respuesta del agente (Lya o especialista)"
+    },
+    "agentName": {
+      "type": "string",
+      "enum": [
+        "Lya",
+        "AgenteCMF",
+        "AgenteSERNAC",
+        "AgenteSII",
+        "AgenteAntifraude",
+        "AgenteDocumentos",
+        "AgenteEducativo",
+        "AgenteCompliance"
+      ],
+      "default": "Lya"
+    },
+    "caseCreated": {
+      "type": "boolean",
+      "default": false
+    },
+    "linkedCaseId": {
+      "type": "string",
+      "description": "Reference \u2192 MisCasos.id si se cre\u00f3 caso"
+    },
+    "documentGenerated": {
+      "type": "boolean",
+      "default": false
+    },
+    "linkedDocumentId": {
+      "type": "string",
+      "description": "Reference \u2192 GeneratedDocument.id si se gener\u00f3 documento"
+    },
+    "regulatoryBodyIdentified": {
+      "type": "string",
+      "enum": [
+        "CMF",
+        "SERNAC",
+        "SII",
+        "CSIRT",
+        "BCN",
+        "FOGAPE",
+        "SERCOTEC",
+        "multiple",
+        "ninguno"
+      ],
+      "default": "ninguno"
+    },
+    "linkedTraceId": {
+      "type": "string",
+      "description": "Reference \u2192 AgentTrace.id"
+    },
+    "userSatisfactionRating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Rating CSAT post-respuesta"
+    },
+    "inputChannel": {
+      "type": "string",
+      "enum": [
+        "web",
+        "whatsapp",
+        "voice",
+        "telegram"
+      ],
+      "default": "web"
+    },
+    "tokensConsumed": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "sessionId",
+    "userMessage"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    }
+  }
+}
