@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ShieldCheck, Menu, X, ArrowRight } from 'lucide-react';
 import Logo from './Logo';
 import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
+import SkinSwitcher from '@/components/skins/SkinSwitcher.jsx';
 
 const navItems = [
   { label: 'Lya IA', to: '/AsistenteLya' },
@@ -49,6 +50,7 @@ export default function HeroNav() {
             <ShieldCheck className="w-3 h-3 text-mint-600" />
             <span className="font-semibold text-mint-700">Ley 21.521</span>
           </div>
+          <SkinSwitcher />
           <AccessibilityToggle />
           <Button
             asChild

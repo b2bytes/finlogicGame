@@ -8,9 +8,11 @@ import Logo from '@/components/home/Logo';
 import PipelineLoader from '@/components/consulta/PipelineLoader';
 import ResponseCard from '@/components/consulta/ResponseCard';
 import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
+import SkinSwitcher from '@/components/skins/SkinSwitcher.jsx';
 import VoiceInput from '@/components/consulta/VoiceInput';
 import ConsultaSidePanel from '@/components/consulta/ConsultaSidePanel';
 import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
+import { useSkin } from '@/lib/SkinContext.jsx';
 
 export default function Consulta() {
   const [query, setQuery] = useState('');
@@ -21,6 +23,7 @@ export default function Consulta() {
   const [voiceMode, setVoiceMode] = useState(false);
   const location = useLocation();
   const lyaVoice = useLyaVoice();
+  const { setSkin } = useSkin();
 
   // Lee ?q= del HeroSection y ?modo=voz para activar voz al entrar
   useEffect(() => {
@@ -58,6 +61,10 @@ export default function Consulta() {
       if (data?.success) {
         setResponse(data.response);
         setTraceId(data.traceId);
+        // Skin Adaptativo: aplica el perfil detectado por triage (no sobreescribe selección manual)
+        if (data.response?.detectedProfile) {
+          setSkin(data.response.detectedProfile, { auto: true });
+        }
         // Si la consulta entró por voz, Lya responde hablando (manos libres real)
         if (voiceMode && lyaVoice.ttsSupported && data.response) {
           const spoken = [
@@ -98,6 +105,7 @@ export default function Consulta() {
               <ShieldCheck className="w-3.5 h-3.5 text-mint-600" />
               Sin login
             </div>
+            <SkinSwitcher />
             <AccessibilityToggle />
           </div>
         </div>

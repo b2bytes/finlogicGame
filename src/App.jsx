@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { AccessibilityProvider } from '@/lib/AccessibilityContext';
+import { SkinProvider } from '@/lib/SkinContext.jsx';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from '@/pages/Home';
 import Consulta from '@/pages/Consulta';
@@ -102,12 +103,14 @@ function App() {
   return (
     <AuthProvider>
       <AccessibilityProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
-            <AuthenticatedApp />
-          </Router>
-          <Toaster />
-        </QueryClientProvider>
+        <SkinProvider>
+          <QueryClientProvider client={queryClientInstance}>
+            <Router>
+              <AuthenticatedApp />
+            </Router>
+            <Toaster />
+          </QueryClientProvider>
+        </SkinProvider>
       </AccessibilityProvider>
     </AuthProvider>
   )

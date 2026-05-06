@@ -193,3 +193,90 @@
     line-height: 1.6;
   }
 }
+
+/* ============================================================
+   SKINS ADAPTATIVOS — 4 perfiles canónicos del mandato
+   Cada skin altera tokens vía clase en <html>: skin-{key}
+   ============================================================ */
+@layer base {
+  /* CAMILA — 22 Stgo · móvil-first · vibrante · acento púrpura */
+  html.skin-camila {
+    --primary: 280 60% 55%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 280 60% 55%;
+    --mint-500: 280 60% 55%;
+    --mint-600: 280 65% 47%;
+    --mint-700: 280 70% 38%;
+    --mint-50: 280 60% 96%;
+    --mint-100: 280 55% 90%;
+    --mint-200: 280 50% 82%;
+    --mint-300: 280 55% 70%;
+    --accent: 50 90% 92%;
+    --radius: 1.25rem;
+  }
+  html.skin-camila body {
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  /* DON LUIS — 68 Vlpo · accesible · texto grande · alto contraste */
+  html.skin-don_luis {
+    font-size: 18.75px;
+    --foreground: 220 40% 8%;
+    --muted-foreground: 220 25% 28%;
+    --border: 220 20% 65%;
+    --primary: 158 70% 28%;
+    --mint-500: 158 70% 28%;
+    --mint-600: 158 75% 22%;
+    --mint-700: 158 80% 18%;
+    --mint-50: 158 50% 94%;
+    --mint-200: 158 50% 70%;
+    --radius: 1.5rem;
+  }
+  html.skin-don_luis body {
+    font-weight: 500;
+  }
+  html.skin-don_luis button,
+  html.skin-don_luis a[role="button"],
+  html.skin-don_luis [type="button"],
+  html.skin-don_luis [type="submit"] {
+    min-height: 48px;
+  }
+  html.skin-don_luis .text-xs { font-size: 0.95rem; line-height: 1.5; }
+  html.skin-don_luis .text-sm { font-size: 1.05rem; line-height: 1.6; }
+
+  /* MARÍA JOSÉ — 34 Tco · emprendedora · profesional + naranja pyme */
+  html.skin-maria_jose {
+    --primary: 28 80% 50%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 28 80% 50%;
+    --mint-500: 28 80% 50%;
+    --mint-600: 28 85% 42%;
+    --mint-700: 28 90% 34%;
+    --mint-50: 28 80% 96%;
+    --mint-100: 28 75% 88%;
+    --mint-200: 28 70% 80%;
+    --mint-300: 28 75% 65%;
+    --accent: 158 50% 92%;
+    --radius: 1rem;
+  }
+
+  /* ROBERTO — 45 Antof. · técnico · navy + mint · densidad alta */
+  html.skin-roberto {
+    --background: 220 25% 97%;
+    --primary: 220 60% 35%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 220 60% 35%;
+    --mint-500: 220 60% 35%;
+    --mint-600: 220 65% 28%;
+    --mint-700: 220 70% 22%;
+    --mint-50: 220 50% 96%;
+    --mint-200: 220 50% 80%;
+    --accent: 158 40% 90%;
+    --radius: 0.625rem;
+  }
+  html.skin-roberto h1,
+  html.skin-roberto h2,
+  html.skin-roberto h3 {
+    letter-spacing: -0.02em;
+  }
+}

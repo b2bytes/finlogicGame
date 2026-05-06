@@ -2,6 +2,7 @@ import React from 'react';
 import DesignHero from '@/components/diseno/DesignHero';
 import UserFlowsMap from '@/components/diseno/UserFlowsMap';
 import DesignSystem from '@/components/diseno/DesignSystem';
+import SkinsShowcase from '@/components/diseno/SkinsShowcase';
 import WireframesGallery from '@/components/diseno/WireframesGallery';
 import DesignGuideChat from '@/components/diseno/DesignGuideChat';
 import Footer from '@/components/home/Footer';
@@ -19,6 +20,7 @@ export default function Diseno() {
     <div className="min-h-[100dvh] bg-background">
       <main>
         <DesignHero />
+        <SkinsShowcase />
         <UserFlowsMap />
         <DesignSystem />
         <WireframesGallery />
