@@ -85,6 +85,8 @@ export default function EmbedLya() {
           text: data.response,
           sources: data.sources,
           confidence: data.confidence,
+          verifierScore: data.verifierScore,
+          hallucinationRisk: data.hallucinationRisk,
           regulatoryBody: data.regulatoryBody,
           shouldEscalate: data.shouldEscalate,
           ctaUrl: data.ctaUrl,
@@ -278,6 +280,8 @@ export default function EmbedLya() {
                 <EmbedSources
                   sources={m.sources}
                   confidence={m.confidence}
+                  verifierScore={m.verifierScore}
+                  hallucinationRisk={m.hallucinationRisk}
                   regulatoryBody={m.regulatoryBody}
                   accentBg={colors.bg}
                 />

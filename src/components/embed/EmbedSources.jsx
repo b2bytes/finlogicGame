@@ -1,10 +1,22 @@
 import React from 'react';
-import { ShieldCheck, BookOpen } from 'lucide-react';
+import { ShieldCheck, BookOpen, AlertTriangle, ShieldAlert } from 'lucide-react';
 
-export default function EmbedSources({ sources, confidence, regulatoryBody, accentBg }) {
-  if ((!sources || sources.length === 0) && confidence == null) return null;
+export default function EmbedSources({ sources, confidence, regulatoryBody, accentBg, verifierScore, hallucinationRisk }) {
+  if ((!sources || sources.length === 0) && confidence == null && verifierScore == null) return null;
 
   const confidencePct = confidence != null ? Math.round(confidence * 100) : null;
+
+  // Trust badge — paridad con LyaTrustBadge del widget principal
+  let trust = null;
+  if (typeof verifierScore === 'number') {
+    if (hallucinationRisk === 'high' || verifierScore < 60) {
+      trust = { label: 'Verificar fuente', color: '#991b1b', bg: '#fef2f2', border: '#fecaca', Icon: ShieldAlert };
+    } else if (hallucinationRisk === 'medium' || verifierScore < 80) {
+      trust = { label: 'Confianza media', color: '#b45309', bg: '#fffbeb', border: '#fde68a', Icon: AlertTriangle };
+    } else {
+      trust = { label: 'Verificado', color: '#047857', bg: '#ecfdf5', border: '#a7f3d0', Icon: ShieldCheck };
+    }
+  }
 
   return (
     <div
@@ -18,6 +30,24 @@ export default function EmbedSources({ sources, confidence, regulatoryBody, acce
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        {trust && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              background: trust.bg,
+              color: trust.color,
+              border: `1px solid ${trust.border}`,
+              padding: '2px 8px',
+              borderRadius: 999,
+              fontWeight: 600,
+              fontSize: 10,
+            }}
+          >
+            <trust.Icon size={10} /> {trust.label} · {verifierScore}/100
+          </span>
+        )}
         {regulatoryBody && (
           <span
             style={{
