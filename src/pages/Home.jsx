@@ -15,7 +15,6 @@ import Footer from '@/components/home/Footer';
 import ImpactPullQuote from '@/components/home/ImpactPullQuote';
 import CapasFinLogic from '@/components/home/CapasFinLogic';
 import SFAUrgencyBanner from '@/components/home/SFAUrgencyBanner';
-import ImpactLabBadge from '@/components/home/ImpactLabBadge';
 import ImpactLabBanner from '@/components/home/ImpactLabBanner';
 import OrganismosCobertura from '@/components/home/OrganismosCobertura';
 import DiferencialFinLogic from '@/components/home/DiferencialFinLogic';
@@ -28,8 +27,8 @@ export default function Home() {
       <ImpactLabBanner />
       <HeroNav />
       <main>
+        <ImpactLabBanner />
         <SFAUrgencyBanner />
-        <ImpactLabBadge />
         <HeroSection />
         <MediaLogos />
         <OrganismosCobertura />
