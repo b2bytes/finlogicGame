@@ -1,88 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    /* === FinLogic — Ciudadano Cálido Apple === */
+    /* Apple + Wise + Mercado Pago: blanco, mint suave, radio 24px+, sombras blandas */
+
+    /* Surface (blanco cálido, casi imperceptible) */
+    --background: 60 30% 98%;
+    --foreground: 220 25% 12%;
+
+    /* Cards con un punto más cálidas que el fondo */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 220 25% 12%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --popover-foreground: 220 25% 12%;
+
+    /* Primary: Mint Wise — verde menta cálido y premium */
+    --primary: 158 52% 42%;
+    --primary-foreground: 60 30% 98%;
+
+    /* Secondary: arena tibia (cálido) */
+    --secondary: 38 35% 94%;
+    --secondary-foreground: 220 25% 18%;
+
+    /* Muted: gris muy cálido */
+    --muted: 40 20% 95%;
+    --muted-foreground: 220 10% 45%;
+
+    /* Accent: durazno suave Apple */
+    --accent: 28 80% 92%;
+    --accent-foreground: 220 25% 18%;
+
+    /* Destructive: coral, no rojo agresivo */
+    --destructive: 8 75% 58%;
+    --destructive-foreground: 60 30% 98%;
+
+    /* Border casi invisible (estilo Apple) */
+    --border: 40 15% 90%;
+    --input: 40 15% 90%;
+    --ring: 158 52% 42%;
+
+    /* Mint scale para usos específicos */
+    --mint-50: 158 50% 96%;
+    --mint-100: 158 48% 90%;
+    --mint-200: 158 46% 80%;
+    --mint-300: 158 48% 68%;
+    --mint-400: 158 50% 55%;
+    --mint-500: 158 52% 42%;
+    --mint-600: 158 55% 34%;
+    --mint-700: 158 58% 26%;
+
+    /* Charts */
+    --chart-1: 158 52% 42%;
+    --chart-2: 28 80% 65%;
+    --chart-3: 220 60% 55%;
+    --chart-4: 38 75% 60%;
+    --chart-5: 280 50% 60%;
+
+    /* Apple-style: radios grandes y suaves */
+    --radius: 1.5rem;
+
+    /* Sidebar */
+    --sidebar-background: 60 30% 98%;
+    --sidebar-foreground: 220 25% 18%;
+    --sidebar-primary: 158 52% 42%;
+    --sidebar-primary-foreground: 60 30% 98%;
+    --sidebar-accent: 158 50% 96%;
+    --sidebar-accent-foreground: 158 58% 26%;
+    --sidebar-border: 40 15% 90%;
+    --sidebar-ring: 158 52% 42%;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --background: 220 30% 8%;
+    --foreground: 60 30% 96%;
+    --card: 220 28% 11%;
+    --card-foreground: 60 30% 96%;
+    --popover: 220 28% 11%;
+    --popover-foreground: 60 30% 96%;
+    --primary: 158 55% 55%;
+    --primary-foreground: 220 30% 8%;
+    --secondary: 220 22% 16%;
+    --secondary-foreground: 60 30% 96%;
+    --muted: 220 22% 16%;
+    --muted-foreground: 220 12% 65%;
+    --accent: 220 22% 18%;
+    --accent-foreground: 60 30% 96%;
+    --destructive: 8 70% 60%;
+    --destructive-foreground: 60 30% 96%;
+    --border: 220 22% 18%;
+    --input: 220 22% 18%;
+    --ring: 158 55% 55%;
+    --chart-1: 158 55% 55%;
+    --chart-2: 28 75% 65%;
+    --chart-3: 220 60% 65%;
+    --chart-4: 38 70% 60%;
+    --chart-5: 280 55% 65%;
+    --sidebar-background: 220 30% 10%;
+    --sidebar-foreground: 60 30% 96%;
+    --sidebar-primary: 158 55% 55%;
+    --sidebar-primary-foreground: 220 30% 8%;
+    --sidebar-accent: 220 22% 16%;
+    --sidebar-accent-foreground: 60 30% 96%;
+    --sidebar-border: 220 22% 18%;
+    --sidebar-ring: 158 55% 55%;
   }
 }
-
-
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
 
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer utilities {
+  /* Sombras Apple-style: blandas, en capas */
+  .shadow-soft {
+    box-shadow: 0 1px 2px hsl(220 25% 12% / 0.04), 0 8px 24px hsl(220 25% 12% / 0.06);
+  }
+  .shadow-soft-lg {
+    box-shadow: 0 2px 4px hsl(220 25% 12% / 0.04), 0 24px 48px hsl(220 25% 12% / 0.08);
+  }
+  .shadow-mint {
+    box-shadow: 0 1px 2px hsl(158 52% 42% / 0.08), 0 12px 32px hsl(158 52% 42% / 0.18);
+  }
+
+  /* Glassmorphism Apple */
+  .glass {
+    @apply backdrop-blur-xl bg-white/70;
+    -webkit-backdrop-filter: blur(24px);
   }
 }

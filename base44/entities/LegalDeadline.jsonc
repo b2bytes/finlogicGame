@@ -1,0 +1,119 @@
+{
+  "name": "LegalDeadline",
+  "type": "object",
+  "description": "Plazo legal vinculado a un caso ciudadano. Trigger autom\u00e1tico de alertas WhatsApp y email cuando se acerca el vencimiento.",
+  "properties": {
+    "casoRef": {
+      "type": "string",
+      "description": "Reference \u2192 MisCasos ID"
+    },
+    "normativeRef": {
+      "type": "string",
+      "description": "Identificador del plazo normativo, ej: 'ley_20009_fraude_5dias'"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del plazo en lenguaje ciudadano"
+    },
+    "deadlineDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha exacta de vencimiento"
+    },
+    "daysLimit": {
+      "type": "number",
+      "description": "Cantidad de d\u00edas del plazo legal"
+    },
+    "dayType": {
+      "type": "string",
+      "enum": [
+        "habiles",
+        "corridos"
+      ],
+      "default": "habiles"
+    },
+    "organism": {
+      "type": "string",
+      "enum": [
+        "CMF",
+        "SERNAC",
+        "SII",
+        "CSIRT",
+        "BCN",
+        "BANCO"
+      ]
+    },
+    "legalBasis": {
+      "type": "string",
+      "description": "Art\u00edculo espec\u00edfico de la ley, ej: 'Art\u00edculo 5\u00b0 Ley 20.009'"
+    },
+    "consequence": {
+      "type": "string",
+      "description": "Qu\u00e9 pasa si vence el plazo"
+    },
+    "alertSent7d": {
+      "type": "boolean",
+      "default": false,
+      "description": "Alerta enviada 7 d\u00edas antes"
+    },
+    "alertSent3d": {
+      "type": "boolean",
+      "default": false,
+      "description": "Alerta enviada 3 d\u00edas antes"
+    },
+    "alertSent1d": {
+      "type": "boolean",
+      "default": false,
+      "description": "Alerta enviada 1 d\u00eda antes"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendiente",
+        "alertado",
+        "cumplido",
+        "vencido"
+      ],
+      "default": "pendiente"
+    }
+  },
+  "required": [
+    "casoRef",
+    "normativeRef",
+    "description",
+    "deadlineDate",
+    "daysLimit",
+    "organism",
+    "legalBasis"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    }
+  }
+}
