@@ -16,15 +16,12 @@ DON LUIS · 68a · Valparaíso · pensionado AFP, $350K, accesibilidad WCAG AA.
 MARÍA JOSÉ · 34a · Temuco · pyme EIRL, facturación <$3M, busca Pro-Pyme.
 ROBERTO · 45a · Antofagasta · minero, $1.5M, víctima phishing recurrente.`;
 
-const CANAL = `4 canales reales, sin "internet" genérico:
+const CANAL = `4 canales reales (no "internet" ni "app móvil" genéricos):
 
-1. WEB APP finlogic.one — punto de entrada SEO indexable, zero-login para primera consulta.
-
-2. WHATSAPP BUSINESS API — canal #1 en Chile (96% penetración Subtel 2024), distribución vía agente Lya. Crítico para Don Luis (68a) que no descarga apps.
-
-3. WIDGET EMBED B2G — integrable en sernac.cl, municipalidades y CSIRT. Vive donde ya están los reclamos ciudadanos.
-
-4. COMPLIANCE API B2B — fintechs reguladas consumen FinLogic para validación regulatoria automática (Ley 21.521 SFA obliga a 312 fintechs antes del 4 jul 2026).`;
+WEB finlogic.one · SEO indexable, zero-login primera consulta.
+WHATSAPP BUSINESS · 96% penetración Subtel 2024, crítico para Don Luis.
+WIDGET EMBED B2G · integrable en sernac.cl, municipios y CSIRT.
+COMPLIANCE API B2B · 312 fintechs Ley 21.521 obligadas antes 4 jul 2026.`;
 
 const IMPACTO = `Datos cuantificados con fuente .gob.cl / .cl oficial:
 
