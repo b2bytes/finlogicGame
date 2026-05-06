@@ -3,24 +3,14 @@ import { base44 } from '@/api/base44Client';
 
 /**
  * useLyaActions — Detector + ejecutor de "acciones reales" sobre datos en vivo CMF.
- *
- * Sobre la navegación pura, este hook permite a Lya RESPONDER con datos reales:
- *   · "¿Cuánto vale la UF hoy?"            → cmfRealAPI indicators
- *   · "Convierte 2 millones a UF"          → cmfRealAPI convert
- *   · "Valor del dólar"                    → cmfRealAPI indicators
- *   · "¿Cuál es la TPM?" / "TPM actual"    → cmfRealAPI indicators
- *
- * 100% local en detección (regex), datos 100% reales vía función backend.
  */
 
 function normalize(t) {
   return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-// Convierte "dos millones", "1.5 millones", "500 mil" → número
 function parseAmount(text) {
   const t = normalize(text).replace(/\./g, '').replace(/,/g, '.');
-  // patrón con multiplicador
   const m = t.match(/([\d]+(?:\.[\d]+)?)\s*(millones?|mill|millon|mil|k|m)?/);
   if (!m) return null;
   let n = parseFloat(m[1]);
@@ -43,7 +33,6 @@ function detectIndicatorIntent(text) {
     { key: 'imacec', triggers: ['imacec'] },
     { key: 'libra_cobre', triggers: ['cobre', 'libra de cobre', 'libra cobre'] },
   ];
-  // pregunta tipo "cuanto vale", "valor de", "cual es"
   const askingValue = /(cuanto|cu[aá]l|valor|precio|hoy|actual)/.test(n);
   for (const ind of indicators) {
     if (ind.triggers.some((tr) => new RegExp(`(^|\\s)${tr}(\\s|$|\\?)`).test(n))) {
@@ -57,7 +46,6 @@ function detectIndicatorIntent(text) {
 
 function detectConvertIntent(text) {
   const n = normalize(text);
-  // patrones: "convierte X uf a clp", "X uf en pesos", "cuanto son X clp en uf"
   const conv = /(?:convierte|cuanto\s+(?:es|son|equivale)|pasa)\s+([\d.,]+\s*(?:millones?|mill|mil|k|m)?)\s*(uf|clp|peso|pesos|usd|dolares?|dolar)\s+(?:a|en)\s+(uf|clp|peso|pesos|usd|dolares?|dolar)/;
   const m = n.match(conv);
   if (!m) return null;
@@ -76,12 +64,7 @@ function detectConvertIntent(text) {
 }
 
 export function useLyaActions() {
-  /**
-   * Intenta resolver con datos REALES CMF.
-   * Retorna { handled: bool, response: string | null }
-   */
   const tryAction = useCallback(async (text) => {
-    // 1. Conversión explícita (más específico, va primero)
     const conv = detectConvertIntent(text);
     if (conv) {
       try {
@@ -100,7 +83,6 @@ export function useLyaActions() {
       } catch (_) { return { handled: false }; }
     }
 
-    // 2. Indicador puntual
     const indKey = detectIndicatorIntent(text);
     if (indKey) {
       try {

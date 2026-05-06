@@ -10,7 +10,7 @@ import ResponseCard from '@/components/consulta/ResponseCard';
 import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
 import VoiceInput from '@/components/consulta/VoiceInput';
 import ConsultaSidePanel from '@/components/consulta/ConsultaSidePanel';
-import { useLyaVoice } from '@/lib/useLyaVoice';
+import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
 
 export default function Consulta() {
   const [query, setQuery] = useState('');

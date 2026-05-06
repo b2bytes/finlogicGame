@@ -3,18 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 /**
  * Lya Navigator — parser de intenciones de navegación 100% local (sin LLM).
- *
- * Convierte frases naturales del usuario en acciones de navegación dentro de la app.
- * No altera ninguna estructura existente: solo dispara `navigate(path)` y devuelve
- * un mensaje que Lya puede leer en voz alta para guiar al usuario.
- *
- * Detecta dos tipos de patrones:
- *  1. Verbo de navegación explícito: "llévame a", "muéstrame", "ábreme", "ir a"…
- *  2. Mención directa de la sección: "mis casos", "transparencia", "precios"…
  */
 
-// ─── Mapa de rutas conocidas ────────────────────────────────────────────────
-// Cada destino: keywords (lemmatización ligera) + path + frase guía hablada.
 const DESTINATIONS = [
   {
     path: '/Consulta',
@@ -96,7 +86,6 @@ const DESTINATIONS = [
   },
 ];
 
-// Verbos de navegación: si aparecen, sube la confianza
 const NAV_VERBS = [
   'llevame', 'llévame', 'lleva me',
   'muestrame', 'muéstrame', 'muestra me',
@@ -111,20 +100,12 @@ function normalize(text) {
   return (text || '')
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // quita acentos
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/[¿?¡!.,;:]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-/**
- * Devuelve { destination, confidence } o null si no hay intención de navegación.
- *
- * Confidence:
- *  - 0.9 si verbo de navegación + keyword
- *  - 0.6 si solo keyword (frase corta < 8 palabras)
- *  - null si nada coincide
- */
 export function detectNavigationIntent(text) {
   const norm = normalize(text);
   if (!norm) return null;
@@ -132,12 +113,10 @@ export function detectNavigationIntent(text) {
   const wordCount = norm.split(' ').length;
   const hasVerb = NAV_VERBS.some((v) => norm.includes(normalize(v)));
 
-  // Buscar destino por keywords (más largo = más específico, prioridad)
   let best = null;
   for (const dest of DESTINATIONS) {
     for (const kw of dest.keywords) {
       const nkw = normalize(kw);
-      // Match de palabra/frase: con bordes para evitar falsos positivos cortos
       const pattern = new RegExp(`(^|\\s)${nkw.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}(\\s|$)`);
       if (pattern.test(norm)) {
         if (!best || nkw.length > best.matchedLength) {
@@ -149,10 +128,6 @@ export function detectNavigationIntent(text) {
 
   if (!best) return null;
 
-  // Reglas de confianza:
-  // - verbo + keyword → siempre alta
-  // - solo keyword en frase corta (≤7 palabras) → media (probablemente intención de ir)
-  // - keyword en frase larga (consulta sustantiva) → baja, mejor NO navegar
   let confidence = 0;
   if (hasVerb) confidence = 0.9;
   else if (wordCount <= 7) confidence = 0.6;
@@ -164,12 +139,6 @@ export function detectNavigationIntent(text) {
 export function useLyaNavigator() {
   const navigate = useNavigate();
 
-  /**
-   * Intenta navegar a partir de un texto del usuario.
-   * Retorna { navigated: bool, message: string | null }
-   *  - navigated: true si se ejecutó navigate()
-   *  - message: frase que Lya debe decir/mostrar (si aplica)
-   */
   const tryNavigate = useCallback((text) => {
     const intent = detectNavigationIntent(text);
     if (!intent || intent.confidence < 0.6) {

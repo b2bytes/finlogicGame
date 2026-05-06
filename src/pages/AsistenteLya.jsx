@@ -8,9 +8,9 @@ import LyaSources from '@/components/lya/LyaSources';
 import LyaActionCTA from '@/components/lya/LyaActionCTA';
 import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
 import LyaVoiceControls from '@/components/lya/LyaVoiceControls';
-import { useLyaVoice } from '@/lib/useLyaVoice';
-import { useLyaNavigator } from '@/lib/useLyaNavigator';
-import { useLyaActions } from '@/lib/useLyaActions';
+import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
+import { useLyaNavigator } from '@/lib/useLyaNavigator.jsx';
+import { useLyaActions } from '@/lib/useLyaActions.jsx';
 
 const SUGERENCIAS = [
   '¿Cuánto vale la UF hoy?',
