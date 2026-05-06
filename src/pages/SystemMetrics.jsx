@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Gauge, Zap, ShieldCheck, AlertTriangle, Activity } from 'lucide-react';
+import { ArrowLeft, Gauge, Zap, ShieldCheck, AlertTriangle, Activity, MessageSquare, Ticket } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/home/Logo';
 import MetricKPICard from '@/components/admin/MetricKPICard';
+import FAQDeflectionPanel from '@/components/admin/FAQDeflectionPanel';
 
 export default function SystemMetrics() {
   const [traces, setTraces] = useState([]);
   const [alerts, setAlerts] = useState([]);
+  const [faqs, setFaqs] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,11 +18,15 @@ export default function SystemMetrics() {
     Promise.all([
       base44.entities.AgentTrace.list('-created_date', 200),
       base44.entities.OperationalAlert.filter({ status: 'open' }, '-created_date', 50),
+      base44.entities.FAQInteraction.list('-created_date', 500).catch(() => []),
+      base44.entities.SupportTicket.list('-created_date', 200).catch(() => []),
     ])
-      .then(([t, a]) => {
+      .then(([t, a, f, tk]) => {
         if (!alive) return;
         setTraces(t || []);
         setAlerts(a || []);
+        setFaqs(f || []);
+        setTickets(tk || []);
       })
       .finally(() => alive && setLoading(false));
     return () => {
@@ -39,6 +46,16 @@ export default function SystemMetrics() {
 
   const tracesPub = traces.filter((t) => t.isPublic).length;
   const openAlerts = alerts.length;
+
+  // FAQ deflection
+  const faqDeflected = faqs.filter((f) => f.deflectionSuccess).length;
+  const faqDeflectionRate = faqs.length ? Math.round((faqDeflected / faqs.length) * 100) : 0;
+
+  // Tickets auto-resueltos
+  const ticketsAutoResolved = tickets.filter((t) => t.autoResolved).length;
+  const ticketsResolvedRate = tickets.length
+    ? Math.round((ticketsAutoResolved / tickets.length) * 100)
+    : 0;
 
   // Distribución por organismo
   const byCat = traces.reduce((acc, t) => {
@@ -89,7 +106,7 @@ export default function SystemMetrics() {
           </div>
         ) : (
           <>
-            <div className="grid md:grid-cols-4 gap-4 mb-10">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
               <MetricKPICard
                 label="Score verificador"
                 value={avgScore}
@@ -109,6 +126,30 @@ export default function SystemMetrics() {
                 trend={avgLatency < 35 ? '✓ óptimo' : avgLatency < 49 ? '→ mejorando' : '↓ sobre baseline'}
               />
               <MetricKPICard
+                label="FAQ deflection"
+                value={faqDeflectionRate}
+                suffix="%"
+                target="65% D+90"
+                color="mint"
+                icon={MessageSquare}
+                trend={
+                  faqDeflectionRate >= 65
+                    ? '✓ meta'
+                    : faqDeflectionRate >= 40
+                      ? '→ avanzando'
+                      : '↓ baseline'
+                }
+              />
+              <MetricKPICard
+                label="Tickets auto-resueltos"
+                value={ticketsResolvedRate}
+                suffix="%"
+                target="N1 ≥40%"
+                color="orange"
+                icon={Ticket}
+                trend={`${ticketsAutoResolved}/${tickets.length}`}
+              />
+              <MetricKPICard
                 label="Trazas públicas"
                 value={tracesPub}
                 target="auditables"
@@ -123,6 +164,15 @@ export default function SystemMetrics() {
                 icon={AlertTriangle}
               />
             </div>
+
+            {/* FAQ Deflection panel */}
+            <section className="mb-10">
+              <h2 className="font-display text-xl font-bold text-foreground mb-5 flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-mint-600" />
+                Auto-resolución FAQ
+              </h2>
+              <FAQDeflectionPanel interactions={faqs} />
+            </section>
 
             {/* Distribución por categoría */}
             <section className="mb-10">
