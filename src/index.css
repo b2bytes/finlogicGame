@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fraunces:opsz,wght,SOFT@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -20,8 +20,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 12%;
 
-    /* Primary: Mint Wise — verde menta cálido y premium */
-    --primary: 158 52% 42%;
+    /* Primary: Mint Deck — verde editorial profundo (deck v11 #0E7A47) */
+    --primary: 152 79% 26%;
     --primary-foreground: 60 30% 98%;
 
     /* Secondary: arena tibia (cálido) */
@@ -36,27 +36,27 @@
     --accent: 28 80% 92%;
     --accent-foreground: 220 25% 18%;
 
-    /* Destructive: coral, no rojo agresivo */
-    --destructive: 8 75% 58%;
+    /* Destructive: coral editorial (deck #E25A3B) — usado en cifras críticas */
+    --destructive: 11 73% 56%;
     --destructive-foreground: 60 30% 98%;
 
     /* Border casi invisible (estilo Apple) */
     --border: 40 15% 90%;
     --input: 40 15% 90%;
-    --ring: 158 52% 42%;
+    --ring: 152 79% 26%;
 
-    /* Mint scale para usos específicos */
-    --mint-50: 158 50% 96%;
-    --mint-100: 158 48% 90%;
-    --mint-200: 158 46% 80%;
-    --mint-300: 158 48% 68%;
-    --mint-400: 158 50% 55%;
-    --mint-500: 158 52% 42%;
-    --mint-600: 158 55% 34%;
-    --mint-700: 158 58% 26%;
+    /* Mint scale alineado al deck v11 (#0E7A47 base) */
+    --mint-50: 152 60% 96%;
+    --mint-100: 152 55% 90%;
+    --mint-200: 152 50% 80%;
+    --mint-300: 152 55% 65%;
+    --mint-400: 152 65% 45%;
+    --mint-500: 152 79% 26%;
+    --mint-600: 152 82% 22%;
+    --mint-700: 152 85% 18%;
 
     /* Charts */
-    --chart-1: 158 52% 42%;
+    --chart-1: 152 79% 26%;
     --chart-2: 28 80% 65%;
     --chart-3: 220 60% 55%;
     --chart-4: 38 75% 60%;
@@ -68,47 +68,48 @@
     /* Sidebar */
     --sidebar-background: 60 30% 98%;
     --sidebar-foreground: 220 25% 18%;
-    --sidebar-primary: 158 52% 42%;
+    --sidebar-primary: 152 79% 26%;
     --sidebar-primary-foreground: 60 30% 98%;
-    --sidebar-accent: 158 50% 96%;
-    --sidebar-accent-foreground: 158 58% 26%;
+    --sidebar-accent: 152 60% 96%;
+    --sidebar-accent-foreground: 152 85% 18%;
     --sidebar-border: 40 15% 90%;
-    --sidebar-ring: 158 52% 42%;
+    --sidebar-ring: 152 79% 26%;
   }
 
   .dark {
-    --background: 220 30% 8%;
+    /* Dark mode editorial — slide 9 SFA del deck (#0E1217) */
+    --background: 215 23% 7%;
     --foreground: 60 30% 96%;
-    --card: 220 28% 11%;
+    --card: 215 22% 10%;
     --card-foreground: 60 30% 96%;
-    --popover: 220 28% 11%;
+    --popover: 215 22% 10%;
     --popover-foreground: 60 30% 96%;
-    --primary: 158 55% 55%;
-    --primary-foreground: 220 30% 8%;
+    --primary: 152 65% 50%;
+    --primary-foreground: 215 23% 7%;
     --secondary: 220 22% 16%;
     --secondary-foreground: 60 30% 96%;
-    --muted: 220 22% 16%;
+    --muted: 215 20% 14%;
     --muted-foreground: 220 12% 65%;
-    --accent: 220 22% 18%;
+    --accent: 215 20% 16%;
     --accent-foreground: 60 30% 96%;
-    --destructive: 8 70% 60%;
+    --destructive: 11 73% 60%;
     --destructive-foreground: 60 30% 96%;
-    --border: 220 22% 18%;
-    --input: 220 22% 18%;
-    --ring: 158 55% 55%;
-    --chart-1: 158 55% 55%;
+    --border: 215 20% 16%;
+    --input: 215 20% 16%;
+    --ring: 152 65% 50%;
+    --chart-1: 152 65% 50%;
     --chart-2: 28 75% 65%;
     --chart-3: 220 60% 65%;
     --chart-4: 38 70% 60%;
     --chart-5: 280 55% 65%;
-    --sidebar-background: 220 30% 10%;
+    --sidebar-background: 215 22% 9%;
     --sidebar-foreground: 60 30% 96%;
-    --sidebar-primary: 158 55% 55%;
-    --sidebar-primary-foreground: 220 30% 8%;
-    --sidebar-accent: 220 22% 16%;
+    --sidebar-primary: 152 65% 50%;
+    --sidebar-primary-foreground: 215 23% 7%;
+    --sidebar-accent: 215 20% 14%;
     --sidebar-accent-foreground: 60 30% 96%;
-    --sidebar-border: 220 22% 18%;
-    --sidebar-ring: 158 55% 55%;
+    --sidebar-border: 215 20% 16%;
+    --sidebar-ring: 152 65% 50%;
   }
 }
 
@@ -159,6 +160,36 @@
 
   h1, h2, h3, h4 {
     @apply font-display tracking-tight;
+  }
+}
+
+@layer utilities {
+  /* Editorial serif — headlines tipo deck v11 (Fraunces alto contraste) */
+  .font-editorial {
+    font-family: 'Fraunces', 'Tiempos Headline', Georgia, serif;
+    font-feature-settings: "ss01", "ss02";
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+  }
+  .font-editorial-italic {
+    font-family: 'Fraunces', 'Tiempos Headline', Georgia, serif;
+    font-style: italic;
+    font-feature-settings: "ss01", "ss02";
+  }
+  /* Mono editorial — eyebrows, pills técnicas, código tipo deck */
+  .font-mono-editorial {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-feature-settings: "tnum", "zero";
+    letter-spacing: 0.01em;
+  }
+  /* Cifra-héroe: serif bold gigante con tabular-nums (estilo "$732.000", "1.847") */
+  .hero-number {
+    font-family: 'Fraunces', 'Tiempos Headline', Georgia, serif;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+    font-optical-sizing: auto;
   }
 }
 

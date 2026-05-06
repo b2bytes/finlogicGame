@@ -7,6 +7,8 @@ module.exports = {
   		fontFamily: {
   			sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
   			display: ['Plus Jakarta Sans', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  			editorial: ['Fraunces', 'Tiempos Headline', 'Georgia', 'serif'],
+  			mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
   		},
   		borderRadius: {
   			'2xs': '0.375rem',
