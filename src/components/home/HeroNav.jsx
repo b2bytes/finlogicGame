@@ -19,6 +19,9 @@ export default function HeroNav() {
           <a href="#perfiles" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Para quién
           </a>
+          <Link to="/Casos" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Casos
+          </Link>
           <Link to="/Transparencia" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Transparencia
           </Link>

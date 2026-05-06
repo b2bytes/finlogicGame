@@ -11,6 +11,7 @@ import Transparencia from '@/pages/Transparencia';
 import MisCasos from '@/pages/MisCasos';
 import Soporte from '@/pages/Soporte';
 import B2BAPIKeys from '@/pages/B2BAPIKeys';
+import Casos from '@/pages/Casos';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -44,6 +45,7 @@ const AuthenticatedApp = () => {
       <Route path="/MisCasos" element={<MisCasos />} />
       <Route path="/Soporte" element={<Soporte />} />
       <Route path="/B2B/APIKeys" element={<B2BAPIKeys />} />
+      <Route path="/Casos" element={<Casos />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
