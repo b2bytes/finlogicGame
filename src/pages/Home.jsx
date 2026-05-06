@@ -24,9 +24,9 @@ import { useReferralCapture } from '@/lib/useReferralCapture.jsx';
 export default function Home() {
   useReferralCapture();
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-clip">
       <HeroNav />
-      <main>
+      <main className="overflow-x-clip">
         <ImpactLabBanner />
         <SFAUrgencyBanner />
         <HeroSection />

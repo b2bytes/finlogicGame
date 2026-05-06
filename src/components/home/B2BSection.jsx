@@ -42,7 +42,7 @@ export default function B2BSection() {
               </p>
 
               {/* Mock terminal */}
-              <div className="bg-black/40 backdrop-blur rounded-2xl p-4 border border-white/10 font-mono text-xs leading-relaxed mb-6">
+              <div className="bg-black/40 backdrop-blur rounded-2xl p-4 border border-white/10 font-mono text-[11px] sm:text-xs leading-relaxed mb-6 overflow-x-auto break-all">
                 <div className="text-mint-300">POST /v1/check-tmc</div>
                 <div className="text-background/50 mt-1">{`{ "tasa": 38.5, "monto": 500000 }`}</div>
                 <div className="mt-3 text-background/40">→ 200 OK · 142ms</div>
