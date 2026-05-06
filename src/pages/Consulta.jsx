@@ -34,7 +34,36 @@ export default function Consulta() {
   }, [location.search]);
 
   const handleVoiceTranscript = (text) => {
-    setQuery((prev) => (prev ? `${prev} ${text}`.trim() : text));
+    const merged = query ? `${query} ${text}`.trim() : text.trim();
+    setQuery(merged);
+    // Envío automático tras transcripción final — sin paso extra para el usuario
+    if (merged.length >= 5 && !loading) {
+      setTimeout(() => {
+        setLoading(true);
+        setError(null);
+        setResponse(null);
+        base44.functions
+          .invoke('processConsultation', { query: merged, channel: 'web' })
+          .then(({ data }) => {
+            if (data?.success) {
+              setResponse(data.response);
+              setTraceId(data.traceId);
+              if (data.response?.detectedProfile) {
+                setSkin(data.response.detectedProfile, { auto: true });
+              }
+              if (lyaVoice.ttsSupported && data.response) {
+                const spoken = [data.response.fact, data.response.translation, data.response.action]
+                  .filter(Boolean).join('. ');
+                lyaVoice.speak(spoken);
+              }
+            } else {
+              setError(data?.error || 'No pudimos procesar tu consulta');
+            }
+          })
+          .catch((err) => setError(err.message || 'Error de conexión'))
+          .finally(() => setLoading(false));
+      }, 250);
+    }
   };
 
   const examples = [
