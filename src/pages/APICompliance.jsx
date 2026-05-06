@@ -6,6 +6,7 @@ import EndpointsGrid from '@/components/api-compliance/EndpointsGrid';
 import ROICalculator from '@/components/api-compliance/ROICalculator';
 import DemoCheckTMC from '@/components/api-compliance/DemoCheckTMC';
 import ComplianceCTA from '@/components/api-compliance/ComplianceCTA';
+import EmbedSection from '@/components/api-compliance/EmbedSection';
 
 export default function APICompliance() {
   return (
@@ -16,6 +17,7 @@ export default function APICompliance() {
         <EndpointsGrid />
         <DemoCheckTMC />
         <ROICalculator />
+        <EmbedSection />
         <ComplianceCTA />
       </main>
       <Footer />

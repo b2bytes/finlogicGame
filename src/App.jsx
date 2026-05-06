@@ -28,6 +28,7 @@ import SystemMetrics from '@/pages/SystemMetrics';
 import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
 import FloatingLyaCTA from '@/components/lya/FloatingLyaCTA';
+import EmbedLya from '@/pages/EmbedLya';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -78,6 +79,7 @@ const AuthenticatedApp = () => {
       <Route path="/Admin/SystemMetrics" element={<SystemMetrics />} />
       <Route path="/AsistenteLya" element={<AsistenteLya />} />
       <Route path="/Admin/ContentStudio" element={<ContentStudio />} />
+      <Route path="/Embed/Lya" element={<EmbedLya />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     <FloatingLyaCTA />
