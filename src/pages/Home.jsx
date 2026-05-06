@@ -16,6 +16,7 @@ import ImpactPullQuote from '@/components/home/ImpactPullQuote';
 import CapasFinLogic from '@/components/home/CapasFinLogic';
 import SFAUrgencyBanner from '@/components/home/SFAUrgencyBanner';
 import OrganismosCobertura from '@/components/home/OrganismosCobertura';
+import DiferencialFinLogic from '@/components/home/DiferencialFinLogic';
 import { useReferralCapture } from '@/lib/useReferralCapture';
 
 export default function Home() {
@@ -37,6 +38,7 @@ export default function Home() {
         <PerfilesSection />
         <TestimoniosSection />
         <TrustSection />
+        <DiferencialFinLogic />
         <B2BSection />
         <CTASection />
       </main>
