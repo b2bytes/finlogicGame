@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
 import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
 import LyaTrustBadge from '@/components/lya/LyaTrustBadge';
+import LyaGenerateDocButton from '@/components/lya/LyaGenerateDocButton';
 
 /**
  * LyaChatWidget — widget de chat flotante global de Lya (FinLogic).
@@ -333,11 +334,20 @@ export default function LyaChatWidget() {
                 {messages.map((m, i) => {
                   // El último mensaje del usuario es el que produjo la respuesta más reciente de Lya.
                   const lastUserBefore = messages.slice(0, i).reverse().find((x) => x.role === 'user');
+                  // ¿Es la última respuesta de Lya? → mostrar botón de generar doc
+                  const isLastLya =
+                    m.role === 'lya' &&
+                    !m.error &&
+                    i === messages.length - 1;
                   return (
                     <ChatBubble
                       key={i}
                       message={m}
                       userQuery={lastUserBefore?.content}
+                      historyForDoc={isLastLya ? messages.map((mm) => ({
+                        role: mm.role === 'lya' ? 'assistant' : 'user',
+                        content: mm.content,
+                      })) : null}
                     />
                   );
                 })}
@@ -389,7 +399,7 @@ export default function LyaChatWidget() {
 }
 
 // ─── Burbuja de mensaje ───────────────────────────────────────────────
-function ChatBubble({ message, userQuery }) {
+function ChatBubble({ message, userQuery, historyForDoc }) {
   const isUser = message.role === 'user';
 
   if (isUser) {
@@ -497,6 +507,9 @@ function ChatBubble({ message, userQuery }) {
           sources={message.sources || []}
         />
       )}
+
+      {/* Generar documento PDF firmable (solo en última respuesta de Lya) */}
+      {historyForDoc && <LyaGenerateDocButton history={historyForDoc} />}
 
       {/* Suggested action */}
       {message.suggestedAction && (
