@@ -48,9 +48,7 @@ export default function PricingTier({ tier }) {
       <ul className="space-y-2.5 mb-8 flex-1">
         {features.map((f) => (
           <li key={f} className="flex items-start gap-2 text-sm">
-            <Check
-              className={`w-4 h-4 mt-0.5 shrink-0 ${highlight ? 'text-mint-300' : 'text-mint-600'}`}
-            />
+            <Check className={`w-4 h-4 mt-0.5 shrink-0 ${highlight ? 'text-mint-300' : 'text-mint-600'}`} />
             <span className={highlight ? 'text-background/90' : 'text-foreground/90'}>{f}</span>
           </li>
         ))}
