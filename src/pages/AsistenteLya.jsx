@@ -9,12 +9,20 @@ import LyaActionCTA from '@/components/lya/LyaActionCTA';
 import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
 import LyaVoiceControls from '@/components/lya/LyaVoiceControls';
 import { useLyaVoice } from '@/lib/useLyaVoice';
+import { useLyaNavigator } from '@/lib/useLyaNavigator';
 
 const SUGERENCIAS = [
   '¿Qué hago si no reconozco un cobro en mi tarjeta?',
   '¿Cómo solicito una carta ARCO a mi banco?',
   '¿Cuál es la TMC vigente para créditos de consumo?',
   '¿Cuántos días tengo para reclamar un fraude?',
+];
+
+const NAV_SHORTCUTS = [
+  'Llévame a mis casos',
+  'Muéstrame transparencia',
+  'Abre los precios',
+  'Ir al pitch deck',
 ];
 
 export default function AsistenteLya() {
@@ -33,6 +41,7 @@ export default function AsistenteLya() {
   const handsFreeRef = useRef(false);
 
   const voice = useLyaVoice();
+  const { tryNavigate } = useLyaNavigator();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -58,6 +67,21 @@ export default function AsistenteLya() {
     setLoading(true);
 
     try {
+      // 0. Pre-filtro NAVEGACIÓN — si el usuario pide ir a una sección, Lya navega
+      const navResult = tryNavigate(q);
+      if (navResult.navigated) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: `${navResult.message}\n\nEstás ahora en **${navResult.label}**. Si quieres volver a hablar conmigo, vuelve a /AsistenteLya.`,
+            isNav: true,
+          },
+        ]);
+        if (autoSpeak) voice.speak(navResult.message);
+        return;
+      }
+
       // 1. Pre-filtro FAQ (deflection rápido <1s en preguntas frecuentes)
       const faqResult = await base44.functions
         .invoke('autoResolveFAQ', { query: q, channel: 'web' })
@@ -193,16 +217,32 @@ export default function AsistenteLya() {
 
         {/* Sugerencias */}
         {messages.length <= 1 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {SUGERENCIAS.map((s) => (
-              <button
-                key={s}
-                onClick={() => send(s)}
-                className="text-xs font-medium px-3 py-2 rounded-full bg-mint-50 hover:bg-mint-100 border border-mint-200 text-mint-700 transition-colors"
-              >
-                {s}
-              </button>
-            ))}
+          <div className="space-y-3 mb-4">
+            <div className="flex flex-wrap gap-2">
+              {SUGERENCIAS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => send(s)}
+                  className="text-xs font-medium px-3 py-2 rounded-full bg-mint-50 hover:bg-mint-100 border border-mint-200 text-mint-700 transition-colors"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground self-center">
+                O pídeme que te lleve:
+              </span>
+              {NAV_SHORTCUTS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => send(s)}
+                  className="text-xs font-medium px-3 py-2 rounded-full bg-secondary hover:bg-foreground hover:text-background border border-border text-foreground transition-colors"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
