@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Copy, Check, Share2, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function ReferralCard({ referralCode, userEmail }) {
+export default function ReferralCard({ referralCode, userEmail, stats }) {
   const [copied, setCopied] = useState(false);
 
   const referralUrl = `${window.location.origin}/?ref=${referralCode}`;
@@ -72,11 +72,33 @@ export default function ReferralCard({ referralCode, userEmail }) {
         </Button>
       </div>
 
+      {stats && (
+        <div className="mt-5 pt-5 border-t border-border grid grid-cols-3 gap-3">
+          <ReferralStat value={stats.total} label="referidos" />
+          <ReferralStat value={stats.activated} label="activados" />
+          <ReferralStat value={stats.converted} label="conversiones Pro" />
+          <div className="col-span-3 mt-2 text-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mint-50 border border-mint-200 text-xs font-semibold text-mint-700">
+              Tu nivel: {stats.tier}
+            </span>
+          </div>
+        </div>
+      )}
+
       {userEmail && (
         <p className="mt-4 text-xs text-muted-foreground">
           Vinculado a {userEmail}
         </p>
       )}
+    </div>
+  );
+}
+
+function ReferralStat({ value, label }) {
+  return (
+    <div className="text-center">
+      <div className="font-display text-2xl font-bold text-foreground tabular-nums">{value}</div>
+      <p className="text-[11px] text-muted-foreground mt-0.5">{label}</p>
     </div>
   );
 }

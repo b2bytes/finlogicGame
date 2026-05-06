@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FileSignature, Loader2, CheckCircle2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
+import { getStoredReferral } from '@/lib/useReferralCapture';
 
 const BODY_TO_MODULE = {
   CMF: 'ley_fintech_21521',
@@ -33,6 +34,16 @@ export default function LyaActionCTA({ query, response, regulatoryBody, suggeste
         channel: 'web',
       });
       setCasoId(caso.id);
+
+      // Cerrar loop de referidos: si hay código guardado, registrar atribución
+      const refCode = getStoredReferral();
+      if (refCode) {
+        try {
+          await base44.functions.invoke('registerReferral', { referralCode: refCode });
+        } catch {
+          /* ignore — no bloquea creación del caso */
+        }
+      }
     } catch (e) {
       console.error(e);
     } finally {

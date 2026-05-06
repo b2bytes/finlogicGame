@@ -18,10 +18,19 @@ function generateCode(email) {
 export default function Embajadores() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     base44.auth.me()
-      .then((u) => setUser(u))
+      .then(async (u) => {
+        setUser(u);
+        try {
+          const res = await base44.functions.invoke('getReferralStats', {});
+          if (res?.data?.ok) setStats(res.data);
+        } catch {
+          /* ignore */
+        }
+      })
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
@@ -36,7 +45,7 @@ export default function Embajadores() {
           {loading ? (
             <div className="bg-card rounded-3xl p-8 border border-border animate-pulse h-48" />
           ) : user ? (
-            <ReferralCard referralCode={generateCode(user.email)} userEmail={user.email} />
+            <ReferralCard referralCode={generateCode(user.email)} userEmail={user.email} stats={stats} />
           ) : (
             <div className="bg-card rounded-3xl border border-border shadow-soft p-8 text-center">
               <h2 className="font-display text-xl font-bold text-foreground mb-2">
