@@ -442,30 +442,13 @@ Responde JSON con:
       }
     }
 
-    // ─── VERIFICADOR ASYNC (fire-and-forget) ────────────────────────────
-    // No bloqueamos al usuario. Si falla update por RLS, lo ignoramos —
-    // selfConfidence ya está guardado en el trace inicial.
+    // ─── VERIFICADOR ─────────────────────────────────────────────────
+    // El verificador async hacía updates que disparaban 403 por RLS sobre
+    // AgentTrace (write=admin only) y ensuciaba los logs. Como ya tenemos
+    // selfConfidence del especialista (buen proxy de calidad), nos basta.
+    // Si en el futuro queremos verificación profunda, debe ser un job admin
+    // separado que recorra los traces sin restricción RLS.
     const traceId = traceRecord.id;
-    (async () => {
-      try {
-        const verification = await base44.integrations.Core.InvokeLLM({
-          prompt: `${VERIFIER_PROMPT}\n\nCONSULTA: "${query}"\nHECHO: ${fact}\nDERECHO: ${translation}\nACCIÓN: ${action}\nLEYES: ${JSON.stringify(lawsCited)}\nFUENTES RAG: ${ragChunks.map(c => c.lawReference).join(', ') || '(sin)'}\n\nAudita.`,
-          response_json_schema: VERIFIER_SCHEMA,
-        });
-        const finalScore = Math.round(verification.verifierScore || selfConfidence);
-        // Update via service role (la entity AgentTrace tiene RLS write=admin only)
-        await base44.asServiceRole.entities.AgentTrace.update(traceId, {
-          verifierScore: finalScore,
-        }).catch(e => console.warn('trace update skipped:', e.message));
-        if (caseId) {
-          await base44.asServiceRole.entities.MisCasos.update(caseId, {
-            verifierScore: finalScore,
-          }).catch(e => console.warn('case update skipped:', e.message));
-        }
-      } catch (e) {
-        console.error('async verifier failed:', e.message);
-      }
-    })();
 
     return Response.json({
       success: true,

@@ -59,9 +59,45 @@ function pickBestSpanishFemaleVoice(voices) {
   return null;
 }
 
+// Siglas que el TTS pronuncia mal (letra por letra raro o se traba).
+// Las expandimos a su nombre real en español chileno.
+const ACRONYM_EXPANSIONS = [
+  [/\bCMF\b/g, 'Comisión para el Mercado Financiero'],
+  [/\bSERNAC\b/g, 'Sernac'],
+  [/\bSII\b/g, 'Servicio de Impuestos Internos'],
+  [/\bCSIRT\b/g, 'C-Sirt'],
+  [/\bBCN\b/g, 'Biblioteca del Congreso'],
+  [/\bFOGAPE\b/g, 'Fogape'],
+  [/\bSERCOTEC\b/g, 'Sercotec'],
+  [/\bARCO\b/g, 'A-R-C-O'],
+  [/\bTMC\b/g, 'Tasa Máxima Convencional'],
+  [/\bCAE\b/g, 'C-A-E'],
+  [/\bTIR\b/g, 'T-I-R'],
+  [/\bTER\b/g, 'T-E-R'],
+  [/\bIVA\b/g, 'I-V-A'],
+  [/\bRUT\b/g, 'rut'],
+  [/\bAFP\b/g, 'A-F-P'],
+  [/\bNCG\b/g, 'norma de carácter general'],
+  [/\bLPC\b/g, 'Ley del Consumidor'],
+  [/\bLIR\b/g, 'Ley de la Renta'],
+  [/\bF22\b/g, 'formulario 22'],
+  [/\bF29\b/g, 'formulario 29'],
+  [/\bUF\b/g, 'U-F'],
+  [/\bUTM\b/g, 'U-T-M'],
+];
+
+// Lectura natural de leyes y artículos
+const LAW_REFS = [
+  // "Ley 19.496" → "Ley diecinueve mil cuatrocientos noventa y seis" es complejo;
+  // dejamos que el TTS lo lea como número con punto eliminado
+  [/Ley\s+(\d{1,2})\.(\d{3})/g, 'Ley $1$2'],
+  [/Art\.\s*(\d+)/g, 'artículo $1'],
+  [/Artículo\s*(\d+)°?/g, 'artículo $1'],
+];
+
 function sanitizeForSpeech(text) {
   if (!text) return '';
-  return String(text)
+  let clean = String(text)
     .replace(/```[\s\S]*?```/g, '')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/!\[[^\]]*\]\([^)]+\)/g, '')
@@ -70,10 +106,31 @@ function sanitizeForSpeech(text) {
     .replace(/\*([^*]+)\*/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/^[-•·]\s+/gm, '')
+    .replace(/^\d+\.\s+/gm, '') // listas numeradas "1. " → quita marcador
+    .replace(/https?:\/\/\S+/g, '') // urls (TTS las lee carácter por carácter)
     .replace(/\|/g, ' ')
     .replace(/—/g, ', ')
-    .replace(/\s+/g, ' ')
+    .replace(/–/g, ', ')
+    .replace(/°/g, '')
+    .replace(/\$\s?(\d)/g, '$$$1') // mantiene "$" pegado al número
     .trim();
+
+  // Expandir leyes/artículos PRIMERO (antes de tocar números)
+  for (const [pat, rep] of LAW_REFS) clean = clean.replace(pat, rep);
+  // Luego siglas
+  for (const [pat, rep] of ACRONYM_EXPANSIONS) clean = clean.replace(pat, rep);
+
+  // Limpieza final de espacios
+  clean = clean.replace(/\s+/g, ' ').replace(/\s+([.,;:])/g, '$1').trim();
+
+  // TTS móvil corta enunciados largos (~32k chars es teórico, pero en práctica
+  // muchos engines fallan >2-3k). Truncamos a 1800 con cierre limpio.
+  if (clean.length > 1800) {
+    clean = clean.substring(0, 1800);
+    const lastDot = clean.lastIndexOf('. ');
+    if (lastDot > 1200) clean = clean.substring(0, lastDot + 1);
+  }
+  return clean;
 }
 
 export function useLyaVoice() {
