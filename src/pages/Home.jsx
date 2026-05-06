@@ -15,6 +15,8 @@ import Footer from '@/components/home/Footer';
 import ImpactPullQuote from '@/components/home/ImpactPullQuote';
 import CapasFinLogic from '@/components/home/CapasFinLogic';
 import SFAUrgencyBanner from '@/components/home/SFAUrgencyBanner';
+import ImpactLabBadge from '@/components/home/ImpactLabBadge';
+import ImpactLabBanner from '@/components/home/ImpactLabBanner';
 import OrganismosCobertura from '@/components/home/OrganismosCobertura';
 import DiferencialFinLogic from '@/components/home/DiferencialFinLogic';
 import { useReferralCapture } from '@/lib/useReferralCapture';
@@ -23,9 +25,11 @@ export default function Home() {
   useReferralCapture();
   return (
     <div className="min-h-screen bg-background">
+      <ImpactLabBanner />
       <HeroNav />
       <main>
         <SFAUrgencyBanner />
+        <ImpactLabBadge />
         <HeroSection />
         <MediaLogos />
         <OrganismosCobertura />
