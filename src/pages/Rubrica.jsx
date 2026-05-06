@@ -224,6 +224,44 @@ export default function Rubrica() {
           </div>
         </div>
 
+        {/* Evidencia visual · Consola Anthropic + integración MCP */}
+        <section className="mb-12 animate-fade-up">
+          <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-soft">
+            <div className="px-5 sm:px-6 py-4 border-b border-border bg-muted/30">
+              <p className="text-[11px] font-mono-editorial text-mint-700 uppercase tracking-widest mb-1">
+                · EVIDENCIA VISUAL · CLAUDE IMPACT LAB CHILE 2026
+              </p>
+              <h2 className="font-display text-lg sm:text-xl font-bold text-foreground tracking-tight">
+                Integración MCP de FinLogic en consola Claude
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+                Captura del workspace oficial del evento. Confirma uso real de Claude Sonnet 4.6 + integración MCP propia para deploy del agente FinLogic vía Streamlit + GitHub.
+              </p>
+            </div>
+            <a
+              href="https://media.base44.com/images/public/69fae03fe83575f06c206e95/bf6a27c49_WhatsAppImage2026-05-06at55217PM.jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block hover:opacity-95 transition-opacity"
+            >
+              <img
+                src="https://media.base44.com/images/public/69fae03fe83575f06c206e95/bf6a27c49_WhatsAppImage2026-05-06at55217PM.jpg"
+                alt="Screenshot consola Claude · workspace Claude Impact Lab Chile 2026 · integración MCP FinLogic con Diego"
+                className="w-full h-auto block"
+                loading="lazy"
+              />
+            </a>
+            <div className="px-5 sm:px-6 py-3 bg-muted/20 border-t border-border flex items-center justify-between gap-3 flex-wrap text-[11px]">
+              <span className="font-mono-editorial text-muted-foreground">
+                workspace: <span className="text-foreground font-semibold">Claude Impact Lab Chile 2026</span> · modelo: <span className="text-foreground font-semibold">Sonnet 4.6</span>
+              </span>
+              <span className="font-mono-editorial text-mint-700">
+                ● VERIFICABLE · 6 MAY 2026
+              </span>
+            </div>
+          </div>
+        </section>
+
         {/* Score card global */}
         <div className="mb-10 bg-gradient-to-br from-mint-500 to-mint-700 text-white rounded-3xl p-6 md:p-8 shadow-soft-lg">
           <div className="flex items-start justify-between gap-6 flex-wrap">
