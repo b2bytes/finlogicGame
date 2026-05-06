@@ -64,7 +64,7 @@ export default function HeroSection() {
                 className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground/70 outline-none py-2 min-w-0"
               />
               <button
-                onClick={() => goToConsulta('?modo=voz')}
+                onClick={() => navigate('/Consulta?modo=voz')}
                 aria-label="Consultar por voz"
                 className="w-9 h-9 rounded-full bg-secondary hover:bg-mint-50 flex items-center justify-center transition-colors flex-shrink-0"
               >
