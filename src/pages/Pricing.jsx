@@ -1,7 +1,7 @@
 import React from 'react';
 import HeroNav from '@/components/home/HeroNav';
 import Footer from '@/components/home/Footer';
-import PricingTier from '@/components/pricing/PricingTier';
+import PricingTier from '@/components/pricing/PricingTier.jsx';
 
 const TIERS = [
   {
