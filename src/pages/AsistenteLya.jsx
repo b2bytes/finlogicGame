@@ -10,11 +10,14 @@ import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
 import LyaVoiceControls from '@/components/lya/LyaVoiceControls';
 import { useLyaVoice } from '@/lib/useLyaVoice';
 import { useLyaNavigator } from '@/lib/useLyaNavigator';
+import { useLyaActions } from '@/lib/useLyaActions';
 
 const SUGERENCIAS = [
+  '¿Cuánto vale la UF hoy?',
+  'Convierte 1 millón de pesos a UF',
   '¿Qué hago si no reconozco un cobro en mi tarjeta?',
   '¿Cómo solicito una carta ARCO a mi banco?',
-  '¿Cuál es la TMC vigente para créditos de consumo?',
+  '¿Cuál es la TPM actual?',
   '¿Cuántos días tengo para reclamar un fraude?',
 ];
 
@@ -42,6 +45,7 @@ export default function AsistenteLya() {
 
   const voice = useLyaVoice();
   const { tryNavigate } = useLyaNavigator();
+  const { tryAction } = useLyaActions();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -79,6 +83,25 @@ export default function AsistenteLya() {
           },
         ]);
         if (autoSpeak) voice.speak(navResult.message);
+        return;
+      }
+
+      // 0.5 Pre-filtro ACCIÓN REAL CMF (UF/dólar/UTM/TPM, conversiones)
+      const action = await tryAction(q);
+      if (action.handled) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: action.response,
+            sources: [action.source],
+            confidence: 1.0,
+            regulatoryBody: 'CMF',
+            query: q,
+            isLive: true,
+          },
+        ]);
+        if (autoSpeak) voice.speak(action.response.replace(/[*_]/g, ''));
         return;
       }
 
