@@ -164,25 +164,26 @@ export default function AsistenteLya() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-[100dvh] bg-background flex flex-col pb-[env(safe-area-inset-bottom)]">
       <header className="sticky top-0 z-40 glass border-b border-border/40">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
           <Link
             to="/"
+            aria-label="Volver"
             className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver
+            <span className="hidden sm:inline">Volver</span>
           </Link>
           <Logo size="sm" />
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-mint-50 border border-mint-200">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-mint-50 border border-mint-200">
             <ShieldCheck className="w-3 h-3 text-mint-700" />
             <span className="text-[10px] font-semibold text-mint-700">Ley 21.521</span>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 md:px-6 py-6 md:py-8 flex flex-col">
+      <main className="flex-1 max-w-4xl mx-auto w-full px-4 md:px-6 py-5 md:py-8 flex flex-col">
         <div className="mb-6 animate-fade-up">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-3">
             <Sparkles className="w-3.5 h-3.5 text-mint-700" />
@@ -238,29 +239,29 @@ export default function AsistenteLya() {
           )}
         </div>
 
-        {/* Sugerencias */}
+        {/* Sugerencias — scroll horizontal en mobile, wrap en desktop */}
         {messages.length <= 1 && (
-          <div className="space-y-3 mb-4">
-            <div className="flex flex-wrap gap-2">
+          <div className="space-y-2.5 mb-4 -mx-4 sm:mx-0">
+            <div className="flex sm:flex-wrap gap-2 overflow-x-auto sm:overflow-visible px-4 sm:px-0 pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {SUGERENCIAS.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="text-xs font-medium px-3 py-2 rounded-full bg-mint-50 hover:bg-mint-100 border border-mint-200 text-mint-700 transition-colors"
+                  className="text-xs font-medium px-3 py-2 rounded-full bg-mint-50 hover:bg-mint-100 border border-mint-200 text-mint-700 transition-colors flex-shrink-0 whitespace-nowrap"
                 >
                   {s}
                 </button>
               ))}
             </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground self-center">
-                O pídeme que te lleve:
+            <div className="flex sm:flex-wrap items-center gap-2 overflow-x-auto sm:overflow-visible px-4 sm:px-0 pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground self-center flex-shrink-0">
+                O pídeme:
               </span>
               {NAV_SHORTCUTS.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="text-xs font-medium px-3 py-2 rounded-full bg-secondary hover:bg-foreground hover:text-background border border-border text-foreground transition-colors"
+                  className="text-xs font-medium px-3 py-2 rounded-full bg-secondary hover:bg-foreground hover:text-background border border-border text-foreground transition-colors flex-shrink-0 whitespace-nowrap"
                 >
                   {s}
                 </button>

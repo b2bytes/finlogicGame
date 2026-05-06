@@ -29,6 +29,8 @@ import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
 import FloatingLyaCTA from '@/components/lya/FloatingLyaCTA';
 import EmbedLya from '@/pages/EmbedLya';
+import ScrollToTop from '@/components/ScrollToTop';
+import PWAInstallBanner from '@/components/pwa/PWAInstallBanner';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -56,6 +58,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <>
+    <ScrollToTop />
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/Consulta" element={<Consulta />} />
@@ -83,6 +86,7 @@ const AuthenticatedApp = () => {
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     <FloatingLyaCTA />
+    <PWAInstallBanner />
     </>
   );
 };

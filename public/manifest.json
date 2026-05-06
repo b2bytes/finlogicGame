@@ -1,0 +1,48 @@
+{
+  "name": "FinLogic — Tu derecho, en tu idioma",
+  "short_name": "FinLogic",
+  "description": "Asistente IA financiero y legal para ciudadanos y pymes de Chile. Resolución de fraudes, derechos ARCO y normativa CMF/SERNAC en lenguaje simple.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F2E8",
+  "theme_color": "#34A57F",
+  "scope": "/",
+  "lang": "es-CL",
+  "dir": "ltr",
+  "categories": ["finance", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "https://qtrypzzcjebvfhfsdmaq.supabase.co/storage/v1/object/public/base44-prod/public/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://qtrypzzcjebvfhfsdmaq.supabase.co/storage/v1/object/public/base44-prod/public/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nueva consulta",
+      "short_name": "Consultar",
+      "url": "/Consulta",
+      "description": "Hacer una consulta legal/financiera"
+    },
+    {
+      "name": "Hablar con Lya",
+      "short_name": "Lya",
+      "url": "/AsistenteLya",
+      "description": "Asistente IA con voz"
+    },
+    {
+      "name": "Mis casos",
+      "short_name": "Casos",
+      "url": "/MisCasos",
+      "description": "Ver mis casos abiertos"
+    }
+  ]
+}
