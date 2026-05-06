@@ -28,6 +28,9 @@ export default function HeroNav() {
           <Link to="/Soporte" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Soporte
           </Link>
+          <Link to="/Soporte" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Soporte
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
