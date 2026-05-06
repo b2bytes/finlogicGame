@@ -1,0 +1,113 @@
+{
+  "name": "ComplianceAPIKey",
+  "type": "object",
+  "description": "API Key de cliente B2B (fintech) que consume la Compliance API de FinLogic. Plan base $490.000 CLP/mes con 10.000 llamadas + $0.008 USD por llamada adicional.",
+  "properties": {
+    "organizationName": {
+      "type": "string",
+      "description": "Nombre de la fintech / instituci\u00f3n cliente"
+    },
+    "rut": {
+      "type": "string",
+      "description": "RUT chileno de la organizaci\u00f3n (formato 12345678-9)"
+    },
+    "contactEmail": {
+      "type": "string",
+      "format": "email"
+    },
+    "apiKeyHash": {
+      "type": "string",
+      "description": "Hash SHA-256 de la API key real (la key nunca se almacena en texto plano)"
+    },
+    "apiKeyPrefix": {
+      "type": "string",
+      "description": "Primeros 8 caracteres de la key para identificaci\u00f3n (ej: 'fl_live_a1b2')"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "base",
+        "professional",
+        "enterprise"
+      ],
+      "default": "base",
+      "description": "base=10K calls, professional=50K, enterprise=ilimitado"
+    },
+    "monthlyCallLimit": {
+      "type": "number",
+      "default": 10000
+    },
+    "callsUsedThisMonth": {
+      "type": "number",
+      "default": 0
+    },
+    "lastResetDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima fecha de reseteo del contador mensual"
+    },
+    "enabledEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "check-tmc",
+          "verify-entity",
+          "regulatory-impact",
+          "fraud-pattern-match",
+          "consumer-rights-check"
+        ]
+      },
+      "default": [
+        "check-tmc",
+        "verify-entity",
+        "regulatory-impact",
+        "fraud-pattern-match",
+        "consumer-rights-check"
+      ]
+    },
+    "stripeSubscriptionId": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "suspended",
+        "revoked",
+        "trialing"
+      ],
+      "default": "trialing"
+    },
+    "contractStart": {
+      "type": "string",
+      "format": "date"
+    },
+    "renewalDate": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "organizationName",
+    "contactEmail",
+    "plan",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "description": "Suscripci\u00f3n del usuario al plan Free / Pro / Compliance API. Vincula UserProfile con Stripe.",
+  "properties": {
+    "userId": {
+      "type": "string",
+      "description": "FK a UserProfile (email o id)"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "free",
+        "pro",
+        "compliance_api"
+      ],
+      "default": "free",
+      "description": "Plan can\u00f3nico FinLogic"
+    },
+    "stripeSubscriptionId": {
+      "type": "string",
+      "description": "ID de suscripci\u00f3n en Stripe"
+    },
+    "stripeCustomerId": {
+      "type": "string",
+      "description": "ID de cliente en Stripe"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "canceled",
+        "trialing",
+        "incomplete"
+      ],
+      "default": "trialing"
+    },
+    "currentPeriodStart": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "currentPeriodEnd": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "cancelAtPeriodEnd": {
+      "type": "boolean",
+      "default": false
+    },
+    "priceClp": {
+      "type": "number",
+      "description": "Precio en CLP. Pro=3990, Compliance API base=490000"
+    }
+  },
+  "required": [
+    "userId",
+    "plan",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "write": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    }
+  }
+}
