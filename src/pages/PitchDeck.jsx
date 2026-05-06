@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { ArrowRight, Eye, Award, Sparkles, Film } from 'lucide-react';
+import { ArrowRight, Eye, Award, Sparkles, Film, Download } from 'lucide-react';
 import Logo from '@/components/home/Logo';
+import { downloadPitchDeckPDF } from '@/lib/generatePitchDeckPDF';
 import Eyebrow from '@/components/editorial/Eyebrow';
 import LegalPill from '@/components/editorial/LegalPill';
 import EditorialHeading from '@/components/editorial/EditorialHeading';
@@ -100,6 +101,16 @@ export default function PitchDeck() {
 
   return (
     <div className="bg-background">
+      {/* === FAB Descargar PDF (sticky bottom-right) === */}
+      <button
+        onClick={() => downloadPitchDeckPDF(stats)}
+        className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-mint-600 hover:bg-mint-700 text-white font-semibold text-sm shadow-soft-lg active:scale-95 transition-all"
+        aria-label="Descargar PitchDeck en PDF"
+      >
+        <Download className="w-4 h-4" />
+        <span className="hidden sm:inline">Descargar PDF</span>
+      </button>
+
       {/* === SLIDE 1 — HERO === */}
       <section className="relative min-h-screen flex items-center px-6 lg:px-12 overflow-hidden">
         <div aria-hidden className="absolute inset-0 -z-10">
