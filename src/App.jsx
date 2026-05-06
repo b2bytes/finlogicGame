@@ -14,6 +14,7 @@ import Soporte from '@/pages/Soporte';
 import B2BAPIKeys from '@/pages/B2BAPIKeys';
 import Casos from '@/pages/Casos';
 import APICompliance from '@/pages/APICompliance';
+import Pyme from '@/pages/Pyme';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -49,6 +50,7 @@ const AuthenticatedApp = () => {
       <Route path="/B2B/APIKeys" element={<B2BAPIKeys />} />
       <Route path="/Casos" element={<Casos />} />
       <Route path="/api-compliance" element={<APICompliance />} />
+      <Route path="/Pyme" element={<Pyme />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

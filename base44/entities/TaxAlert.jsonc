@@ -1,0 +1,112 @@
+{
+  "name": "TaxAlert",
+  "type": "object",
+  "description": "Alerta tributaria/financiera para una pyme. Generada por analyzeTaxSituation o ingresada manualmente. Vinculada a PymeProfile.",
+  "properties": {
+    "pymeProfileId": {
+      "type": "string",
+      "description": "Reference \u2192 PymeProfile.id"
+    },
+    "alertType": {
+      "type": "string",
+      "enum": [
+        "vencimiento_iva",
+        "vencimiento_ppm",
+        "declaracion_renta",
+        "multa_detectada",
+        "beneficio_disponible",
+        "cambio_normativo",
+        "salud_financiera"
+      ],
+      "default": "vencimiento_iva"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo corto en lenguaje pyme"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detalle accionable de la alerta"
+    },
+    "amountAtRisk": {
+      "type": "number",
+      "description": "Monto en CLP en riesgo si no se act\u00faa"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha l\u00edmite para la acci\u00f3n"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "critico",
+        "alto",
+        "medio",
+        "bajo"
+      ],
+      "default": "medio"
+    },
+    "actionRequired": {
+      "type": "string",
+      "description": "Acci\u00f3n concreta recomendada"
+    },
+    "siiFormReference": {
+      "type": "string",
+      "description": "Formulario SII referenciado, ej: 'Formulario 29'"
+    },
+    "legalBasis": {
+      "type": "string",
+      "description": "Art\u00edculo de ley o normativa SII que respalda"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendiente",
+        "en_proceso",
+        "resuelta",
+        "descartada"
+      ],
+      "default": "pendiente"
+    },
+    "resolvedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "pymeProfileId",
+    "alertType",
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    }
+  }
+}

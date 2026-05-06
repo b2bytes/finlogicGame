@@ -23,6 +23,9 @@ export default function HeroNav() {
           <Link to="/Casos" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Casos
           </Link>
+          <Link to="/Pyme" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Pyme
+          </Link>
           <Link to="/api-compliance" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             API B2B
           </Link>
