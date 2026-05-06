@@ -63,21 +63,35 @@ Deno.serve(async (req) => {
       }
 
       if (alertWindow && dl.casoRef) {
-        const caso = await base44.asServiceRole.entities.MisCasos.get(dl.casoRef);
+        const caso = await base44.asServiceRole.entities.MisCasos.get(dl.casoRef).catch(() => null);
         if (caso?.created_by) {
-          const subject = `⏰ FinLogic: tu plazo vence en ${alertWindow}`;
-          const body = buildAlertEmail(caso, dl, daysRemaining);
-          await base44.asServiceRole.integrations.Core.SendEmail({
-            from_name: 'FinLogic',
-            to: caso.created_by,
-            subject,
-            body,
-          });
+          // Verificar que el destinatario exista como usuario de la app
+          // (SendEmail rechaza correos a no-usuarios). Si no existe, marcamos
+          // el alert como enviado para no reintentar en cada CRON.
+          const userExists = await base44.asServiceRole.entities.User.filter({
+            email: caso.created_by,
+          }).then(u => u.length > 0).catch(() => false);
+
+          if (userExists) {
+            try {
+              const subject = `⏰ FinLogic: tu plazo vence en ${alertWindow}`;
+              const body = buildAlertEmail(caso, dl, daysRemaining);
+              await base44.asServiceRole.integrations.Core.SendEmail({
+                from_name: 'FinLogic',
+                to: caso.created_by,
+                subject,
+                body,
+              });
+              alertsSent++;
+            } catch (e) {
+              console.warn(`email failed for ${caso.created_by}:`, e.message);
+            }
+          }
+          // Siempre marcamos el alert window para no reintentar
           await base44.asServiceRole.entities.LegalDeadline.update(dl.id, {
             [updateField]: true,
             status: 'alertado',
           });
-          alertsSent++;
         }
       }
 

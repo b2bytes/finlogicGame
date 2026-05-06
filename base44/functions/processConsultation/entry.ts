@@ -323,10 +323,7 @@ Deno.serve(async (req) => {
       general: 'balanceado profesional',
     };
 
-    let specialist = {};
-    try {
-      specialist = await base44.integrations.Core.InvokeLLM({
-        prompt: `Eres un especialista senior de FinLogic en derecho ${regulatoryBody} chileno. Foco: ${focusLine}
+    const specialistPrompt = `Eres un especialista senior de FinLogic en derecho ${regulatoryBody} chileno. Foco: ${focusLine}
 
 REGLAS DURAS:
 - Cita ley + artículo específico (nunca inventes).
@@ -347,19 +344,30 @@ Responde JSON con:
 - lawsCited: ["Ley X Art. Y", ...]
 - legalDeadlineDays: número (0 si no aplica)
 - deadlineDescription: consecuencia del vencimiento
-- selfConfidence: 0-100`,
+- selfConfidence: 0-100`;
+
+    let specialist = {};
+    try {
+      // Usamos el modelo default (gpt-4o-mini equivalente) — más rápido y
+      // respeta JSON schema de forma confiable. Sonnet a veces devuelve vacío.
+      specialist = await base44.integrations.Core.InvokeLLM({
+        prompt: specialistPrompt,
         response_json_schema: SPECIALIST_SCHEMA,
-        model: 'claude_sonnet_4_6',
       });
     } catch (e) {
-      console.error('specialist (sonnet) failed:', e.message);
+      console.error('specialist failed:', e.message);
+    }
+    // Si vino vacío sin error, intentamos con Sonnet como fallback de calidad
+    if (!specialist.fact || !specialist.action) {
+      console.warn('specialist devolvió vacío, retry con sonnet');
       try {
         specialist = await base44.integrations.Core.InvokeLLM({
-          prompt: `Especialista ${regulatoryBody}. ${focusLine}\n\nCONSULTA: "${query}"\n\n${ragContext}\n\nResponde fact/translation/action/lawsCited/legalDeadlineDays.`,
+          prompt: specialistPrompt,
           response_json_schema: SPECIALIST_SCHEMA,
+          model: 'claude_sonnet_4_6',
         });
       } catch (e2) {
-        console.error('specialist fallback failed:', e2.message);
+        console.error('specialist sonnet retry failed:', e2.message);
       }
     }
     const specialistLatencyMs = Date.now() - specialistStart;
@@ -434,22 +442,25 @@ Responde JSON con:
       }
     }
 
-    // ─── VERIFICADOR ASYNC (fire-and-forget, actualiza el trace después) ─
-    // No bloqueamos la respuesta al usuario. Sonnet es más rápido que Opus aquí.
+    // ─── VERIFICADOR ASYNC (fire-and-forget) ────────────────────────────
+    // No bloqueamos al usuario. Si falla update por RLS, lo ignoramos —
+    // selfConfidence ya está guardado en el trace inicial.
     const traceId = traceRecord.id;
     (async () => {
       try {
         const verification = await base44.integrations.Core.InvokeLLM({
           prompt: `${VERIFIER_PROMPT}\n\nCONSULTA: "${query}"\nHECHO: ${fact}\nDERECHO: ${translation}\nACCIÓN: ${action}\nLEYES: ${JSON.stringify(lawsCited)}\nFUENTES RAG: ${ragChunks.map(c => c.lawReference).join(', ') || '(sin)'}\n\nAudita.`,
           response_json_schema: VERIFIER_SCHEMA,
-          model: 'claude_sonnet_4_6',
         });
         const finalScore = Math.round(verification.verifierScore || selfConfidence);
+        // Update via service role (la entity AgentTrace tiene RLS write=admin only)
         await base44.asServiceRole.entities.AgentTrace.update(traceId, {
           verifierScore: finalScore,
-        });
+        }).catch(e => console.warn('trace update skipped:', e.message));
         if (caseId) {
-          await base44.asServiceRole.entities.MisCasos.update(caseId, { verifierScore: finalScore });
+          await base44.asServiceRole.entities.MisCasos.update(caseId, {
+            verifierScore: finalScore,
+          }).catch(e => console.warn('case update skipped:', e.message));
         }
       } catch (e) {
         console.error('async verifier failed:', e.message);
@@ -483,8 +494,8 @@ Responde JSON con:
           ragSources: ragChunks.map(c => ({ lawReference: c.lawReference, score: c.score })),
           modelsUsed: {
             triage: 'gpt_5_mini',
-            specialist: 'claude_sonnet_4_6',
-            verifier: 'claude_sonnet_4_6 (async)',
+            specialist: 'default (sonnet fallback)',
+            verifier: 'default (async)',
             embeddings: 'pinecone-multilingual-e5-large',
           },
         },
