@@ -20,6 +20,7 @@ import FinancialDashboard from '@/pages/FinancialDashboard';
 import Marca from '@/pages/Marca';
 import CasoDetalle from '@/pages/CasoDetalle';
 import PitchDeck from '@/pages/PitchDeck';
+import OperacionesDashboard from '@/pages/OperacionesDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -61,6 +62,7 @@ const AuthenticatedApp = () => {
       <Route path="/Marca" element={<Marca />} />
       <Route path="/MisCasos/:id" element={<CasoDetalle />} />
       <Route path="/PitchDeck" element={<PitchDeck />} />
+      <Route path="/OperacionesDashboard" element={<OperacionesDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

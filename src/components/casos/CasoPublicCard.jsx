@@ -25,6 +25,14 @@ const organismColors = {
   multiple: 'bg-secondary text-secondary-foreground border-border',
 };
 
+const profileEmojis = {
+  camila: '👩🏽‍🎓',
+  don_luis: '👴🏼',
+  maria_jose: '👩🏽‍💼',
+  roberto: '👨🏽‍🔧',
+  general: '👤',
+};
+
 export default function CasoPublicCard({ caso, onShare }) {
   const handleShare = (e) => {
     e.stopPropagation();
@@ -37,9 +45,14 @@ export default function CasoPublicCard({ caso, onShare }) {
   return (
     <article className="group bg-card rounded-3xl border border-border p-6 shadow-soft hover:shadow-soft-lg hover:border-mint-200 transition-all">
       <div className="flex items-start justify-between gap-3 mb-4">
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${organismColors[caso.regulatoryBody] || organismColors.multiple}`}>
-          {caso.regulatoryBody}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-2xl" aria-hidden="true">
+            {profileEmojis[caso.userProfile] || profileEmojis.general}
+          </span>
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${organismColors[caso.regulatoryBody] || organismColors.multiple}`}>
+            {caso.regulatoryBody}
+          </span>
+        </div>
         <div className="flex items-center gap-1 text-xs text-mint-700">
           <ShieldCheck className="w-3.5 h-3.5" />
           <span className="font-semibold">Resuelto</span>
@@ -52,6 +65,15 @@ export default function CasoPublicCard({ caso, onShare }) {
       <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
         {caso.description}
       </p>
+
+      {caso.amountInvolved > 0 && (
+        <div className="bg-mint-50 border border-mint-200 rounded-2xl px-3 py-2 mb-4">
+          <p className="text-[10px] font-bold text-mint-600 uppercase tracking-wider">Recuperado</p>
+          <p className="text-base font-bold text-mint-700 tabular-nums">
+            ${caso.amountInvolved.toLocaleString('es-CL')} CLP
+          </p>
+        </div>
+      )}
 
       <div className="flex items-center gap-2 mb-4 text-xs">
         <Scale className="w-3.5 h-3.5 text-mint-600 flex-shrink-0" />

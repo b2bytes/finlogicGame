@@ -13,13 +13,7 @@ export default function HeroNav() {
           <Logo size="md" />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-7">
-          <a href="#como-funciona" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Cómo funciona
-          </a>
-          <a href="#perfiles" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Para quién
-          </a>
+        <nav className="hidden md:flex items-center gap-6">
           <Link to="/Casos" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Casos
           </Link>
@@ -37,9 +31,6 @@ export default function HeroNav() {
           </Link>
           <Link to="/MisCasos" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Mis casos
-          </Link>
-          <Link to="/Soporte" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Soporte
           </Link>
         </nav>
 

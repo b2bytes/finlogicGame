@@ -6,7 +6,7 @@ import Logo from '@/components/home/Logo';
 import CasoPublicCard from '@/components/casos/CasoPublicCard';
 import CasosPublicHero from '@/components/casos/CasosPublicHero';
 
-const ORGANISMS = ['all', 'CMF', 'SERNAC', 'SII', 'CSIRT', 'BCN'];
+const ORGANISMS = ['all', 'CMF', 'SERNAC', 'SII', 'CSIRT'];
 
 export default function Casos() {
   const [casos, setCasos] = useState([]);
@@ -38,7 +38,7 @@ export default function Casos() {
         </div>
       </header>
 
-      <CasosPublicHero count={casos.length} />
+      <CasosPublicHero count={casos.length} casos={casos} />
 
       <main className="max-w-6xl mx-auto px-6 pb-20">
         <div className="flex flex-wrap gap-2 mb-8 justify-center">

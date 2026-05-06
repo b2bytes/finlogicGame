@@ -2,6 +2,7 @@ import React from 'react';
 import HeroNav from '@/components/home/HeroNav';
 import HeroSection from '@/components/home/HeroSection';
 import StatsBar from '@/components/home/StatsBar';
+import RecentCasos from '@/components/home/RecentCasos';
 import HowItWorks from '@/components/home/HowItWorks';
 import PerfilesSection from '@/components/home/PerfilesSection';
 import TrustSection from '@/components/home/TrustSection';
@@ -15,6 +16,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <StatsBar />
+        <RecentCasos />
         <HowItWorks />
         <PerfilesSection />
         <TrustSection />
