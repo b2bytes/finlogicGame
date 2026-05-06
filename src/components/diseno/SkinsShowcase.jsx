@@ -246,7 +246,7 @@ export default function SkinsShowcase() {
   return (
     <section
       id="skins"
-      className="relative py-20 px-4 sm:px-6 max-w-7xl mx-auto overflow-hidden"
+      className="relative py-16 sm:py-20 px-4 sm:px-6 max-w-7xl mx-auto overflow-hidden"
     >
       {/* Mesh decorativo */}
       <motion.div
@@ -254,7 +254,7 @@ export default function SkinsShowcase() {
         whileInView={{ opacity: 0.5 }}
         viewport={{ once: true }}
         transition={{ duration: 1.2 }}
-        className="absolute -top-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-gradient-to-br from-mint-200/30 to-purple-200/20 blur-3xl pointer-events-none"
+        className="absolute -top-20 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[300px] rounded-full bg-gradient-to-br from-mint-200/30 to-purple-200/20 blur-3xl pointer-events-none"
       />
 
       <motion.div

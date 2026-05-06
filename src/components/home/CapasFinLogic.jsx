@@ -73,7 +73,7 @@ const CAPAS = [
 export default function CapasFinLogic() {
   return (
     <section id="capas" className="py-16 md:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold text-mint-600 mb-3 tracking-wider uppercase">

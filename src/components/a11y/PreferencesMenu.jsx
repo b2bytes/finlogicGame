@@ -83,7 +83,7 @@ export default function PreferencesMenu() {
           <div
             role="dialog"
             aria-label="Menú de preferencias de visualización"
-            className="absolute right-0 mt-2 w-[340px] max-w-[calc(100vw-2rem)] rounded-3xl border border-border bg-popover shadow-soft-lg p-2 z-50 animate-fade-up"
+            className="fixed sm:absolute left-3 right-3 top-16 sm:left-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-[340px] sm:max-w-[calc(100vw-2rem)] rounded-3xl border border-border bg-popover shadow-soft-lg p-2 z-50 animate-fade-up"
             style={{ animationDuration: '0.2s' }}
           >
             {/* Header */}

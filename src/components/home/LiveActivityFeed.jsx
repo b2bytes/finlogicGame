@@ -49,9 +49,9 @@ export default function LiveActivityFeed() {
 
   return (
     <section className="py-12 md:py-16">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="rounded-[32px] bg-card border border-border/60 shadow-soft overflow-hidden">
-          <div className="flex items-center justify-between px-6 md:px-8 py-4 border-b border-border/60 bg-secondary/30">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="rounded-[28px] sm:rounded-[32px] bg-card border border-border/60 shadow-soft overflow-hidden">
+          <div className="flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 border-b border-border/60 bg-secondary/30">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mint-500 opacity-75"></span>
@@ -70,7 +70,7 @@ export default function LiveActivityFeed() {
             {visible.map((item, i) => (
               <li
                 key={`${tick}-${i}`}
-                className="flex items-center gap-3 md:gap-4 px-6 md:px-8 py-3.5 animate-fade-up"
+                className="flex items-center gap-3 md:gap-4 px-4 sm:px-6 md:px-8 py-3.5 animate-fade-up"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${ORG_COLORS[item.regulatoryBody] || 'bg-secondary'} flex-shrink-0`}>

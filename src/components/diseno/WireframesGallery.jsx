@@ -60,7 +60,7 @@ const STATUS_MAP = {
 export default function WireframesGallery() {
   return (
     <section id="wireframes" className="py-20 md:py-28 scroll-mt-16">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-4">
             <Frame className="w-3.5 h-3.5 text-mint-700" />

@@ -12,7 +12,7 @@ const MEDIA = [
 export default function MediaLogos() {
   return (
     <section className="py-8 md:py-10 border-y border-border/40 bg-gradient-to-r from-card/30 via-card/60 to-card/30">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <p className="text-center text-[10px] font-bold text-muted-foreground/80 uppercase tracking-[0.2em] mb-5">
           Cobertura editorial
         </p>

@@ -7,8 +7,8 @@ const ILLUSTRATION = 'https://media.base44.com/images/public/69fae03fe83575f06c2
 export default function CTASection() {
   return (
     <section className="py-12 md:py-20">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-mint-600 via-mint-600 to-mint-700 p-8 md:p-12 lg:p-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[28px] sm:rounded-[36px] bg-gradient-to-br from-mint-600 via-mint-600 to-mint-700 p-6 sm:p-8 md:p-12 lg:p-14">
           <div aria-hidden="true" className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4" />
           <div aria-hidden="true" className="absolute bottom-0 left-0 w-72 h-72 bg-white/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
 

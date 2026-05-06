@@ -123,6 +123,13 @@
     text-rendering: optimizeLegibility;
   }
 
+  html, body {
+    /* CRITICAL: previene scroll horizontal en mobile causado por
+       gradient orbs absolutos, blurs y elementos que escapan del viewport */
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
   body {
     @apply bg-background text-foreground font-sans;
     font-feature-settings: "ss01", "cv11";
@@ -132,6 +139,15 @@
     /* Mejor scroll en mobile */
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: none;
+    /* Reduce work del compositor en mobile */
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Asegura que imágenes nunca rompan el layout en mobile */
+  img, video, svg {
+    max-width: 100%;
+    height: auto;
   }
 
   /* Inputs sin zoom en iOS (16px mínimo) */

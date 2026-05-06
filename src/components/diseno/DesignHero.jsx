@@ -14,23 +14,23 @@ const SECTIONS = [
 export default function DesignHero() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-mint-50/60 via-background to-background border-b border-border/40">
-      {/* Mesh decorativo animado */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Mesh decorativo animado — clipped al viewport */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.5 }}
           transition={{ duration: 1.5, ease: 'easeOut' }}
-          className="absolute -top-32 -right-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-mint-200/40 to-mint-300/20 blur-3xl"
+          className="absolute -top-32 -right-20 w-80 sm:w-[500px] h-80 sm:h-[500px] rounded-full bg-gradient-to-br from-mint-200/40 to-mint-300/20 blur-3xl"
         />
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.4 }}
           transition={{ duration: 1.5, delay: 0.2, ease: 'easeOut' }}
-          className="absolute top-40 -left-20 w-96 h-96 rounded-full bg-gradient-to-br from-accent/50 to-amber-100/30 blur-3xl"
+          className="absolute top-40 -left-20 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-gradient-to-br from-accent/50 to-amber-100/30 blur-3xl"
         />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8 pt-20 md:pt-24 pb-16">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 md:pt-24 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

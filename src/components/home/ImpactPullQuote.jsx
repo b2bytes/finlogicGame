@@ -6,7 +6,7 @@ import { Quote } from 'lucide-react';
 export default function ImpactPullQuote() {
   return (
     <section className="py-16 md:py-24">
-      <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <Quote className="w-10 h-10 text-mint-300 mx-auto mb-6" strokeWidth={1.5} />
         <p className="font-display text-2xl md:text-4xl lg:text-[44px] font-bold tracking-tight text-foreground leading-[1.15]">
           Hoy en Chile hay <span className="text-mint-600">500.000 personas</span> que presentaron un reclamo en SERNAC sin saber si tenían razón.

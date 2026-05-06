@@ -6,10 +6,10 @@ const HERO_ILLUSTRATION =
 
 export default function HeroIllustration() {
   return (
-    <div className="relative w-full">
+    <div className="relative w-full overflow-hidden">
       {/* Ambient glow detrás de la ilustración */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[110%] h-[80%] bg-mint-200/40 rounded-full blur-[100px]" />
+      <div aria-hidden="true" className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full h-[80%] bg-mint-200/40 rounded-full blur-[100px]" />
         <div className="absolute bottom-0 right-1/4 w-2/3 h-2/3 bg-[#FFD9B8]/50 rounded-full blur-[90px]" />
       </div>
 

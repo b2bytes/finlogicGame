@@ -20,7 +20,7 @@ const despues = [
 export default function AntesDespues() {
   return (
     <section className="py-16 md:py-20">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <p className="text-xs font-semibold text-mint-600 mb-3 tracking-wider uppercase">
             El cambio que mereces

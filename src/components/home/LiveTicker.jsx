@@ -50,7 +50,7 @@ export default function LiveTicker() {
 
   return (
     <section className="py-10 md:py-12 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <div className="flex items-center gap-2.5">
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mint-500 opacity-75" />

@@ -29,7 +29,7 @@ export default function IndicadoresLive() {
   if (!data) {
     return (
       <section className="py-6 bg-card/30 border-y border-border/40">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-center gap-2 text-muted-foreground text-xs">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-2 text-muted-foreground text-xs">
           <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
           Cargando indicadores oficiales…
         </div>

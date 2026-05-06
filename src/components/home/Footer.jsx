@@ -6,7 +6,7 @@ import Logo from './Logo';
 export default function Footer() {
   return (
     <footer className="border-t border-border/40 bg-gradient-to-b from-card/40 to-mint-50/30">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid md:grid-cols-12 gap-10">
           <div className="md:col-span-5">
             <Logo size="md" />

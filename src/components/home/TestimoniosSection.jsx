@@ -37,7 +37,7 @@ const TESTIMONIOS = [
 export default function TestimoniosSection() {
   return (
     <section className="py-16 md:py-24">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mb-12">
           <p className="text-xs font-semibold text-mint-600 mb-3 tracking-wider uppercase">
             Lo que dicen

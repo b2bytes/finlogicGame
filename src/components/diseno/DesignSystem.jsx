@@ -96,7 +96,7 @@ const SectionHeader = ({ children, ...props }) => (
 export default function DesignSystem() {
   return (
     <section id="system" className="py-20 md:py-28 bg-secondary/40 border-y border-border/40 scroll-mt-16">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeader className="max-w-3xl mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-4">
             <Palette className="w-3.5 h-3.5 text-mint-700" />

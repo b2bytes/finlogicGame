@@ -5,7 +5,7 @@ import { Code2, BarChart3, ArrowRight, Check, Zap, Lock } from 'lucide-react';
 export default function B2BSection() {
   return (
     <section className="py-16 md:py-24 bg-gradient-to-b from-background to-mint-50/40">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mb-14">
           <p className="text-xs font-semibold text-mint-600 mb-3 tracking-wider uppercase">
             Para empresas
@@ -21,7 +21,7 @@ export default function B2BSection() {
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Compliance API card */}
-          <div className="group bg-foreground text-background rounded-[32px] p-8 md:p-10 relative overflow-hidden hover:shadow-soft-lg transition-all">
+          <div className="group bg-foreground text-background rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 md:p-10 relative overflow-hidden hover:shadow-soft-lg transition-all">
             <div aria-hidden="true" className="absolute -top-32 -right-32 w-80 h-80 bg-mint-500/20 rounded-full blur-3xl" />
 
             <div className="relative">
@@ -78,7 +78,7 @@ export default function B2BSection() {
           </div>
 
           {/* Insights card */}
-          <div className="group bg-card border border-border rounded-[32px] p-8 md:p-10 relative overflow-hidden hover:shadow-soft-lg transition-all">
+          <div className="group bg-card border border-border rounded-[28px] sm:rounded-[32px] p-6 sm:p-8 md:p-10 relative overflow-hidden hover:shadow-soft-lg transition-all">
             <div className="flex items-center gap-2 mb-6">
               <div className="w-10 h-10 rounded-2xl bg-[#F0E5FF] flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-purple-700" strokeWidth={2.2} />

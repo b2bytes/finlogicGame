@@ -81,7 +81,7 @@ export default function StatsBar() {
 
   return (
     <section className="py-10 md:py-12">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-1.5 mb-3">

@@ -15,7 +15,7 @@ const ORGANISMOS = [
 export default function OrganismosCobertura() {
   return (
     <section className="py-10 md:py-14 border-y border-border/40 bg-card/30">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center mb-7">
           <p className="text-[11px] sm:text-xs font-semibold tracking-wider uppercase text-muted-foreground text-center">
             Cobertura end-to-end · 7 organismos reguladores · 12 normativas vivas
