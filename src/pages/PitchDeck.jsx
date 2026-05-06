@@ -152,13 +152,22 @@ export default function PitchDeck() {
           <p className="mt-8 text-xl text-background/70 max-w-2xl mx-auto leading-relaxed">
             El concurso es la chispa. El legado es el fuego.
           </p>
-          <Link
-            to="/Consulta"
-            className="inline-flex items-center gap-2 mt-10 rounded-full bg-mint-500 hover:bg-mint-400 text-white h-14 px-8 text-base font-bold transition-colors"
-          >
-            Probar el sistema en vivo
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+          <div className="mt-10 flex flex-wrap gap-3 justify-center">
+            <Link
+              to="/Consulta"
+              className="inline-flex items-center gap-2 rounded-full bg-mint-500 hover:bg-mint-400 text-white h-14 px-8 text-base font-bold transition-colors"
+            >
+              Probar el sistema en vivo
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              to="/Transparencia"
+              className="inline-flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-background h-14 px-8 text-base font-bold transition-colors"
+            >
+              <Eye className="w-5 h-5" />
+              Ver AgentTrace público
+            </Link>
+          </div>
         </div>
       </section>
     </div>
