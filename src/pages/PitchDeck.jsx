@@ -93,8 +93,10 @@ export default function PitchDeck() {
     load();
   }, []);
 
-  const url = typeof window !== 'undefined' ? window.location.origin : 'https://finlogic.one';
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&color=0E7A47&bgcolor=FAF6EC&margin=12&data=${encodeURIComponent(url + '/Consulta')}`;
+  // QR canónico → finlogic.one (dominio público real, no preview).
+  // ECC=H (alta corrección de errores), color mint corporativo, fondo crema, margen amplio.
+  const FINLOGIC_URL = 'https://finlogic.one';
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(FINLOGIC_URL)}&size=600x600&color=0E7A47&bgcolor=FAF6EC&margin=16&ecc=H&format=svg&qzone=2`;
 
   return (
     <div className="bg-background">
@@ -135,17 +137,39 @@ export default function PitchDeck() {
           </div>
 
           <div className="lg:col-span-2 animate-fade-up" style={{ animationDelay: '120ms' }}>
-            <div className="bg-card rounded-3xl border-2 border-mint-200 p-6 shadow-soft-lg">
-              <Eyebrow size="sm" className="mb-3 justify-center w-full">
-                Pruébalo desde tu celular
-              </Eyebrow>
-              <div className="bg-background rounded-2xl p-4 flex items-center justify-center">
-                <img src={qrUrl} alt="QR finlogic.one/Consulta" className="w-full max-w-[280px] aspect-square" />
+            <a
+              href={FINLOGIC_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Ir a finlogic.one"
+              className="block group"
+            >
+              <div className="relative bg-card rounded-3xl border-2 border-mint-200 p-6 shadow-soft-lg group-hover:shadow-mint group-hover:border-mint-400 transition-all">
+                <Eyebrow size="sm" className="mb-3 justify-center w-full">
+                  Escanéame · Pruébalo ahora
+                </Eyebrow>
+                <div className="relative bg-background rounded-2xl p-5 flex items-center justify-center">
+                  <img
+                    src={qrUrl}
+                    alt="QR para abrir finlogic.one"
+                    className="w-full max-w-[280px] aspect-square"
+                    loading="eager"
+                  />
+                  {/* Logo central sobre el QR — el ECC=H tolera ~30% de oclusión */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-soft ring-4 ring-background">
+                      <span className="font-editorial text-mint-700 text-2xl font-bold leading-none -mt-0.5">L</span>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-center text-sm font-mono-editorial text-foreground mt-4 font-bold tracking-wider">
+                  finlogic.one
+                </p>
+                <p className="text-center text-[11px] text-muted-foreground mt-1">
+                  Sistema operativo financiero · Chile
+                </p>
               </div>
-              <p className="text-center text-xs font-mono-editorial text-muted-foreground mt-3">
-                finlogic.one/Consulta
-              </p>
-            </div>
+            </a>
 
             <div className="mt-5 grid grid-cols-2 gap-3">
               <div className="bg-foreground text-background rounded-2xl p-4">
