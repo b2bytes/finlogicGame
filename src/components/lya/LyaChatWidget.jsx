@@ -32,6 +32,7 @@ export default function LyaChatWidget() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const sessionIdRef = useRef(null);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -86,9 +87,15 @@ export default function LyaChatWidget() {
         query,
         mode: 'text',
         userProfile: 'general',
-        history: priorHistory,
+        history: sessionIdRef.current
+          ? [{ sessionId: sessionIdRef.current }, ...priorHistory]
+          : priorHistory,
       });
       const data = res.data || {};
+      // Persistir sessionId para que todos los turnos se agrupen en /Transparencia
+      if (data.sessionId && !sessionIdRef.current) {
+        sessionIdRef.current = data.sessionId;
+      }
       setMessages((m) => [
         ...m,
         {
