@@ -29,6 +29,7 @@ import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
 import FloatingLyaCTA from '@/components/lya/FloatingLyaCTA';
 import EmbedLya from '@/pages/EmbedLya';
+import Diseno from '@/pages/Diseno';
 import ScrollToTop from '@/components/ScrollToTop';
 import PWAInstallBanner from '@/components/pwa/PWAInstallBanner';
 
@@ -83,6 +84,8 @@ const AuthenticatedApp = () => {
       <Route path="/AsistenteLya" element={<AsistenteLya />} />
       <Route path="/Admin/ContentStudio" element={<ContentStudio />} />
       <Route path="/Embed/Lya" element={<EmbedLya />} />
+      <Route path="/Diseno" element={<Diseno />} />
+      <Route path="/Diseño" element={<Diseno />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     <FloatingLyaCTA />
