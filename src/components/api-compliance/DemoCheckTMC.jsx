@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Copy, Check } from 'lucide-react';
 
-const SAMPLE_REQUEST = `curl -X POST https://api.finlogic.one/v1/lyaComplianceAPIEndpoint \\
+const SAMPLE_REQUEST = `curl -X POST https://api.finlogic.one/v1/compliance \\
   -H "x-api-key: fl_live_••••••••" \\
   -H "Content-Type: application/json" \\
   -d '{
