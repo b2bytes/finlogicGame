@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Send, Sparkles, Loader2, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Send, Sparkles, Loader2, ShieldCheck, Scale } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import Logo from '@/components/home/Logo';
 import LyaMessage from '@/components/lya/LyaMessage';
@@ -12,20 +12,7 @@ const SUGERENCIAS = [
   '¿Cuántos días tengo para reclamar un fraude?',
 ];
 
-const SISTEMA_LYA = `Eres Lya, el asistente IA de FinLogic — el sistema operativo financiero del pueblo de Chile.
-
-REGLAS:
-- Respondes en español chileno claro y cálido. Sin tecnicismos innecesarios.
-- Eres concreta, accionable y empática. Nunca condescendiente.
-- Para cada respuesta usa estas 3 secciones cuando aplique:
-  ⚖️ **Tu derecho** (cita normativa solo si la conoces con certeza: Ley 21.521, NCG 502 CMF, Ley 19.496 SERNAC, Ley 21.719 datos, Ley 20.009 fraude)
-  📋 **Acción concreta** (máximo 3 pasos numerados que pueda hacer HOY)
-  ⏰ **Plazo legal** (si aplica)
-- NUNCA inventes artículos legales que no conoces.
-- NUNCA recomiendes una institución financiera específica.
-- Si requiere verificación adicional, dilo: "te recomiendo confirmar con [organismo]".
-- Termina siempre invitando a la siguiente acción concreta.
-- Máximo 250 palabras por respuesta.`;
+const sessionId = `lya-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 export default function AsistenteLya() {
   const [messages, setMessages] = useState([
@@ -52,18 +39,54 @@ export default function AsistenteLya() {
     setLoading(true);
 
     try {
-      const conversation = messages
-        .map((m) => `${m.role === 'user' ? 'Usuario' : 'Lya'}: ${m.content}`)
-        .join('\n');
-
-      const fullPrompt = `${SISTEMA_LYA}\n\n--- CONVERSACIÓN PREVIA ---\n${conversation}\n\n--- NUEVA CONSULTA ---\nUsuario: ${q}\n\nLya responde:`;
-
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: fullPrompt,
+      const result = await base44.functions.invoke('lyaKnowledgeQuery', {
+        query: q,
+        userProfile: 'general',
+        mode: 'text',
       });
 
-      const text = typeof response === 'string' ? response : response?.text || JSON.stringify(response);
-      setMessages((prev) => [...prev, { role: 'assistant', content: text }]);
+      const data = result.data || {};
+      const answer = data.response || 'No pude generar una respuesta en este momento.';
+      const sources = Array.isArray(data.sources) ? data.sources : [];
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: answer,
+          sources,
+          confidence: data.confidence,
+          regulatoryBody: data.regulatoryBody,
+        },
+      ]);
+
+      // Persistir auditoría — alimenta /Transparencia y /Admin/SystemMetrics
+      try {
+        await base44.entities.AgentTrace.create({
+          sessionId,
+          query: q,
+          category: data.regulatoryBody === 'CSIRT' ? 'fraude_digital' : 'normativa_consulta',
+          pipelineStage: 'complete',
+          totalLatencyMs: data.latencyMs,
+          verifierScore: Math.round((data.confidence || 0.85) * 100),
+          lawsCited: sources,
+          responsePreview: answer.slice(0, 200),
+          modelUsed: 'sonnet',
+          isPublic: true,
+        });
+
+        await base44.entities.ConsultationHistory.create({
+          sessionId,
+          userMessage: q,
+          agentResponse: answer.slice(0, 1000),
+          agentName: 'Lya',
+          regulatoryBodyIdentified: data.regulatoryBody || 'ninguno',
+          inputChannel: 'web',
+        });
+      } catch (auditErr) {
+        // Auditoría no bloquea UX
+        console.warn('Audit trace error:', auditErr);
+      }
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -114,7 +137,13 @@ export default function AsistenteLya() {
           className="flex-1 bg-card/40 border border-border rounded-3xl p-5 md:p-7 space-y-4 overflow-y-auto min-h-[400px] max-h-[60vh] mb-4"
         >
           {messages.map((m, i) => (
-            <LyaMessage key={i} role={m.role} content={m.content} />
+            <LyaMessage
+              key={i}
+              role={m.role}
+              content={m.content}
+              sources={m.sources}
+              confidence={m.confidence}
+            />
           ))}
           {loading && (
             <div className="flex gap-3">

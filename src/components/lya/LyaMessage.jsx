@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Scale } from 'lucide-react';
 
-export default function LyaMessage({ role, content }) {
+export default function LyaMessage({ role, content, sources, confidence }) {
   const isUser = role === 'user';
 
   if (isUser) {
@@ -37,6 +37,29 @@ export default function LyaMessage({ role, content }) {
         >
           {content}
         </ReactMarkdown>
+
+        {sources && sources.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-border/60">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-mint-700 mb-1.5 flex items-center gap-1">
+              <Scale className="w-3 h-3" /> Fundamento normativo
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {sources.map((s, i) => (
+                <span
+                  key={i}
+                  className="text-[11px] font-medium text-mint-700 bg-mint-50 border border-mint-200 px-2 py-0.5 rounded-full"
+                >
+                  {s}
+                </span>
+              ))}
+              {typeof confidence === 'number' && (
+                <span className="text-[11px] font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+                  Score: {Math.round(confidence * 100)}/100
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
