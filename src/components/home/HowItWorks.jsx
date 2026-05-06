@@ -1,36 +1,30 @@
 import React from 'react';
-import { FileSearch, ShieldCheck, Bell } from 'lucide-react';
+import { MessageSquare, Sparkles, FileCheck2, ArrowRight } from 'lucide-react';
 
 const steps = [
   {
-    number: '1',
-    icon: FileSearch,
-    title: 'Tu cobro de APP correcto.',
-    actionLabel: 'Conecta tus cuentas',
-    accentBg: 'bg-mint-50',
-    accentText: 'text-mint-600',
-    decorBg: 'bg-blue-50',
-    decor: '📊',
+    number: '01',
+    icon: MessageSquare,
+    title: 'Cuéntanos en tus palabras.',
+    description: 'Sin formularios, sin tecnicismos. Habla o escribe lo que te pasó con tu banco.',
+    iconBg: 'bg-mint-100',
+    iconColor: 'text-mint-700',
   },
   {
-    number: '2',
-    icon: ShieldCheck,
-    title: 'Tu cobro de APP es correcto.',
-    actionLabel: 'Analizamos tus datos',
-    accentBg: 'bg-mint-50',
-    accentText: 'text-mint-600',
-    decorBg: 'bg-mint-50',
-    decor: '✅',
+    number: '02',
+    icon: Sparkles,
+    title: 'Nuestra IA identifica tu derecho.',
+    description: 'Pipeline auditable: triage + 12 normativas chilenas + verificador 89/100.',
+    iconBg: 'bg-[#F0E5FF]',
+    iconColor: 'text-purple-700',
   },
   {
-    number: '3',
-    icon: Bell,
-    title: 'Alerta: Movimientos irregulares detectados.',
-    actionLabel: 'Recibe informes y toma acción',
-    accentBg: 'bg-orange-50',
-    accentText: 'text-orange-600',
-    decorBg: 'bg-amber-50',
-    decor: '🙂',
+    number: '03',
+    icon: FileCheck2,
+    title: 'Recibe tu carta lista para enviar.',
+    description: 'Carta ARCO, reclamo SERNAC o denuncia CMF generada en segundos. Tu firma y listo.',
+    iconBg: 'bg-[#FFE0CC]',
+    iconColor: 'text-orange-700',
   },
 ];
 
@@ -38,45 +32,45 @@ export default function HowItWorks() {
   return (
     <section id="como-funciona" className="py-12 md:py-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-8">
-          Cómo funciona
-        </h2>
+        <div className="max-w-2xl mb-10">
+          <p className="text-xs font-semibold text-mint-600 mb-3 tracking-wider uppercase">
+            Cómo funciona
+          </p>
+          <h2 className="font-display text-3xl md:text-[40px] font-bold tracking-tight text-foreground leading-[1.05]">
+            De tu problema a la acción<br />
+            <span className="text-mint-600">en 3 pasos.</span>
+          </h2>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-5">
-          {steps.map((step) => (
+          {steps.map((step, i) => (
             <div
               key={step.number}
-              className="group relative bg-card rounded-3xl p-6 border border-border/60 hover:shadow-soft-lg transition-all duration-300"
+              className="group relative bg-card rounded-[28px] p-7 border border-border/60 hover:shadow-soft-lg hover:-translate-y-1 transition-all duration-300"
             >
-              {/* Top row: icon big + title */}
-              <div className="flex items-start gap-4 mb-5">
-                <div className={`w-12 h-12 rounded-2xl ${step.accentBg} flex items-center justify-center flex-shrink-0`}>
-                  <span className={`w-6 h-6 ${step.accentText} flex items-center justify-center`}>
-                    <step.icon className="w-6 h-6" />
-                  </span>
+              <div className="flex items-start justify-between mb-6">
+                <div className={`w-14 h-14 rounded-2xl ${step.iconBg} flex items-center justify-center`}>
+                  <step.icon className={`w-6 h-6 ${step.iconColor}`} strokeWidth={2.2} />
                 </div>
-                <p className="text-sm font-semibold text-foreground leading-snug pt-1">
-                  {step.title}
-                </p>
+                <span className="font-display text-3xl font-bold tabular-nums text-foreground/15 leading-none">
+                  {step.number}
+                </span>
               </div>
 
-              {/* Bottom row: numbered action + decor */}
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="text-xs font-bold text-muted-foreground flex-shrink-0">
-                    {step.number}.
-                  </span>
-                  <span className="text-sm font-medium text-foreground truncate">
-                    {step.actionLabel}
-                  </span>
+              <h3 className="font-display text-lg font-bold text-foreground mb-2 leading-snug">
+                {step.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {step.description}
+              </p>
+
+              {i < steps.length - 1 && (
+                <div className="hidden md:flex absolute top-[3.5rem] -right-3 w-6 h-6 rounded-full bg-card border border-border shadow-soft items-center justify-center z-10">
+                  <ArrowRight className="w-3 h-3 text-mint-600" />
                 </div>
-                <div className={`w-12 h-12 rounded-2xl ${step.decorBg} flex items-center justify-center flex-shrink-0 text-2xl`}>
-                  {step.decor}
-                </div>
-              </div>
+              )}
             </div>
-          ))}
-        </div>
+          ))}</div>
       </div>
     </section>
   );

@@ -7,6 +7,7 @@ import HowItWorks from '@/components/home/HowItWorks';
 import PerfilesSection from '@/components/home/PerfilesSection';
 import TrustSection from '@/components/home/TrustSection';
 import CTASection from '@/components/home/CTASection';
+import AntesDespues from '@/components/home/AntesDespues';
 import Footer from '@/components/home/Footer';
 
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
         <StatsBar />
         <RecentCasos />
         <HowItWorks />
+        <AntesDespues />
         <PerfilesSection />
         <TrustSection />
         <CTASection />

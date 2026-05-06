@@ -21,7 +21,14 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative pt-8 pb-12 md:pt-12 md:pb-16">
+    <section className="relative pt-8 pb-12 md:pt-12 md:pb-16 overflow-hidden">
+      {/* Soft gradient mesh background */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-20 -left-20 w-96 h-96 bg-mint-100/50 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#FFE5D0]/40 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-[#F0E5FF]/40 rounded-full blur-[120px]" />
+      </div>
+
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1.05fr_1fr] gap-8 lg:gap-12 items-center">
           {/* Left — Title + input + trust */}

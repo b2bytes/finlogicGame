@@ -9,6 +9,7 @@ import PipelineLoader from '@/components/consulta/PipelineLoader';
 import ResponseCard from '@/components/consulta/ResponseCard';
 import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
 import VoiceInput from '@/components/consulta/VoiceInput';
+import ConsultaSidePanel from '@/components/consulta/ConsultaSidePanel';
 
 export default function Consulta() {
   const [query, setQuery] = useState('');
@@ -91,10 +92,15 @@ export default function Consulta() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-10 md:py-16">
+      <main className={`mx-auto px-6 py-10 md:py-16 ${response || loading ? 'max-w-3xl' : 'max-w-6xl'}`}>
         {!response && !loading && (
-          <>
+          <div className="grid lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
+            <div>
             <div className="mb-10 animate-fade-up">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-5">
+                <span className="w-1.5 h-1.5 rounded-full bg-mint-500 animate-pulse-soft" />
+                <span className="text-xs font-semibold text-mint-700">Sistema en línea · respuesta en 60s</span>
+              </span>
               <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
                 Cuéntame qué pasó.
               </h1>
@@ -166,10 +172,12 @@ export default function Consulta() {
               </div>
             </div>
 
-            <p className="mt-10 text-xs text-center text-muted-foreground">
-              Tus datos no salen de aquí · Ley 21.719 · Auditable en /Transparencia
-            </p>
-          </>
+            </div>
+
+            <div className="hidden lg:block">
+              <ConsultaSidePanel />
+            </div>
+          </div>
         )}
 
         {loading && (

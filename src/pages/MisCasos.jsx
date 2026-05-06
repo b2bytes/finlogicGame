@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, Folder } from 'lucide-react';
 import Logo from '@/components/home/Logo';
 import CasoCard from '@/components/casos/CasoCard';
 import CasosFilters from '@/components/casos/CasosFilters';
+import MisCasosStats from '@/components/casos/MisCasosStats';
 
 export default function MisCasos() {
   const [casos, setCasos] = useState([]);
@@ -56,6 +57,8 @@ export default function MisCasos() {
             Cada consulta resuelta queda registrada con su plazo legal y organismo competente.
           </p>
         </div>
+
+        <MisCasosStats casos={casos} />
 
         <div className="mb-6">
           <CasosFilters active={filter} onChange={setFilter} counts={counts} />

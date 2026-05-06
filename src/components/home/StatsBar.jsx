@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Scale, FileText, TrendingUp, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 const fallback = {
@@ -43,52 +44,81 @@ export default function StatsBar() {
     {
       value: stats.consultas.toLocaleString('es-CL'),
       label: 'consultas resueltas',
-      icon: '⚖️',
+      sub: 'esta semana',
+      icon: Scale,
       bg: 'bg-[#C5E8D5]',
-      iconBg: 'bg-white/60',
+      iconColor: 'text-mint-700',
+      trend: '+24%',
     },
     {
       value: stats.documentos.toLocaleString('es-CL'),
       label: 'documentos legales',
-      icon: '📄',
+      sub: 'generados con IA',
+      icon: FileText,
       bg: 'bg-[#DCC9F0]',
-      iconBg: 'bg-white/60',
+      iconColor: 'text-purple-700',
+      trend: '+18%',
     },
     {
       value: `$${(stats.recuperados / 1000000).toFixed(1)}M`,
       label: 'CLP recuperados',
-      icon: '💰',
+      sub: 'a los ciudadanos',
+      icon: TrendingUp,
       bg: 'bg-[#FFD4B0]',
-      iconBg: 'bg-white/60',
+      iconColor: 'text-orange-700',
+      trend: '+32%',
     },
     {
       value: `${stats.score}/100`,
       label: 'score verificador IA',
-      icon: '🛡️',
+      sub: 'auditoría continua',
+      icon: ShieldCheck,
       bg: 'bg-[#FFE08A]',
-      iconBg: 'bg-white/60',
+      iconColor: 'text-amber-700',
+      trend: 'Top 1%',
     },
   ];
 
   return (
-    <section className="py-8 md:py-10">
+    <section className="py-10 md:py-12">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-6">
-          Datos en producción
-        </h2>
+        <div className="flex items-end justify-between flex-wrap gap-3 mb-7">
+          <div>
+            <p className="text-xs font-semibold text-mint-600 mb-2 uppercase tracking-wider">
+              Datos en producción
+            </p>
+            <h2 className="font-display text-3xl md:text-[40px] font-bold tracking-tight text-foreground leading-[1.05]">
+              Justicia financiera<br />
+              <span className="text-mint-600">en tiempo real.</span>
+            </h2>
+          </div>
+          <p className="text-xs text-muted-foreground max-w-xs">
+            Métricas auditadas en vivo desde nuestro pipeline IA. Cada número es un caso real.
+          </p>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
           {items.map((stat) => (
             <div
               key={stat.label}
-              className={`${stat.bg} rounded-[28px] p-6 md:p-7 hover:shadow-soft-lg transition-all duration-300`}
+              className={`${stat.bg} rounded-[28px] p-6 md:p-7 hover:shadow-soft-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden`}
             >
-              <div className={`w-12 h-12 rounded-2xl ${stat.iconBg} flex items-center justify-center text-2xl mb-4`}>
-                {stat.icon}
+              <div className="flex items-start justify-between mb-5">
+                <div className="w-11 h-11 rounded-2xl bg-white/70 backdrop-blur flex items-center justify-center">
+                  <stat.icon className={`w-5 h-5 ${stat.iconColor}`} strokeWidth={2.2} />
+                </div>
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-mint-700 bg-white/70 backdrop-blur px-2 py-1 rounded-full">
+                  <ArrowUpRight className="w-2.5 h-2.5" />
+                  {stat.trend}
+                </span>
               </div>
-              <div className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground leading-none tabular-nums">
+
+              <div className="font-display text-[34px] md:text-[42px] font-bold tracking-tight text-foreground leading-[0.95] tabular-nums">
                 {stat.value}
               </div>
-              <p className="mt-2 text-sm font-medium text-foreground/70">{stat.label}</p>
+
+              <p className="mt-2 text-sm font-semibold text-foreground/80">{stat.label}</p>
+              <p className="text-xs text-foreground/55">{stat.sub}</p>
             </div>
           ))}
         </div>

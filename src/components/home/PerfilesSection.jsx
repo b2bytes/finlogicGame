@@ -4,7 +4,6 @@ import { Languages } from 'lucide-react';
 const perfiles = [
   {
     avatar: 'https://media.base44.com/images/public/69fae03fe83575f06c206e95/100231319_generated_image.png',
-    emoji: '👴',
     name: 'Don Luis',
     age: '68',
     location: 'Valparaíso',
@@ -13,7 +12,6 @@ const perfiles = [
   },
   {
     avatar: 'https://media.base44.com/images/public/69fae03fe83575f06c206e95/2b5e2a921_generated_image.png',
-    emoji: '👩‍🎓',
     name: 'Camila',
     age: '22',
     location: 'Santiago',
@@ -22,7 +20,6 @@ const perfiles = [
   },
   {
     avatar: 'https://media.base44.com/images/public/69fae03fe83575f06c206e95/fddcf327a_generated_image.png',
-    emoji: '👩‍💼',
     name: 'María José',
     age: '34',
     location: 'Temuco',
@@ -31,7 +28,6 @@ const perfiles = [
   },
   {
     avatar: 'https://media.base44.com/images/public/69fae03fe83575f06c206e95/55d62fe58_generated_image.png',
-    emoji: '👨‍🔧',
     name: 'Roberto',
     age: '45',
     location: 'Antofagasta',
@@ -58,36 +54,31 @@ export default function PerfilesSection() {
           {perfiles.map((p) => (
             <div
               key={p.name}
-              className={`relative overflow-hidden rounded-[28px] ${p.color} p-6 hover:shadow-soft hover:-translate-y-1 transition-all duration-300`}
+              className={`relative overflow-hidden rounded-[28px] ${p.color} hover:shadow-soft-lg hover:-translate-y-1 transition-all duration-300 flex flex-col`}
             >
-              {/* Floating language icon */}
-              <div className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/80 backdrop-blur flex items-center justify-center shadow-soft">
-                <Languages className="w-4 h-4 text-mint-700" />
-              </div>
-
-              {/* Top: emoji bubble */}
-              <div className="w-12 h-12 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-2xl mb-3 shadow-soft">
-                {p.emoji}
-              </div>
-
-              {/* Avatar — más grande, dominante */}
-              <div className="relative -mx-6 mb-4 mt-2 h-44 overflow-hidden">
+              <div className="relative h-52 overflow-hidden">
                 <img
                   src={p.avatar}
                   alt={p.name}
                   className="w-full h-full object-cover object-top"
                 />
+                <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur shadow-soft">
+                  <Languages className="w-3 h-3 text-mint-700" />
+                  <span className="text-[10px] font-bold text-mint-700">Lenguaje simple</span>
+                </div>
               </div>
 
-              <p className="text-[11px] font-semibold text-foreground/60 mb-1">
-                {p.age} años · {p.location}
-              </p>
-              <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                {p.name}
-              </h3>
-              <p className="text-sm text-foreground/75 leading-relaxed italic">
-                {p.quote}
-              </p>
+              <div className="p-6 flex-1 flex flex-col">
+                <p className="text-[11px] font-semibold text-foreground/60 mb-1">
+                  {p.age} años · {p.location}
+                </p>
+                <h3 className="font-display text-xl font-bold text-foreground mb-2">
+                  {p.name}
+                </h3>
+                <p className="text-sm text-foreground/75 leading-relaxed italic">
+                  {p.quote}
+                </p>
+              </div>
             </div>
           ))}
         </div>

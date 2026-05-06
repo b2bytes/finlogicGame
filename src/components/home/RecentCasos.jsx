@@ -55,7 +55,7 @@ export default function RecentCasos() {
             <Link
               key={c.id}
               to="/Casos"
-              className="group bg-card rounded-3xl border border-border p-5 shadow-soft hover:shadow-soft-lg hover:border-mint-200 transition-all"
+              className="group bg-card rounded-3xl border border-border p-5 shadow-soft hover:shadow-soft-lg hover:border-mint-200 hover:-translate-y-1 transition-all duration-300"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="w-11 h-11 rounded-full overflow-hidden ring-2 ring-mint-100 bg-mint-50">
