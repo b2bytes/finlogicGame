@@ -180,12 +180,16 @@
     -webkit-backdrop-filter: blur(24px);
   }
 
-  /* Modo Accesibilidad Don Luis: texto +25%, contraste alto, áreas táctiles ≥48px */
+  /* Modo Accesibilidad Don Luis: texto +17%, contraste alto, áreas táctiles ≥48px
+     PROFESIONAL: scroll suave, animaciones reducidas, focus prominente */
   html.a11y-mode {
-    font-size: 18.75px; /* base 16 → 18.75 = +120% efectivo en cuerpo */
+    font-size: 18.75px; /* base 16 → 18.75 = +117% efectivo en cuerpo */
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* offset para sticky headers al saltar a anchors */
   }
   html.a11y-mode body {
     font-weight: 500;
+    line-height: 1.65;
   }
   html.a11y-mode {
     --foreground: 220 40% 8%;
@@ -208,6 +212,22 @@
     font-size: 1.05rem;
     line-height: 1.6;
   }
+  /* Focus prominente y profesional para navegación con teclado */
+  html.a11y-mode *:focus-visible {
+    outline: 3px solid hsl(158 70% 30%) !important;
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+  /* Reduce animaciones florituras (parallax, hover-lift, decorative) en modo accesible */
+  html.a11y-mode .animate-pulse-soft,
+  html.a11y-mode .animate-float {
+    animation: none !important;
+  }
+  /* Hover-lift más sutil y predecible */
+  html.a11y-mode [class*="hover:-translate"],
+  html.a11y-mode [class*="hover:translate"] {
+    transform: none !important;
+  }
 }
 
 /* ============================================================
@@ -216,23 +236,28 @@
    Transición fluida entre skins (Apple-style cross-fade de tokens)
    ============================================================ */
 @layer base {
+  /* Transición de tokens entre skins — sin font-size para evitar reflow brusco */
   html, body {
     transition:
-      background-color 600ms cubic-bezier(0.22, 1, 0.36, 1),
-      color 400ms cubic-bezier(0.22, 1, 0.36, 1),
-      font-size 500ms cubic-bezier(0.22, 1, 0.36, 1);
+      background-color 350ms ease-out,
+      color 250ms ease-out;
   }
-  /* Elementos UI heredan transición de tokens */
+  /* font-size se transiciona por separado con curva más suave y corta para evitar "zoom" raro */
+  html {
+    transition: font-size 180ms ease-out;
+  }
+  /* Elementos UI heredan transición de tokens (sin border-radius para evitar warping) */
   button, a, .rounded-3xl, .rounded-2xl, .rounded-full, [class*="bg-mint"],
   [class*="bg-card"], [class*="border-mint"], [class*="text-mint"],
   [class*="bg-primary"], [class*="text-primary"] {
-    transition-property: background-color, border-color, color, border-radius, box-shadow;
-    transition-duration: 400ms;
-    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-duration: 280ms;
+    transition-timing-function: ease-out;
   }
   @media (prefers-reduced-motion: reduce) {
     html, body, button, a {
       transition: none !important;
+      scroll-behavior: auto !important;
     }
   }
   /* CAMILA — 22 Stgo · móvil-first · vibrante · acento púrpura
@@ -256,9 +281,11 @@
     font-feature-settings: "ss01", "cv11";
   }
 
-  /* DON LUIS — 68 Vlpo · accesible · texto grande · alto contraste */
+  /* DON LUIS — 68 Vlpo · accesible · texto grande · alto contraste · scroll suave */
   html.skin-don_luis {
     font-size: 18.75px;
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
     --foreground: 220 40% 8%;
     --muted-foreground: 220 25% 28%;
     --border: 220 20% 65%;
@@ -272,6 +299,7 @@
   }
   html.skin-don_luis body {
     font-weight: 500;
+    line-height: 1.65;
   }
   html.skin-don_luis button,
   html.skin-don_luis a[role="button"],
@@ -281,6 +309,21 @@
   }
   html.skin-don_luis .text-xs { font-size: 0.95rem; line-height: 1.5; }
   html.skin-don_luis .text-sm { font-size: 1.05rem; line-height: 1.6; }
+  /* Focus prominente profesional */
+  html.skin-don_luis *:focus-visible {
+    outline: 3px solid hsl(158 70% 28%) !important;
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+  /* Animaciones decorativas off — Don Luis prioriza claridad sobre microinteracciones */
+  html.skin-don_luis .animate-pulse-soft,
+  html.skin-don_luis .animate-float {
+    animation: none !important;
+  }
+  html.skin-don_luis [class*="hover:-translate"],
+  html.skin-don_luis [class*="hover:translate"] {
+    transform: none !important;
+  }
 
   /* MARÍA JOSÉ — 34 Tco · emprendedora · profesional + naranja pyme
      Inspiración Imagen 1: card púrpura con badge naranja "Régimen recomendado",
