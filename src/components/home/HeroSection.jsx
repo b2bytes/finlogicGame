@@ -5,10 +5,12 @@ import HeroIllustration from './HeroIllustration';
 import HeroTrustStrip from './HeroTrustStrip';
 
 const QUICK_PILLS = [
-  { label: 'Cobros indebidos', query: 'Tengo un cobro que no reconozco en mi tarjeta' },
-  { label: 'Documentos', query: 'Necesito una carta ARCO para mi banco' },
-  { label: 'Deudas', query: 'Quiero entender mi deuda y tasas que me cobran' },
-  { label: 'Inversiones', query: 'Tengo dudas sobre una inversión que me ofrecieron' },
+  { label: 'Cobro indebido', query: 'Tengo un cobro que no reconozco en mi tarjeta' },
+  { label: 'Fraude', query: 'Recibí un SMS sospechoso del banco, creo que es phishing' },
+  { label: 'SII / Pyme', query: 'Vendo por Instagram, ¿cómo formalizo en el SII?' },
+  { label: 'Cripto', query: '¿Tengo que declarar mis ganancias en cripto al SII?' },
+  { label: 'Datos / ARCO', query: 'Quiero que el banco elimine mis datos personales' },
+  { label: 'TMC / Tasas', query: 'Quiero saber si la tasa de mi crédito supera el TMC' },
 ];
 
 export default function HeroSection() {
@@ -49,7 +51,7 @@ export default function HeroSection() {
             </h1>
 
             <p className="mt-5 text-base md:text-lg text-muted-foreground max-w-xl leading-relaxed">
-              Cuéntanos qué te pasó con tu banco. Nuestra IA lo traduce a la ley chilena, identifica tu derecho y genera la carta. <span className="font-semibold text-foreground">Gratis. En menos de 60 segundos.</span>
+              Banco, SII, fraude, cripto, datos personales o pyme. Cuéntanos qué te pasa: nuestra IA lo traduce a la ley chilena, identifica tu derecho y genera la carta. <span className="font-semibold text-foreground">Gratis. En menos de 60 segundos.</span>
             </p>
 
             {/* Inline input row — pill estilo mockup */}

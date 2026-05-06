@@ -13,6 +13,7 @@ import CTASection from '@/components/home/CTASection';
 import AntesDespues from '@/components/home/AntesDespues';
 import Footer from '@/components/home/Footer';
 import ImpactPullQuote from '@/components/home/ImpactPullQuote';
+import CapasFinLogic from '@/components/home/CapasFinLogic';
 import { useReferralCapture } from '@/lib/useReferralCapture';
 
 export default function Home() {
@@ -26,6 +27,7 @@ export default function Home() {
         <StatsBar />
         <ImpactPullQuote />
         <AntesDespues />
+        <CapasFinLogic />
         <HowItWorks />
         <RecentCasos />
         <PerfilesSection />
