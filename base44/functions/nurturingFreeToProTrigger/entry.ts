@@ -101,12 +101,24 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    await base44.asServiceRole.integrations.Core.SendEmail({
-      from_name: 'FinLogic',
-      to: userEmail,
-      subject: tmpl.subject,
-      body: emailBody,
-    });
+    try {
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        from_name: 'FinLogic',
+        to: userEmail,
+        subject: tmpl.subject,
+        body: emailBody,
+      });
+    } catch (mailErr) {
+      // Email puede fallar si el user fue eliminado o no es app user (test).
+      // No bloqueamos la automation: registramos y seguimos para no marcar failed.
+      console.warn('nurturingFreeToProTrigger email skipped:', mailErr.message);
+      return Response.json({
+        ok: true,
+        trigger: triggerKey,
+        skipped: 'email_unavailable',
+        reason: mailErr.message,
+      });
+    }
 
     // Registrar en Lead
     if (lead) {
