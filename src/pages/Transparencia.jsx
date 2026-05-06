@@ -6,7 +6,7 @@ import Logo from '@/components/home/Logo';
 import TraceCard from '@/components/transparencia/TraceCard';
 import TraceDetail from '@/components/transparencia/TraceDetail';
 import TransparenciaStats from '@/components/transparencia/TransparenciaStats';
-import ViewToggle from '@/components/transparencia/ViewToggle.jsx';
+import ViewToggle from '@/components/transparencia/ViewToggle';
 
 export default function Transparencia() {
   const [traces, setTraces] = useState([]);
