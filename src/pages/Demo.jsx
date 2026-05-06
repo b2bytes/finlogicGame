@@ -7,6 +7,7 @@ import EditorialHeading from '@/components/editorial/EditorialHeading';
 import DemoVideoPlayer from '@/components/demo/DemoVideoPlayer';
 import DemoScript from '@/components/demo/DemoScript';
 import DemoSpecs from '@/components/demo/DemoSpecs';
+import DemoChecklist from '@/components/demo/DemoChecklist';
 
 /**
  * /Demo — página de producción del video Bendi (3 min).
@@ -50,11 +51,11 @@ export default function Demo() {
             Video oficial · Claude Impact Lab Chile · 6-7 mayo 2026
           </Eyebrow>
           <EditorialHeading size="xl">
-            3 minutos para<br />
+            4:30 minutos para<br />
             <span className="text-mint-600">tumbarlos.</span>
           </EditorialHeading>
           <p className="mt-6 text-lg text-muted-foreground max-w-3xl leading-relaxed">
-            Guion construido sobre la rúbrica oficial de Bendi: 25% impacto, 25% Claude, 20% datos responsables, 15% funciona, 15% narrativa. Bonus agéntico +5. Cada segundo está mapeado a un criterio.
+            Guion cinematográfico de 3 actos sobre la rúbrica oficial Bendi: 25% impacto, 25% Claude, 20% datos, 15% funciona, 15% narrativa. Bonus agéntico +5. Cada segundo mapeado a un criterio.
           </p>
         </div>
 
@@ -66,12 +67,12 @@ export default function Demo() {
         {/* Guion */}
         <section className="mb-16">
           <div className="mb-7">
-            <Eyebrow size="sm" className="mb-3">Guion canónico · 6 escenas</Eyebrow>
+            <Eyebrow size="sm" className="mb-3">Guion cinematográfico · 9 escenas · 3 actos</Eyebrow>
             <h2 className="font-display tracking-tight font-bold text-foreground text-3xl sm:text-4xl">
               Cada escena pesa un criterio.
             </h2>
             <p className="mt-3 text-muted-foreground max-w-2xl">
-              Voz en off en español neutro chileno. Visual sincronizado al producto real en producción. Sin promesas, sin mockups.
+              Voz en off en español chileno (ElevenLabs Sabina). Pacing emocional 3 actos: tensión → solución → manifiesto. Producto real en producción. Sin mockups.
             </p>
           </div>
           <DemoScript />
@@ -80,15 +81,29 @@ export default function Demo() {
         {/* Specs técnicas */}
         <section className="mb-16">
           <div className="mb-7">
-            <Eyebrow size="sm" className="mb-3">Especificaciones técnicas</Eyebrow>
+            <Eyebrow size="sm" className="mb-3">Especificaciones técnicas · calidad broadcast</Eyebrow>
             <h2 className="font-display tracking-tight font-bold text-foreground text-3xl sm:text-4xl">
               Cómo lo grabamos.
             </h2>
             <p className="mt-3 text-muted-foreground max-w-2xl">
-              Calidad broadcast. Mismo lenguaje visual del PitchDeck (mint editorial + crema cálido + Fraunces).
+              Apple keynote · Linear launch · Stripe Sessions. Mismo lenguaje visual del PitchDeck (mint editorial + crema cálido + Fraunces).
             </p>
           </div>
           <DemoSpecs />
+        </section>
+
+        {/* Pre-flight checklist */}
+        <section className="mb-16">
+          <div className="mb-7">
+            <Eyebrow size="sm" className="mb-3">Pre-flight checklist</Eyebrow>
+            <h2 className="font-display tracking-tight font-bold text-foreground text-3xl sm:text-4xl">
+              Todo listo antes del REC.
+            </h2>
+            <p className="mt-3 text-muted-foreground max-w-2xl">
+              28 items que validar antes de presionar grabar. El progreso se guarda en este navegador.
+            </p>
+          </div>
+          <DemoChecklist />
         </section>
 
         {/* CTA */}
