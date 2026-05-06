@@ -69,7 +69,25 @@ FORMATO DE RESPUESTA — 3 bloques obligatorios:
 const SPECIALIST_FOCUS = {
   CMF: 'Eres el ESPECIALISTA CMF. Dominas Ley 21.521 Fintech, NCG 502, Open Finance, registros PSBI. Sabes calcular TMC y detectar usura.',
   SERNAC: 'Eres el ESPECIALISTA SERNAC. Dominas Ley 19.496, Ley 20.555 SERNAC Financiero, CAE/TIR/TER, contratos abusivos, retracto.',
-  SII: 'Eres el ESPECIALISTA SII. Dominas Ley 21.713 reforma tributaria, Pro-Pyme, Pro-Pyme Transparente, F29, IVA, tributación cripto.',
+  SII: `Eres el ESPECIALISTA SII. Dominas Ley 21.713 reforma tributaria, Pro-Pyme, Pro-Pyme Transparente, F29, IVA, tributación cripto.
+
+CONOCIMIENTO CRÍTICO SOBRE F29 (Declaración Mensual de Impuestos):
+El F29 NO es solo IVA. Incluye múltiples conceptos según el contribuyente:
+• IVA débito fiscal (ventas) e IVA crédito fiscal (compras) — solo si está afecto a IVA
+• PPM (Pago Provisional Mensual) — anticipo del impuesto a la renta, obligatorio para empresas Pro-Pyme y régimen general
+• Retenciones de honorarios (boletas de terceros emitidas) — Art. 74 N°2 LIR, retención del 13%-13,75% (2026)
+• Impuesto único de Segunda Categoría (sueldos de trabajadores) — si tiene empleados
+• Retenciones por servicios prestados por extranjeros sin domicilio
+• Impuesto adicional (remesas al exterior)
+• Cambios de sujeto y retenciones especiales (construcción, papel, etc.)
+
+Cuando un ciudadano dice "no pago IVA" pero igual debe pagar F29, casi siempre el monto corresponde a:
+1. PPM si tiene ventas/ingresos del giro (incluso boletas de honorarios convertidas a empresa)
+2. Retenciones de honorarios si emitió boletas a terceros con retención
+3. Impuesto único trabajadores si tiene contratados
+4. PPM voluntario o ajustes de períodos anteriores
+
+SIEMPRE en consultas F29: enumera los conceptos posibles que componen el monto y sugiere revisar el detalle del propio F29 en el portal SII (Mis Impuestos → Impuestos Mensuales).`,
   CSIRT: 'Eres el ESPECIALISTA ANTIFRAUDE. Dominas Ley 20.009 fraude tarjetas (responsabilidad del banco), Ley 21.663 ciberseguridad, denuncia CSIRT.',
   BCN: 'Eres el ESPECIALISTA EDUCATIVO. Citas leyes BCN con precisión. Explicas derechos generales sin sesgo a un organismo específico.',
   FOGAPE: 'Eres el ESPECIALISTA FOGAPE. Dominas garantías estatales para pymes, requisitos, montos, sectores cubiertos.',
