@@ -5,25 +5,25 @@ const stats = [
     value: '12.847',
     label: 'consultas',
     emoji: '🤓',
-    bg: 'bg-gradient-to-br from-blue-300 to-blue-500',
+    bg: 'bg-gradient-to-br from-blue-200 via-blue-300 to-blue-400',
   },
   {
     value: '3.291',
     label: 'documentos',
     emoji: '👍',
-    bg: 'bg-gradient-to-br from-emerald-300 to-emerald-500',
+    bg: 'bg-gradient-to-br from-emerald-200 via-emerald-300 to-teal-400',
   },
   {
     value: '8.412',
     label: 'ciudadanos',
     emoji: '🤝',
-    bg: 'bg-gradient-to-br from-purple-300 to-purple-500',
+    bg: 'bg-gradient-to-br from-purple-200 via-purple-300 to-purple-400',
   },
   {
     value: '94,2%',
     label: 'verificado',
-    emoji: '✅',
-    bg: 'bg-gradient-to-br from-orange-300 to-amber-500',
+    emoji: '🤔',
+    bg: 'bg-gradient-to-br from-orange-200 via-orange-300 to-amber-400',
   },
 ];
 
@@ -38,15 +38,17 @@ export default function StatsBar() {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className={`relative ${stat.bg} rounded-3xl p-6 md:p-7 overflow-hidden hover:shadow-soft-lg transition-all duration-300`}
+              className={`relative ${stat.bg} rounded-3xl p-6 md:p-7 overflow-hidden hover:shadow-soft-lg transition-all duration-300 min-h-[160px] flex items-center gap-4`}
             >
-              <div className="text-3xl md:text-4xl mb-2">
+              <div className="text-4xl md:text-5xl flex-shrink-0">
                 {stat.emoji}
               </div>
-              <div className="font-display text-4xl md:text-5xl font-bold tracking-tight text-white drop-shadow-sm">
-                {stat.value}
+              <div className="min-w-0">
+                <div className="font-display text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-sm leading-none">
+                  {stat.value}
+                </div>
+                <p className="mt-1.5 text-sm font-medium text-white/90">{stat.label}</p>
               </div>
-              <p className="mt-1 text-sm font-medium text-white/90">{stat.label}</p>
             </div>
           ))}
         </div>

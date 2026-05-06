@@ -21,26 +21,27 @@ export default function HeroSection() {
 
   return (
     <section className="relative overflow-hidden pt-10 pb-20 md:pt-16 md:pb-28">
-      {/* Soft background blobs — Apple/Wise style */}
+      {/* Soft background blobs — mockup style: halos verdes y durazno detrás del hero */}
       <div aria-hidden="true" className="absolute inset-0 -z-10">
-        <div className="absolute top-20 right-10 w-[500px] h-[500px] bg-mint-100 rounded-full blur-3xl opacity-60" />
-        <div className="absolute -top-10 right-1/3 w-[300px] h-[300px] bg-accent rounded-full blur-3xl opacity-50" />
+        <div className="absolute -top-32 right-[5%] w-[600px] h-[600px] bg-mint-200 rounded-full blur-3xl opacity-40" />
+        <div className="absolute top-10 right-[35%] w-[420px] h-[420px] bg-accent rounded-full blur-3xl opacity-50" />
+        <div className="absolute top-40 right-[50%] w-[300px] h-[300px] bg-mint-100 rounded-full blur-3xl opacity-50" />
       </div>
 
-      {/* Floating decorative emojis/icons */}
-      <div aria-hidden="true" className="absolute top-32 right-[20%] hidden lg:block animate-float">
-        <div className="w-12 h-12 rounded-full bg-mint-100 border border-mint-200 flex items-center justify-center shadow-soft">
-          <span className="text-xl">💰</span>
+      {/* Floating decorative emojis/icons — más grandes y visibles */}
+      <div aria-hidden="true" className="absolute top-24 right-[28%] hidden lg:block animate-float">
+        <div className="w-16 h-16 rounded-full bg-mint-100 border border-mint-200 flex items-center justify-center shadow-soft text-3xl">
+          💰
         </div>
       </div>
-      <div aria-hidden="true" className="absolute top-20 right-[8%] hidden lg:block animate-float" style={{ animationDelay: '1.5s' }}>
-        <div className="w-14 h-14 rounded-2xl bg-card border border-border flex items-center justify-center shadow-soft">
-          <span className="text-2xl">📄</span>
+      <div aria-hidden="true" className="absolute top-8 right-[12%] hidden lg:block animate-float" style={{ animationDelay: '1.5s' }}>
+        <div className="w-20 h-20 rounded-2xl bg-card border border-border flex items-center justify-center shadow-soft-lg text-4xl">
+          📄
         </div>
       </div>
-      <div aria-hidden="true" className="absolute top-56 right-[6%] hidden lg:block animate-float" style={{ animationDelay: '0.8s' }}>
-        <div className="w-12 h-12 rounded-2xl bg-mint-50 border border-mint-200 flex items-center justify-center shadow-soft">
-          <ShieldCheck className="w-6 h-6 text-mint-600" />
+      <div aria-hidden="true" className="absolute top-20 right-[3%] hidden lg:block animate-float" style={{ animationDelay: '0.8s' }}>
+        <div className="w-16 h-16 rounded-2xl bg-mint-100 border border-mint-200 flex items-center justify-center shadow-soft">
+          <ShieldCheck className="w-8 h-8 text-mint-600" />
         </div>
       </div>
 
@@ -88,17 +89,20 @@ export default function HeroSection() {
                 <button
                   onClick={() => goToConsulta('?modo=voz')}
                   aria-label="Consultar por voz"
-                  className="w-14 h-14 rounded-2xl bg-secondary hover:bg-mint-50 border border-border flex items-center justify-center transition-colors flex-shrink-0"
+                  className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 hover:from-purple-200 hover:to-purple-300 border border-purple-200/60 flex items-center justify-center transition-all flex-shrink-0 shadow-soft"
                 >
-                  <Mic className="w-6 h-6 text-mint-600" />
+                  <Mic className="w-6 h-6 text-purple-700" />
                 </button>
-                <Button
-                  onClick={() => goToConsulta(query)}
-                  className="flex-1 h-14 rounded-2xl bg-mint-600 hover:bg-mint-700 text-white text-base font-semibold shadow-mint group"
-                >
-                  Consultar gratis
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <div className="relative flex-1">
+                  <div aria-hidden="true" className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-amber-200 via-mint-300 to-amber-200 blur-md opacity-60" />
+                  <Button
+                    onClick={() => goToConsulta(query)}
+                    className="relative w-full h-14 rounded-2xl bg-mint-600 hover:bg-mint-700 text-white text-base font-semibold shadow-mint group"
+                  >
+                    Consultar gratis
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-2 mt-4">

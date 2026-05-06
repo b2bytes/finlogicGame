@@ -9,8 +9,8 @@
     /* === FinLogic — Ciudadano Cálido Apple === */
     /* Apple + Wise + Mercado Pago: blanco, mint suave, radio 24px+, sombras blandas */
 
-    /* Surface (blanco cálido, casi imperceptible) */
-    --background: 60 30% 98%;
+    /* Surface (crema cálido visible, estilo mockup) */
+    --background: 42 45% 96%;
     --foreground: 220 25% 12%;
 
     /* Cards con un punto más cálidas que el fondo */
