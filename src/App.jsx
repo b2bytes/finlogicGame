@@ -9,6 +9,7 @@ import Home from '@/pages/Home';
 import Consulta from '@/pages/Consulta';
 import Transparencia from '@/pages/Transparencia';
 import MisCasos from '@/pages/MisCasos';
+import Soporte from '@/pages/Soporte';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -40,6 +41,7 @@ const AuthenticatedApp = () => {
       <Route path="/Consulta" element={<Consulta />} />
       <Route path="/Transparencia" element={<Transparencia />} />
       <Route path="/MisCasos" element={<MisCasos />} />
+      <Route path="/Soporte" element={<Soporte />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
