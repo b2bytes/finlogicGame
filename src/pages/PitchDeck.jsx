@@ -398,7 +398,24 @@ export default function PitchDeck() {
           })}
         </div>
 
-
+        {/* Acceso del equipo a Entregables */}
+        <div className="mt-10 bg-background rounded-3xl border-2 border-mint-200 p-6 sm:p-8 shadow-soft flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+          <div>
+            <Eyebrow size="sm" className="mb-2">Para el equipo</Eyebrow>
+            <h3 className="font-display tracking-tight text-xl sm:text-2xl font-bold text-foreground">
+              Entregables del concurso
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1 max-w-md">
+              Ficha cívica, ficha técnica, system prompts, PDFs y assets oficiales en un solo lugar.
+            </p>
+          </div>
+          <Link
+            to="/Entregables"
+            className="inline-flex items-center gap-2 rounded-full bg-mint-600 hover:bg-mint-700 text-white h-12 px-6 text-sm font-semibold transition-colors flex-shrink-0"
+          >
+            Abrir Entregables <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </SlideSection>
 
       {/* === SLIDE 12 — CIERRE === */}
