@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Bell, X } from 'lucide-react';
-import { usePWA } from '@/lib/usePWA';
+import { usePWA } from '@/lib/usePWA.jsx';
 
 /**
  * Banner móvil discreto que invita a:

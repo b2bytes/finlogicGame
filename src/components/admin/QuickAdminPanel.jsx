@@ -95,6 +95,9 @@ export default function QuickAdminPanel() {
   const [query, setQuery] = useState('');
   const location = useLocation();
 
+  // Ocultar en widget embebible (iframe público)
+  const isEmbed = location.pathname.startsWith('/Embed');
+
   // Atajos: ⌘K / Ctrl+K abre el panel · Esc cierra
   useEffect(() => {
     const onKey = (e) => {
@@ -145,22 +148,26 @@ export default function QuickAdminPanel() {
 
   const totalPages = SECTIONS.reduce((sum, s) => sum + s.pages.length, 0);
 
+  if (isEmbed) return null;
+
   return (
     <>
-      {/* FAB trigger — bottom-left para no chocar con FloatingLyaCTA (bottom-right) */}
+      {/* FAB trigger — bottom-left, discreto.
+          En mobile sube por encima del PWAInstallBanner (que está en bottom-3). */}
       <motion.button
         onClick={() => setOpen(true)}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.6 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-5 left-5 z-[60] h-12 px-4 rounded-full bg-foreground text-background shadow-soft-lg flex items-center gap-2 text-xs font-semibold hover:bg-mint-700 transition-colors group"
-        aria-label="Abrir panel admin del equipo"
+        style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+        className="fixed bottom-20 sm:bottom-5 left-4 sm:left-5 z-[60] h-10 sm:h-11 pl-3 pr-3 sm:pr-4 rounded-full bg-foreground/90 backdrop-blur-md text-background shadow-soft-lg flex items-center gap-1.5 sm:gap-2 text-xs font-semibold hover:bg-foreground transition-colors group border border-background/10"
+        aria-label="Abrir panel del equipo (atajo Cmd+K)"
         title="Panel del equipo (⌘K)"
       >
-        <Settings className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" />
-        <span className="hidden sm:inline">Equipo</span>
+        <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:rotate-90 transition-transform duration-500" />
+        <span>Equipo</span>
         <kbd className="hidden md:inline text-[9px] font-mono bg-background/15 px-1.5 py-0.5 rounded border border-background/20">
           ⌘K
         </kbd>
@@ -219,7 +226,7 @@ export default function QuickAdminPanel() {
               </div>
 
               {/* Lista */}
-              <div className="max-h-[60vh] overflow-y-auto p-4 space-y-5">
+              <div className="max-h-[55vh] sm:max-h-[60vh] overflow-y-auto p-4 space-y-5 overscroll-contain">
                 {filtered.length === 0 && (
                   <div className="text-center py-10">
                     <Search className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
