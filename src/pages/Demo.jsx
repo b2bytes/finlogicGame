@@ -8,6 +8,7 @@ import DemoVideoPlayer from '@/components/demo/DemoVideoPlayer';
 import DemoScript from '@/components/demo/DemoScript';
 import DemoSpecs from '@/components/demo/DemoSpecs';
 import DemoChecklist from '@/components/demo/DemoChecklist';
+import DemoVideoUrlInput from '@/components/demo/DemoVideoUrlInput';
 
 /**
  * /Demo — página de producción del video Bendi (3 min).
@@ -60,8 +61,13 @@ export default function Demo() {
         </div>
 
         {/* Player */}
-        <section className="mb-16">
+        <section className="mb-6">
           <DemoVideoPlayer />
+        </section>
+
+        {/* Input para registrar URL del video */}
+        <section className="mb-16">
+          <DemoVideoUrlInput />
         </section>
 
         {/* Guion */}

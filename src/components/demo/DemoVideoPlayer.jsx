@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, ExternalLink, Film } from 'lucide-react';
 
 /**
- * DemoVideoPlayer — slot profesional para el video de 3min del Impact Lab.
- * Acepta una URL (YouTube, Loom, Vimeo, MP4 directo) y renderiza el embed
- * apropiado. Si no hay URL, muestra un placeholder con el guion canónico.
- *
- * Edita VIDEO_URL abajo cuando tengas el video grabado.
+ * DemoVideoPlayer — slot profesional para el video de 3-5min del Impact Lab.
+ * Lee la URL desde:
+ *   1. Prop `url`
+ *   2. localStorage (registrada vía DemoVideoUrlInput)
+ *   3. Fallback: VIDEO_URL hardcoded abajo
  */
 
-// 👉 PEGA AQUÍ LA URL DEL VIDEO CUANDO ESTÉ LISTO
-// Soporta: YouTube (youtube.com/watch?v=, youtu.be/), Loom, Vimeo, MP4 directo
 const VIDEO_URL = '';
+const STORAGE_KEY = 'finlogic_demo_video_url';
 
 function getEmbedUrl(url) {
   if (!url) return null;
@@ -27,8 +26,13 @@ function getEmbedUrl(url) {
   return null;
 }
 
-export default function DemoVideoPlayer({ url = VIDEO_URL, title = 'Demo FinLogic · Claude Impact Lab 2026' }) {
+export default function DemoVideoPlayer({ url: urlProp, title = 'Demo FinLogic · Claude Impact Lab 2026' }) {
   const [playing, setPlaying] = useState(false);
+  const [storedUrl, setStoredUrl] = useState('');
+  useEffect(() => {
+    try { setStoredUrl(localStorage.getItem(STORAGE_KEY) || ''); } catch {}
+  }, []);
+  const url = urlProp || storedUrl || VIDEO_URL;
   const embedUrl = getEmbedUrl(url);
   const isMp4 = url && /\.mp4(\?|$)/i.test(url);
 

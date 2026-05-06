@@ -106,13 +106,41 @@ const RUBRICA = [
   {
     id: 'funciona',
     title: 'Funciona',
-    description: 'Demo end-to-end del agente funcionando.',
+    description: 'Demo end-to-end del agente funcionando + URL video accesible.',
     weight: 13,
     criteria: [
       {
         id: 'demo_video',
-        title: 'Demo video 3-5 min muestra flujo end-to-end',
-        description: 'Bendi verifica duración + URL accesible + flujo completo (input→output).',
+        title: 'Demo video 3-5 min · URL accesible + flujo end-to-end',
+        description: 'Verifica que existan flujos completos en producción + URL del video registrada en el sistema.',
+        weight: 100,
+      },
+    ],
+  },
+  {
+    id: 'narrativa',
+    title: 'Narrativa ciudadana',
+    description: 'Lenguaje simple, perfiles arquetípicos identificables, cero jerga.',
+    weight: 15,
+    criteria: [
+      {
+        id: 'narrativa_ciudadana',
+        title: 'Respuestas en lenguaje simple + perfiles arquetípicos',
+        description: 'Cada AgentTrace tiene citizenSummary sin jerga técnica + casos de Don Luis/Camila/María/Roberto.',
+        weight: 100,
+      },
+    ],
+  },
+  {
+    id: 'bonus_agentic',
+    title: 'Bonus agéntico (+5)',
+    description: 'CRONs y Entity Triggers autónomos sin intervención humana.',
+    weight: 5,
+    criteria: [
+      {
+        id: 'cron_autonomos',
+        title: '≥4 CRONs/triggers agentic activos en producción',
+        description: 'checkLegalDeadlines, monitorIntegrations, detectScoreAnomaly, aggregateWeeklyFeedback, calculateMRR, nurturingFreeToProTrigger.',
         weight: 100,
       },
     ],
@@ -212,7 +240,7 @@ export default function Rubrica() {
               </p>
               <p className="text-sm text-mint-50 mt-2">
                 {validatedCriteria}/{totalCriteria} criterios validados ·
-                rúbrica oficial 51% (Bendi reserva 49% al juicio cualitativo)
+                rúbrica completa 71% técnico + 29% juicio cualitativo Bendi
               </p>
             </div>
             <button
