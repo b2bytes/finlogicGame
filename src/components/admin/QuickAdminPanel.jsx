@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings, X, Search, ExternalLink, Home, MessageCircle, FileText, Briefcase,
   Building2, Code2, DollarSign, BarChart3, Sparkles, Activity, Users, Heart,
-  Layout, Eye, ShieldCheck, Palette, Zap, Star,
+  Layout, Eye, ShieldCheck, Palette, Zap, Star, Film, Award,
 } from 'lucide-react';
 
 /**
@@ -56,6 +56,8 @@ const SECTIONS = [
     color: 'amber',
     pages: [
       { path: '/PitchDeck', label: 'Pitch Deck', icon: Layout, desc: 'Presentación inversor' },
+      { path: '/Demo', label: 'Video Demo · Bendi', icon: Film, desc: 'Guion 4:30 + specs broadcast' },
+      { path: '/Rubrica', label: 'Rúbrica · Validador', icon: Award, desc: 'Validación agentic Bendi' },
       { path: '/Diseno', label: 'Diseño · Entregable', icon: Palette, desc: 'Flujos + sistema + wireframes' },
       { path: '/Marca', label: 'Marca', icon: Sparkles, desc: 'Brand book' },
       { path: '/Insights', label: 'Insights', icon: BarChart3, desc: 'Reporte de mercado' },

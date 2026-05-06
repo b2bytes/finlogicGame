@@ -387,48 +387,7 @@ export default function PitchDeck() {
           })}
         </div>
 
-        {/* Accesos destacados para el jurado: video demo + rúbrica */}
-        <div className="mt-10 grid md:grid-cols-2 gap-4">
-          <Link
-            to="/Demo"
-            className="group block bg-foreground text-background rounded-3xl p-7 shadow-soft-lg transition-all hover:shadow-soft-lg hover:bg-foreground/95"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-mint-300 text-[11px] font-mono-editorial uppercase tracking-widest mb-4">
-              <Film className="w-3.5 h-3.5" />
-              Video demo · 3 min
-            </div>
-            <h3 className="font-display tracking-tight text-xl sm:text-2xl font-bold leading-tight">
-              Mira el sistema funcionando<br />
-              <span className="text-mint-300">en vivo.</span>
-            </h3>
-            <p className="mt-3 text-sm text-background/70 leading-relaxed">
-              Guion oficial Bendi: 25% impacto · 25% Claude · 20% datos · 15% funciona · 15% narrativa.
-            </p>
-            <div className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-mint-300 group-hover:gap-3 transition-all">
-              Ver video <ArrowRight className="w-4 h-4" />
-            </div>
-          </Link>
 
-          <Link
-            to="/Rubrica"
-            className="group block bg-gradient-to-br from-mint-600 to-mint-700 hover:from-mint-700 hover:to-mint-700 text-white rounded-3xl p-7 shadow-soft-lg transition-all hover:shadow-mint"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-mint-50 text-[11px] font-mono-editorial uppercase tracking-widest mb-4">
-              <Award className="w-3.5 h-3.5" />
-              Rúbrica jurado · Bendi
-            </div>
-            <h3 className="font-display tracking-tight text-xl sm:text-2xl font-bold leading-tight">
-              Valida la postulación<br />
-              <span className="text-mint-200">sin tomar nuestra palabra.</span>
-            </h3>
-            <p className="mt-3 text-sm text-mint-50/85 leading-relaxed">
-              Cada criterio se valida agentic-amente contra Pinecone, AgentTrace y URLs <code className="font-mono-editorial text-[11px] px-1.5 py-0.5 bg-white/10 rounded">.gob.cl</code>.
-            </p>
-            <div className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-mint-100 group-hover:gap-3 transition-all">
-              Abrir validador <ArrowRight className="w-4 h-4" />
-            </div>
-          </Link>
-        </div>
       </SlideSection>
 
       {/* === SLIDE 12 — CIERRE === */}
