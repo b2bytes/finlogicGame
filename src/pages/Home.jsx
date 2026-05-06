@@ -19,7 +19,7 @@ import ImpactLabBanner from '@/components/home/ImpactLabBanner';
 import OrganismosCobertura from '@/components/home/OrganismosCobertura';
 import DiferencialFinLogic from '@/components/home/DiferencialFinLogic';
 import IndicadoresLive from '@/components/home/IndicadoresLive';
-import { useReferralCapture } from '@/lib/useReferralCapture';
+import { useReferralCapture } from '@/lib/useReferralCapture.jsx';
 
 export default function Home() {
   useReferralCapture();

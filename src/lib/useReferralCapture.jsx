@@ -8,6 +8,7 @@ const TTL_DAYS = 30;
 
 export function useReferralCapture() {
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
       const params = new URLSearchParams(window.location.search);
       const ref = params.get('ref');
@@ -22,6 +23,7 @@ export function useReferralCapture() {
 }
 
 export function getStoredReferral() {
+  if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;

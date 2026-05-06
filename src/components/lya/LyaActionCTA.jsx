@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FileSignature, Loader2, CheckCircle2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
-import { getStoredReferral } from '@/lib/useReferralCapture';
+import { getStoredReferral } from '@/lib/useReferralCapture.jsx';
 
 const BODY_TO_MODULE = {
   CMF: 'ley_fintech_21521',
