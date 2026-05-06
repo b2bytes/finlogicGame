@@ -8,6 +8,7 @@ import CasoTimeline from '@/components/casos/CasoTimeline';
 import CasoDeadlineCard from '@/components/casos/CasoDeadlineCard';
 import CasoOutcomeStats from '@/components/casos/CasoOutcomeStats';
 import GenerateDocDialog from '@/components/casos/GenerateDocDialog';
+import ProTriggerBanner from '@/components/pro/ProTriggerBanner';
 
 const moduleLabels = {
   ley_fintech_21521: 'Ley Fintech 21.521',
@@ -78,6 +79,11 @@ export default function CasoDetalle() {
   const days = caso.daysRemaining;
   const isOverdue = typeof days === 'number' && days < 0;
 
+  // Detección Momento Pro: doc generado > deadline crítico
+  let proTrigger = null;
+  if (doc) proTrigger = 'document_generated';
+  else if (typeof days === 'number' && days >= 0 && days < 5) proTrigger = 'deadline_critical';
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 glass border-b border-border/40">
@@ -106,6 +112,8 @@ export default function CasoDetalle() {
             {caso.description}
           </p>
         </div>
+
+        <ProTriggerBanner trigger={proTrigger} />
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Columna izq: timeline */}

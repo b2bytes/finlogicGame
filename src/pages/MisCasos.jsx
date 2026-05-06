@@ -7,6 +7,7 @@ import Logo from '@/components/home/Logo';
 import CasoCard from '@/components/casos/CasoCard';
 import CasosFilters from '@/components/casos/CasosFilters';
 import MisCasosStats from '@/components/casos/MisCasosStats';
+import ProTriggerBanner from '@/components/pro/ProTriggerBanner';
 
 export default function MisCasos() {
   const [casos, setCasos] = useState([]);
@@ -59,6 +60,8 @@ export default function MisCasos() {
         </div>
 
         <MisCasosStats casos={casos} />
+
+        {casos.length >= 2 && <ProTriggerBanner trigger="second_case" />}
 
         <div className="mb-6">
           <CasosFilters active={filter} onChange={setFilter} counts={counts} />
