@@ -1,0 +1,352 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, X, Send, ArrowUpRight, Loader2, ShieldCheck } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+
+/**
+ * LyaChatWidget — widget de chat flotante global de Lya (FinLogic).
+ * - Diseño UI/UX 2026: glassmorphism, gradiente mint, micro-animaciones spring,
+ *   ícono "L" con halo animado, mensajes con burbujas y citas RAG.
+ * - Backend: lyaKnowledgeQuery (Pinecone RAG + LLM).
+ * - Acompaña todas las páginas excepto las de chat dedicado (/AsistenteLya, /Consulta, /Embed).
+ * - Mobile: full-screen sheet · Desktop: popover 380px bottom-right.
+ */
+
+const SUGGESTIONS = [
+  'Cobro no reconocido en mi tarjeta',
+  'Quiero retractarme de una compra online',
+  'Régimen tributario para mi pyme',
+  'Mis derechos ARCO',
+];
+
+const HIDDEN_ROUTES = ['/AsistenteLya', '/Consulta', '/Embed'];
+
+export default function LyaChatWidget() {
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const shouldHide = HIDDEN_ROUTES.some((p) => location.pathname.startsWith(p));
+
+  // Cerrar el widget al cambiar de ruta para no bloquear contenido
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  // Auto-scroll al último mensaje
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
+
+  // Foco al abrir
+  useEffect(() => {
+    if (open && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 250);
+    }
+  }, [open]);
+
+  // ESC cierra
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    if (open) window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  if (shouldHide) return null;
+
+  const sendQuery = async (text) => {
+    const query = (text ?? input).trim();
+    if (!query || loading) return;
+    setInput('');
+    setHasInteracted(true);
+    const userMsg = { role: 'user', content: query, ts: Date.now() };
+    setMessages((m) => [...m, userMsg]);
+    setLoading(true);
+
+    try {
+      const res = await base44.functions.invoke('lyaKnowledgeQuery', {
+        query,
+        mode: 'text',
+        userProfile: 'general',
+      });
+      const data = res.data || {};
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'lya',
+          content: data.response || 'No pude procesar tu consulta. Intenta nuevamente.',
+          sources: data.sources || [],
+          confidence: data.confidence,
+          regulatoryBody: data.regulatoryBody,
+          suggestedAction: data.suggestedAction,
+          ts: Date.now(),
+        },
+      ]);
+    } catch (e) {
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'lya',
+          content: 'Hubo un problema técnico. Por favor intenta de nuevo en unos segundos.',
+          error: true,
+          ts: Date.now(),
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    sendQuery();
+  };
+
+  return (
+    <>
+      {/* ─── FAB · Botón flotante ──────────────────────────────────── */}
+      <AnimatePresence>
+        {!open && (
+          <motion.button
+            key="fab"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+            onClick={() => setOpen(true)}
+            aria-label="Abrir chat con Lya"
+            className="fixed bottom-5 right-4 md:bottom-6 md:right-6 z-50 group"
+          >
+            {/* Halo animado */}
+            <span className="absolute inset-0 rounded-full bg-mint-400/40 blur-xl scale-110 group-hover:scale-125 transition-transform" />
+            <span className="absolute -inset-1 rounded-full bg-gradient-to-br from-mint-300 via-mint-500 to-mint-700 opacity-60 blur-md animate-pulse-soft" />
+
+            {/* Botón principal */}
+            <span className="relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-mint-500 to-mint-700 shadow-soft-lg ring-1 ring-white/20 transition-transform group-hover:scale-105 group-active:scale-95">
+              {/* Marca "L" editorial */}
+              <span className="relative flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/95 shadow-inner">
+                <span className="font-editorial text-mint-700 text-xl md:text-2xl font-bold leading-none -mt-0.5">
+                  L
+                </span>
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-mint-400 ring-2 ring-white animate-pulse-soft" />
+              </span>
+            </span>
+
+            {/* Tooltip "Pregunta a Lya" — solo desktop primer load */}
+            {!hasInteracted && (
+              <motion.span
+                initial={{ opacity: 0, x: 8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.4, duration: 0.4 }}
+                className="hidden md:flex absolute right-[72px] top-1/2 -translate-y-1/2 items-center gap-1.5 px-3 py-2 rounded-full bg-foreground text-background text-xs font-semibold whitespace-nowrap shadow-soft pointer-events-none"
+              >
+                <Sparkles className="w-3 h-3 text-mint-300" />
+                Pregunta a Lya
+              </motion.span>
+            )}
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Panel de chat ──────────────────────────────────────────── */}
+      <AnimatePresence>
+        {open && (
+          <>
+            {/* Backdrop solo mobile */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+              className="md:hidden fixed inset-0 bg-foreground/40 backdrop-blur-sm z-40"
+            />
+
+            <motion.div
+              key="panel"
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+              role="dialog"
+              aria-label="Chat con Lya"
+              className="fixed z-50 bg-card border border-border shadow-soft-lg overflow-hidden flex flex-col
+                         bottom-0 right-0 left-0 h-[85vh] rounded-t-3xl
+                         md:bottom-6 md:right-6 md:left-auto md:h-[620px] md:w-[400px] md:rounded-3xl"
+            >
+              {/* Header */}
+              <div className="relative px-4 md:px-5 py-3.5 bg-gradient-to-br from-mint-500 to-mint-700 text-white flex items-center gap-3">
+                <div className="relative w-10 h-10 rounded-full bg-white/95 flex items-center justify-center shadow-inner">
+                  <span className="font-editorial text-mint-700 text-xl font-bold leading-none -mt-0.5">L</span>
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-mint-300 ring-2 ring-mint-600 animate-pulse-soft" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-semibold text-sm">Lya</span>
+                    <ShieldCheck className="w-3.5 h-3.5 text-mint-100" />
+                  </div>
+                  <p className="text-[11px] text-mint-50/90 leading-tight">
+                    Asistente legal IA · FinLogic
+                  </p>
+                </div>
+                <button
+                  onClick={() => setOpen(false)}
+                  aria-label="Cerrar chat"
+                  className="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 inline-flex items-center justify-center transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Body messages */}
+              <div
+                ref={scrollRef}
+                className="flex-1 overflow-y-auto px-4 md:px-5 py-4 space-y-3.5 bg-background/50"
+              >
+                {messages.length === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-3"
+                  >
+                    <div className="rounded-2xl rounded-tl-md bg-card border border-border px-4 py-3 text-sm text-foreground/90 leading-relaxed shadow-soft">
+                      Hola, soy <strong>Lya</strong> 👋 Te ayudo a entender tus derechos
+                      financieros y normativa chilena. ¿Qué te pasó?
+                    </div>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {SUGGESTIONS.map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => sendQuery(s)}
+                          className="text-xs px-3 py-1.5 rounded-full bg-mint-50 text-mint-700 border border-mint-200 hover:bg-mint-100 transition-colors"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {messages.map((m, i) => (
+                  <ChatBubble key={i} message={m} />
+                ))}
+
+                {loading && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground pl-1">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Lya está consultando la normativa...
+                  </div>
+                )}
+              </div>
+
+              {/* Footer · Input + CTA full-page */}
+              <div className="border-t border-border bg-card px-3 md:px-4 py-3 space-y-2">
+                <form onSubmit={handleSubmit} className="flex items-center gap-2">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Escribe tu consulta..."
+                    disabled={loading}
+                    className="flex-1 h-11 px-4 rounded-full bg-muted/60 border border-transparent focus:border-mint-400 focus:bg-card outline-none text-sm transition-all"
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading || !input.trim()}
+                    aria-label="Enviar"
+                    className="flex-shrink-0 w-11 h-11 rounded-full bg-mint-600 hover:bg-mint-700 text-white inline-flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-soft"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </form>
+                <Link
+                  to="/AsistenteLya"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground hover:text-mint-700 transition-colors"
+                >
+                  Abrir conversación completa
+                  <ArrowUpRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+// ─── Burbuja de mensaje ───────────────────────────────────────────────
+function ChatBubble({ message }) {
+  const isUser = message.role === 'user';
+
+  if (isUser) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex justify-end"
+      >
+        <div className="max-w-[82%] rounded-2xl rounded-tr-md bg-mint-600 text-white px-4 py-2.5 text-sm shadow-soft">
+          {message.content}
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col gap-2 max-w-[88%]"
+    >
+      <div
+        className={`rounded-2xl rounded-tl-md px-4 py-3 text-sm leading-relaxed shadow-soft border ${
+          message.error
+            ? 'bg-destructive/5 border-destructive/20 text-destructive'
+            : 'bg-card border-border text-foreground/90'
+        }`}
+      >
+        <div className="whitespace-pre-wrap">{message.content}</div>
+      </div>
+
+      {/* Sources (RAG) */}
+      {message.sources && message.sources.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 pl-1">
+          {message.sources.slice(0, 3).map((src, i) => (
+            <span
+              key={i}
+              className="text-[10px] px-2 py-0.5 rounded-full bg-mint-50 text-mint-700 border border-mint-200 font-mono-editorial"
+            >
+              {src.length > 42 ? `${src.substring(0, 42)}…` : src}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Suggested action */}
+      {message.suggestedAction && (
+        <Link
+          to="/Consulta"
+          className="self-start inline-flex items-center gap-1.5 text-[11px] text-mint-700 hover:text-mint-800 font-medium px-2.5 py-1 rounded-full bg-mint-50 border border-mint-200 transition-colors"
+        >
+          <Sparkles className="w-3 h-3" />
+          {message.suggestedAction.length > 60
+            ? `${message.suggestedAction.substring(0, 60)}…`
+            : message.suggestedAction}
+        </Link>
+      )}
+    </motion.div>
+  );
+}

@@ -28,7 +28,7 @@ import Pro from '@/pages/Pro';
 import SystemMetrics from '@/pages/SystemMetrics';
 import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
-import FloatingLyaCTA from '@/components/lya/FloatingLyaCTA';
+import LyaChatWidget from '@/components/lya/LyaChatWidget';
 import SkinAutoDetectToast from '@/components/skins/SkinAutoDetectToast.jsx';
 import EmbedLya from '@/pages/EmbedLya';
 import Diseno from '@/pages/Diseno';
@@ -91,7 +91,7 @@ const AuthenticatedApp = () => {
       <Route path="/Diseño" element={<Diseno />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
-    <FloatingLyaCTA />
+    <LyaChatWidget />
     <SkinAutoDetectToast />
     <PWAInstallBanner />
     <QuickAdminPanel />
