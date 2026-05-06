@@ -97,11 +97,10 @@ function SkinCard({ skinKey, response, isActive, onClick }) {
     <motion.button
       type="button"
       onClick={onClick}
-      layout
       whileHover={{ y: -4 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className={`text-left rounded-3xl overflow-hidden border-2 shadow-soft outline-none focus-visible:ring-2 focus-visible:ring-mint-500 ${
+      className={`w-full text-left rounded-3xl overflow-hidden border-2 shadow-soft outline-none focus-visible:ring-2 focus-visible:ring-mint-500 ${
         isActive ? 'border-foreground shadow-soft-lg' : 'border-border hover:border-mint-300'
       }`}
       style={{ background: s.bg, fontFamily: s.fontFamily }}
@@ -110,39 +109,35 @@ function SkinCard({ skinKey, response, isActive, onClick }) {
     >
       {/* Header del skin */}
       <div
-        className="px-5 py-4 flex items-center gap-3 border-b"
+        className="px-4 py-3.5 flex items-center gap-2.5 border-b"
         style={{ borderColor: s.accentBorder, background: s.headerBg }}
       >
-        <motion.div
-          whileHover={{ rotate: [0, -8, 8, 0] }}
-          transition={{ duration: 0.5 }}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 shadow-sm"
+        <div
+          className="w-9 h-9 rounded-full flex items-center justify-center text-base flex-shrink-0 shadow-sm"
           style={{ background: s.accent, color: 'white' }}
         >
           {meta.emoji}
-        </motion.div>
+        </div>
         <div className="flex-1 min-w-0">
-          <p className="font-bold truncate" style={{ color: s.text, fontSize: '15px' }}>
+          <p className="font-bold truncate" style={{ color: s.text, fontSize: '14px' }}>
             {meta.label}
           </p>
-          <p className="text-[11px] truncate" style={{ color: s.text, opacity: mutedOpacity }}>
+          <p className="text-[10.5px] truncate" style={{ color: s.text, opacity: mutedOpacity }}>
             {meta.description}
           </p>
         </div>
         {isActive && (
-          <motion.span
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+          <span
+            className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0"
             style={{ background: s.accent, color: 'white' }}
           >
             Activo
-          </motion.span>
+          </span>
         )}
       </div>
 
       {/* Mock respuesta */}
-      <div style={{ padding, color: s.text, fontSize: s.fontSize, lineHeight: 1.55 }}>
+      <div style={{ padding, color: s.text, fontSize: s.fontSize, lineHeight: 1.55, wordBreak: 'break-word' }}>
         <div className="flex items-center gap-1.5 mb-2">
           <span
             className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
@@ -340,7 +335,7 @@ export default function SkinsShowcase() {
         ))}
       </motion.div>
 
-      {/* Grid 4 skins */}
+      {/* Grid 4 skins — 1 col mobile, 2 cols tablet, 4 cols solo en xl+ para evitar apretujamiento */}
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -349,7 +344,7 @@ export default function SkinsShowcase() {
           hidden: {},
           visible: { transition: { staggerChildren: 0.08 } },
         }}
-        className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
+        className="relative grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5"
       >
         {['camila', 'don_luis', 'maria_jose', 'roberto'].map((key) => (
           <motion.div
