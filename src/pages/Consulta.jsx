@@ -10,6 +10,7 @@ import ResponseCard from '@/components/consulta/ResponseCard';
 import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
 import VoiceInput from '@/components/consulta/VoiceInput';
 import ConsultaSidePanel from '@/components/consulta/ConsultaSidePanel';
+import { useLyaVoice } from '@/lib/useLyaVoice';
 
 export default function Consulta() {
   const [query, setQuery] = useState('');
@@ -19,6 +20,7 @@ export default function Consulta() {
   const [error, setError] = useState(null);
   const [voiceMode, setVoiceMode] = useState(false);
   const location = useLocation();
+  const lyaVoice = useLyaVoice();
 
   // Lee ?q= del HeroSection y ?modo=voz para activar voz al entrar
   useEffect(() => {
@@ -56,6 +58,15 @@ export default function Consulta() {
       if (data?.success) {
         setResponse(data.response);
         setTraceId(data.traceId);
+        // Si la consulta entró por voz, Lya responde hablando (manos libres real)
+        if (voiceMode && lyaVoice.ttsSupported && data.response) {
+          const spoken = [
+            data.response.fact,
+            data.response.translation,
+            data.response.action,
+          ].filter(Boolean).join('. ');
+          lyaVoice.speak(spoken);
+        }
       } else {
         setError(data?.error || 'No pudimos procesar tu consulta');
       }

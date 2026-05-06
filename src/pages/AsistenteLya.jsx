@@ -7,6 +7,8 @@ import LyaMessage from '@/components/lya/LyaMessage';
 import LyaSources from '@/components/lya/LyaSources';
 import LyaActionCTA from '@/components/lya/LyaActionCTA';
 import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
+import LyaVoiceControls from '@/components/lya/LyaVoiceControls';
+import { useLyaVoice } from '@/lib/useLyaVoice';
 
 const SUGERENCIAS = [
   '¿Qué hago si no reconozco un cobro en mi tarjeta?',
@@ -25,11 +27,27 @@ export default function AsistenteLya() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(false);
+  const [handsFree, setHandsFree] = useState(false);
   const scrollRef = useRef(null);
+  const handsFreeRef = useRef(false);
+
+  const voice = useLyaVoice();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Mantén ref sincronizado para closures dentro de callbacks de voz
+  useEffect(() => { handsFreeRef.current = handsFree; }, [handsFree]);
+
+  // Anuncio inicial de bienvenida cuando se enciende la voz por primera vez
+  useEffect(() => {
+    if (autoSpeak && voice.ttsSupported && messages.length === 1) {
+      voice.speak('Hola, soy Lya. Cuéntame qué pasó con tus finanzas.');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSpeak]);
 
   const send = async (text) => {
     const q = (text ?? input).trim();
@@ -46,11 +64,12 @@ export default function AsistenteLya() {
         .catch(() => ({ data: { matched: false } }));
 
       if (faqResult.data?.matched && faqResult.data.confidence >= 0.25) {
+        const faqContent = faqResult.data.response;
         setMessages((prev) => [
           ...prev,
           {
             role: 'assistant',
-            content: faqResult.data.response,
+            content: faqContent,
             sources: ['FAQ canónica · ' + faqResult.data.faqQuestion],
             confidence: 0.95,
             regulatoryBody: 'ninguno',
@@ -58,6 +77,7 @@ export default function AsistenteLya() {
             isFaq: true,
           },
         ]);
+        if (autoSpeak) voice.speak(faqContent);
         return;
       }
 
@@ -68,11 +88,12 @@ export default function AsistenteLya() {
         userProfile: 'general',
       });
 
+      const finalContent = data?.response || 'No pude procesar tu consulta.';
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: data?.response || 'No pude procesar tu consulta.',
+          content: finalContent,
           sources: data?.sources,
           confidence: data?.confidence,
           regulatoryBody: data?.regulatoryBody,
@@ -80,6 +101,7 @@ export default function AsistenteLya() {
           query: q,
         },
       ]);
+      if (autoSpeak) voice.speak(finalContent);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -185,6 +207,28 @@ export default function AsistenteLya() {
         )}
 
         {/* Input */}
+        <div className="mb-3">
+          <LyaVoiceControls
+            sttSupported={voice.sttSupported}
+            ttsSupported={voice.ttsSupported}
+            listening={voice.listening}
+            speaking={voice.speaking}
+            autoSpeak={autoSpeak}
+            voiceName={voice.voiceName}
+            interim={voice.interim}
+            disabled={loading}
+            onToggleAutoSpeak={() => setAutoSpeak((v) => !v)}
+            onStopSpeaking={voice.stopSpeaking}
+            onStopListening={voice.stopListening}
+            onStartListening={() => {
+              if (!autoSpeak) setAutoSpeak(true);
+              voice.startListening((finalText) => {
+                send(finalText);
+              });
+            }}
+          />
+        </div>
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -210,7 +254,9 @@ export default function AsistenteLya() {
         </form>
 
         <p className="mt-3 text-xs text-muted-foreground text-center">
-          Lya es un asistente IA · siempre verifica decisiones críticas con un profesional.
+          {voice.sttSupported || voice.ttsSupported
+            ? 'Lya es un asistente IA con voz · español de Chile · siempre verifica decisiones críticas con un profesional.'
+            : 'Lya es un asistente IA · siempre verifica decisiones críticas con un profesional.'}
         </p>
       </main>
     </div>
