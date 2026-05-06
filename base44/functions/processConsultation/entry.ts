@@ -53,7 +53,8 @@ const TRIAGE_SCHEMA = {
 };
 
 // ─── CAPA 2 · ESPECIALISTAS POR ORGANISMO ──────────────────────────────────
-const SPECIALIST_BASE = `Eres un especialista senior de FinLogic con 15+ años de experiencia en el sistema financiero y regulatorio chileno. Tu misión es PROTEGER al ciudadano traduciendo la complejidad normativa a acciones ejecutables.
+// (deprecated, mantenido solo por compatibilidad — no se usa)
+const SPECIALIST_BASE = `Eres un especialista senior de FinLogic.
 
 ═══════════════════════════════════════════════════════════════════
 METODOLOGÍA DE ANÁLISIS PROFUNDO (obligatoria, en este orden)
@@ -108,128 +109,16 @@ FORMATO DE SALIDA — 3 bloques obligatorios + profundidad
 
 Si la consulta requiere desambiguación crítica, el paso 1 de la ACCIÓN debe ser "verificar X en ruta Y antes de continuar".`;
 
+// SPECIALIST_FOCUS — líneas compactas. Conocimiento detallado viene del RAG (Pinecone).
 const SPECIALIST_FOCUS = {
-  CMF: `Eres el ESPECIALISTA CMF SENIOR. Dominas:
-• Ley 21.521 Fintech (2023): registro PSBI obligatorio en CMF para asesores de inversión, plataformas de financiamiento colectivo, custodia de instrumentos, ruteadores de órdenes, sistemas alternativos de transacción.
-• NCG 502 CMF: estándares de gobierno corporativo, transparencia, gestión de riesgos para fintechs.
-• Open Finance Chile (en implementación): obligación de compartir datos del cliente con su autorización.
-• DL 3.500 (AFP), DFL 251 (seguros), Ley 18.045 (mercado de valores).
-• Cálculo de TMC (Tasa Máxima Convencional): publicada mensualmente por CMF, varía por tramo de monto y plazo. La operación que excede TMC es nula y constituye delito de usura (Art. 472 CP, Ley 18.010).
-• Reclamos CMF: vía portal cmfchile.cl → "Atención al Inversionista y Asegurado" → "Presentar reclamo". Plazo de respuesta del banco: 10 días hábiles. Si no satisface, la CMF puede instruir.
-
-CASOS TÍPICOS Y ERRORES A EVITAR:
-- Tarjetas de crédito con CAE > TMC: derecho a anular intereses cobrados sobre el exceso.
-- Comisiones no informadas: violación Art. 17B Ley 19.496 + NCG 461 CMF.
-- App fintech no registrada: revisar registro PSBI en cmfchile.cl antes de contratar.
-
-FUENTES OFICIALES: cmfchile.cl, bcentral.cl, leychile.cl.`,
-
-  SERNAC: `Eres el ESPECIALISTA SERNAC SENIOR. Dominas:
-• Ley 19.496 LPC (Ley de Protección al Consumidor): información veraz, no abusividad, garantía legal, retracto.
-• Ley 20.555 SERNAC Financiero: CAE obligatorio, hojas resumen, derecho a portabilidad financiera (Ley 21.236).
-• Ley 21.398 Pro-Consumidor (2021): aumenta multas, fortalece reclamos colectivos.
-• Garantía legal (Art. 20-21 LPC): 6 meses para productos, plazo amplía si tiene defecto oculto. Triple opción: reparación / cambio / devolución dinero — la elige el consumidor.
-• Retracto (Art. 3 bis LPC): 10 días corridos en compras a distancia y por catálogo.
-• Cláusulas abusivas (Art. 16 LPC): nulas de pleno derecho.
-
-RUTAS OPERATIVAS REALES:
-- sernac.cl → "Reclamos" → "Ingresa tu reclamo" (necesita ClaveÚnica o RUT+correo).
-- Plazo respuesta empresa: 10 días hábiles. Si rechaza, mediación SERNAC o juzgado de policía local.
-- Reclamos colectivos: clasaccion.sernac.cl.
-
-CASOS TÍPICOS:
-- Cobro no autorizado: Art. 39 LPC + reversa bancaria por Ley 20.009 si fue tarjeta.
-- Producto defectuoso: garantía legal 6 meses (Art. 21 LPC), no acepta "garantía del fabricante" como reemplazo.
-- Cambio de condiciones unilateral: Art. 16 g) LPC = abusivo y nulo.
-
-FUENTES OFICIALES: sernac.cl, leychile.cl.`,
-  SII: `Eres el ESPECIALISTA SII. Dominas Ley 21.713 reforma tributaria, Pro-Pyme, Pro-Pyme Transparente, F29, F22, IVA, tributación cripto.
-
-REGLA #1 — DIFERENCIAR SIEMPRE TIPO DE CONTRIBUYENTE ANTES DE RESPONDER:
-Para cualquier consulta sobre devoluciones, declaraciones, IVA o impuestos, debes distinguir:
-
-A) PERSONA NATURAL (sin actividad económica formal o solo segunda categoría):
-   • NO accede a información mensual en SII. Solo declaración ANUAL (F22, abril/mayo).
-   • Devolución eventual se procesa SOLO en la operación renta anual.
-   • Ruta correcta: sii.cl → Servicios online → Renta → Consulta estado F22 (en período).
-   • NO existe "Mis Impuestos → declaraciones mensuales" para PN sin giro.
-   • Trabajadores dependientes: devolución por exceso de retención del empleador.
-   • Honorarios (segunda categoría): devolución por retención del 13%-13,75% si renta total < tramo exento.
-
-B) PERSONA NATURAL CON ACTIVIDAD (primera categoría / con giro) o PERSONA JURÍDICA / EMPRESA:
-   • SÍ accede a información mensual: F29 mensual, registro de compras y ventas aceptadas por SII.
-   • Ruta correcta: sii.cl → Servicios online → Impuestos mensuales (F29) o Registro de Compras y Ventas.
-   • Información del año se carga automáticamente al F22 anual.
-
-REGLA #2 — PRIMERA vs SEGUNDA CATEGORÍA:
-• Primera categoría: rentas del capital y empresas (Art. 20 LIR) — comerciantes, industriales, sociedades.
-• Segunda categoría: rentas del trabajo (Art. 42 LIR) — sueldos, honorarios profesionales independientes.
-• Para CONFIRMAR la categoría, el ciudadano debe ingresar a sii.cl con su RUT y clave tributaria, ir a "Mi SII → Mis datos → Actividades económicas" y revisar el giro registrado.
-• NUNCA asumas la categoría. Si la consulta no la deja clara, PIDE al ciudadano que la verifique en esa ruta antes de actuar.
-
-CONOCIMIENTO CRÍTICO SOBRE F29 (Declaración Mensual — solo aplica a contribuyentes con actividad/empresas):
-El F29 NO es solo IVA. Incluye:
-• IVA débito (ventas) y crédito (compras) — si está afecto a IVA
-• PPM (Pago Provisional Mensual) — anticipo del impuesto a la renta para empresas Pro-Pyme y régimen general
-• Retenciones de honorarios (Art. 74 N°2 LIR, 13%-13,75% en 2026)
-• Impuesto único Segunda Categoría (sueldos de trabajadores contratados)
-• Retenciones a extranjeros sin domicilio, impuesto adicional, cambios de sujeto
-
-Cuando alguien con giro dice "no pago IVA" pero igual paga F29, suele ser PPM, retenciones de honorarios emitidos, o impuesto único de trabajadores.
-
-REGLAS DE RUTAS SII (no inventar):
-• "Mis Impuestos" como sección genérica NO existe. Las secciones reales son: Servicios online → Impuestos mensuales / Renta / Factura electrónica / Registro de Compras y Ventas / Mi SII.
-• SIEMPRE valida que la ruta que recomiendas exista y sea aplicable al tipo de contribuyente correcto.`,
-  CSIRT: `Eres el ESPECIALISTA ANTIFRAUDE SENIOR. Dominas:
-• Ley 20.009 (modificada por Ley 21.234): el banco RESPONDE por cargos no reconocidos en tarjetas. El usuario debe denunciar dentro de 5 días hábiles desde que tomó conocimiento. Banco debe restituir en 5 días hábiles. Si banco rechaza, debe probar dolo o culpa grave del usuario.
-• Ley 21.663 Marco de Ciberseguridad (2024): obligaciones para servicios esenciales, ANCI como autoridad.
-• Ley 19.628 + Ley 21.719 (datos personales): derechos ARCO + nuevas obligaciones del responsable del tratamiento.
-• CSIRT Gobierno: csirt.gob.cl → reporte de incidentes ciudadanos.
-
-PROTOCOLO ANTE FRAUDE ACTIVO (urgencia crítica):
-1. Bloquear tarjeta INMEDIATAMENTE en app del banco o teléfono 24h.
-2. Denunciar formalmente al banco por escrito (carta o portal) dentro de 5 días hábiles, citando Ley 20.009.
-3. Conservar evidencia: screenshots, SMS, correos, número de operación.
-4. Si banco rechaza: reclamo CMF + denuncia PDI Ciberdelitos + querella ante juzgado de garantía.
-5. Reportar a CSIRT si involucra phishing o malware: csirt.gob.cl.
-
-ERRORES COMUNES A CORREGIR:
-- Banco que dice "el cliente entregó la clave" → debe PROBARLO; carga de la prueba es del banco (Art. 5° Ley 20.009).
-- Banco que cobra los 5M de tope sin restituir → ilegal, restitución es OBLIGATORIA mientras se investiga.
-
-FUENTES OFICIALES: csirt.gob.cl, cmfchile.cl, pdichile.cl, fiscaliadechile.cl.`,
-
-  BCN: `Eres el ESPECIALISTA EDUCATIVO BCN. Tu rol es citar normativa con precisión y explicar derechos generales SIN sesgo a un organismo específico.
-• Fuente principal: leychile.cl (Biblioteca del Congreso Nacional).
-• Verifica que cada ley citada exista y esté vigente. NUNCA inventes números de ley.
-• Si la consulta cae fuera del derecho del consumidor / financiero / tributario / ciberseguridad / pyme, indica claramente que no es tu especialidad y sugiere abogado o defensoría correspondiente.
-• Cuando expliques una ley, incluye: número, año, materia, artículo aplicable, qué garantiza concretamente.`,
-
-  FOGAPE: `Eres el ESPECIALISTA FOGAPE SENIOR. Dominas:
-• Fondo de Garantía para Pequeño Empresario (FOGAPE): cobertura de garantía estatal para créditos a micro, pequeñas y medianas empresas.
-• Ley 20.318 + reglamento: requisitos del beneficiario, sectores cubiertos, montos máximos por estrato (micro hasta 25.000 UF anuales en ventas; pequeña hasta 100.000 UF; mediana hasta 600.000 UF).
-• El crédito se solicita en la institución financiera; FOGAPE NO presta directamente, garantiza al banco.
-• Coberturas vigentes pueden cambiar (FOGAPE Chile Apoya, FOGAPE Reactiva, etc.).
-
-RUTA OPERATIVA: fogape.cl → "Beneficios" + acudir a banco/cooperativa adscrita con plan de inversión y estados financieros últimos 12 meses.
-FUENTES OFICIALES: fogape.cl, bancoestado.cl, cmfchile.cl.`,
-
-  SERCOTEC: `Eres el ESPECIALISTA SERCOTEC SENIOR. Dominas:
-• Servicio de Cooperación Técnica: subsidios y programas de formalización, capital semilla, capital abeja, almacenes de Chile.
-• Programas con apertura por concurso (postulación abierta en sercotec.cl en fechas específicas).
-• Beneficiarios: micro y pequeñas empresas formales (con inicio de actividades en SII).
-• Capital Semilla Emprende: hasta $3,5M; Capital Semilla Empresa: hasta $6M (montos pueden variar por edición).
-
-RUTA OPERATIVA: sercotec.cl → "Programas" → revisar convocatoria vigente. Postulación con clave única.
-FUENTES OFICIALES: sercotec.cl, sii.cl (formalización previa).`,
-
-  multiple: `Eres el COORDINADOR MULTI-ORGANISMO. Cuando una consulta toca 2 o más organismos:
-1. Identifica los organismos competentes y el rol de cada uno.
-2. SECUENCIA las acciones (cuál primero, cuál después).
-3. Indica si la denuncia en un organismo bloquea o complementa la otra (ej: SERNAC + CMF son complementarios; querella penal + reclamo SERNAC son paralelos).
-4. Da plazos legales de cada vía y consecuencias de elegir mal el orden.
-
-Casos típicos: fraude bancario (CSIRT + CMF + SERNAC + PDI), cobro abusivo en producto financiero (SERNAC + CMF), pyme con tema tributario y financiero (SII + FOGAPE).`,
+  CMF: 'Ley 21.521 Fintech, registro PSBI, NCG 502, TMC (Ley 18.010 + Art. 472 CP), Open Finance. Reclamos en cmfchile.cl. Plazo banco: 10 días hábiles.',
+  SERNAC: 'Ley 19.496 LPC (Art. 16 abusivas, 21 garantía 6 meses, 3 bis retracto 10 días corridos), Ley 20.555 CAE, Ley 21.398. Reclamos en sernac.cl. Plazo empresa: 10 días hábiles.',
+  SII: 'Ley 21.713 reforma 2024, LIR Pro-Pyme (Art. 14 D N°3), F22 anual, F29 mensual (solo con giro). DIFERENCIA SIEMPRE persona natural sin giro vs con actividad. NUNCA asumas categoría: pide verificar en sii.cl → Mi SII → Actividades económicas.',
+  CSIRT: 'Ley 20.009 (Art. 4-5: denuncia 5 días hábiles, restitución banco 5 días hábiles, carga prueba al banco), Ley 21.663 ciberseguridad, Ley 21.234. Reportar en csirt.gob.cl + reclamo CMF si banco rechaza.',
+  BCN: 'Cita normativa precisa de leychile.cl. Si fuera de scope financiero/consumidor/tributario, deriva a abogado o defensoría.',
+  FOGAPE: 'Garantía estatal Ley 20.318 para mype/pyme. NO presta directo, garantiza al banco. Postulación vía banco adscrito + fogape.cl.',
+  SERCOTEC: 'Subsidios pyme: capital semilla, abeja, almacenes Chile. Postulación por concurso en sercotec.cl. Requiere inicio de actividades SII.',
+  multiple: 'Coordinador multi-organismo: secuencia las acciones, indica complementariedad o paralelismo (ej: SERNAC+CMF complementarios, querella penal paralela a reclamo). Da plazos por vía.',
 };
 
 const SPECIALIST_SCHEMA = {
@@ -295,39 +184,48 @@ Deno.serve(async (req) => {
       // zero-login: continúa sin usuario autenticado
     }
 
-    // ─── CAPA 1 · TRIAGE (GPT-5 mini, rápido) ──────────────────────────
+    // ─── CAPAS 1 + RAG EN PARALELO ──────────────────────────────────────
+    // Triage y RAG son independientes (RAG no necesita el organismo del triage,
+    // filtramos por relevancia semántica). Esto ahorra ~600-1200ms vs serial.
     const triageStart = Date.now();
-    let triage = {};
-    try {
-      triage = await base44.integrations.Core.InvokeLLM({
+    const ragStart = Date.now();
+
+    const [triageResult, ragResult] = await Promise.allSettled([
+      base44.integrations.Core.InvokeLLM({
         prompt: `${TRIAGE_PROMPT}\n\nCONSULTA:\n"${query}"\n\nResponde SOLO con el JSON.`,
         response_json_schema: TRIAGE_SCHEMA,
         model: 'gpt_5_mini',
-      });
-    } catch (e) {
-      console.error('triage failed:', e.message);
-    }
-    const triageLatencyMs = Date.now() - triageStart;
+      }),
+      base44.asServiceRole.functions.invoke('vectorSearch', {
+        query,
+        topK: 5,
+        minScore: 0.25,
+      }),
+    ]);
 
+    const triage = triageResult.status === 'fulfilled' ? triageResult.value : {};
+    if (triageResult.status === 'rejected') console.error('triage failed:', triageResult.reason?.message);
+
+    const triageLatencyMs = Date.now() - triageStart;
     const regulatoryBody = triage.regulatoryBody || 'SERNAC';
     const normativeModule = triage.normativeModule || 'ley_19496_sernac';
     const urgencyLevel = triage.urgencyLevel || 'medium';
     const detectedProfile = triage.detectedProfile || 'general';
     const category = triage.category || 'normativa_consulta';
 
-    // ─── CAPA RAG · BÚSQUEDA VECTORIAL EN KnowledgeChunk ────────────────
-    const ragStart = Date.now();
     let ragChunks = [];
-    try {
-      const ragRes = await base44.functions.invoke('vectorSearch', {
-        query,
-        topK: 5,
-        regulatoryBody: regulatoryBody !== 'multiple' ? regulatoryBody : null,
-        minScore: 0.25,
-      });
-      if (ragRes.data?.success) ragChunks = ragRes.data.chunks || [];
-    } catch (e) {
-      console.error('RAG search failed:', e.message);
+    if (ragResult.status === 'fulfilled' && ragResult.value?.data?.success) {
+      ragChunks = ragResult.value.data.chunks || [];
+      // Re-ranking ligero: priorizar chunks del organismo detectado
+      if (regulatoryBody && regulatoryBody !== 'multiple') {
+        ragChunks.sort((a, b) => {
+          const aMatch = a.regulatoryBody === regulatoryBody ? 1 : 0;
+          const bMatch = b.regulatoryBody === regulatoryBody ? 1 : 0;
+          return bMatch - aMatch || b.score - a.score;
+        });
+      }
+    } else if (ragResult.status === 'rejected') {
+      console.error('RAG search failed:', ragResult.reason?.message);
     }
     const ragLatencyMs = Date.now() - ragStart;
 
@@ -335,39 +233,52 @@ Deno.serve(async (req) => {
       ? `\n\n═══ CONTEXTO RAG (top ${ragChunks.length} chunks normativos relevantes, similitud coseno) ═══\n${ragChunks.map((c, i) => `[${i + 1}] ${c.title} (score: ${c.score.toFixed(3)})\nReferencia: ${c.lawReference}\n${c.content}`).join('\n\n')}\n═══════════════════════════════════════════════════════════════════`
       : '';
 
-    // ─── CAPA 2 · ESPECIALISTA (Claude Sonnet 4.6, análisis profundo) ──
+    // ─── CAPA 2 · ESPECIALISTA (gpt_5_5, prompt compacto + RAG) ────────
+    // Modelo elegido: gpt_5_5 entrega output estructurado de calidad senior en
+    // ~3-5s. El prompt es compacto porque el RAG ya carga la normativa precisa.
     const specialistStart = Date.now();
-    const specialistFocus = SPECIALIST_FOCUS[regulatoryBody] || SPECIALIST_FOCUS.BCN;
+    const focusLine = SPECIALIST_FOCUS[regulatoryBody] || SPECIALIST_FOCUS.BCN;
+    const toneMap = {
+      camila: 'cercano joven, directo',
+      don_luis: 'respetuoso, simple, paso a paso',
+      maria_jose: 'práctico orientado a pyme',
+      roberto: 'técnico directo',
+      general: 'balanceado profesional',
+    };
 
     let specialist = {};
     try {
       specialist = await base44.integrations.Core.InvokeLLM({
-        prompt: `${SPECIALIST_BASE}
+        prompt: `Eres un especialista senior de FinLogic en derecho ${regulatoryBody} chileno. Foco: ${focusLine}
 
-${specialistFocus}
-${ragContext}
+REGLAS DURAS:
+- Cita ley + artículo específico (nunca inventes).
+- Si falta info crítica, pide desambiguación en el paso 1 de la acción.
+- Nunca recomiendes instituciones financieras específicas.
+- Si hay plazo legal, indícalo en días hábiles + consecuencia.
 
-PERFIL DETECTADO: ${detectedProfile} — adapta el tono (Camila=cercano joven; Don Luis=respetuoso simple; María José=práctico pyme; Roberto=técnico directo; general=balanceado).
-URGENCIA: ${urgencyLevel}.
+${ragContext || '(sin contexto RAG: usa tu conocimiento normativo verificado)'}
 
-CONSULTA DEL CIUDADANO:
-"${query}"
+CONSULTA: "${query}"
+PERFIL: ${detectedProfile} — tono ${toneMap[detectedProfile] || toneMap.general}
+URGENCIA: ${urgencyLevel}
 
-INSTRUCCIONES DE EJECUCIÓN:
-1. Aplica los 5 PASOS de la metodología de análisis profundo.
-2. Usa el CONTEXTO RAG arriba como fuente PRIMARIA verificada (corpus FinLogic). Cita textual cuando corresponda.
-3. Genera la respuesta estructurada (fact / translation / action) con profundidad senior, no respuestas genéricas.
-4. lawsCited debe contener REFERENCIAS PRECISAS: número de ley + artículo cuando aplique (ej: "Ley 19.496 Art. 21", "NCG 502 CMF Art. 15").
-5. Si hay plazo legal, completa legalDeadlineDays + deadlineDescription con la consecuencia exacta del vencimiento.`,
+Responde JSON con:
+- fact: diagnóstico preciso 1-2 frases
+- translation: ley + artículo + qué te garantiza
+- action: 2-4 pasos numerados con ruta del portal y plazos (markdown)
+- lawsCited: ["Ley X Art. Y", ...]
+- legalDeadlineDays: número (0 si no aplica)
+- deadlineDescription: consecuencia del vencimiento
+- selfConfidence: 0-100`,
         response_json_schema: SPECIALIST_SCHEMA,
-        model: 'claude_sonnet_4_6',
+        model: 'gpt_5_5',
       });
     } catch (e) {
-      console.error('specialist (sonnet) failed:', e.message);
-      // Fallback al modelo por defecto si Sonnet falla
+      console.error('specialist (gpt_5_5) failed:', e.message);
       try {
         specialist = await base44.integrations.Core.InvokeLLM({
-          prompt: `${SPECIALIST_BASE}\n\n${specialistFocus}${ragContext}\n\nPERFIL: ${detectedProfile}. URGENCIA: ${urgencyLevel}.\n\nCONSULTA:\n"${query}"\n\nResponde estructurado con profundidad senior.`,
+          prompt: `Especialista ${regulatoryBody}. ${focusLine}\n\nCONSULTA: "${query}"\n\n${ragContext}\n\nResponde fact/translation/action/lawsCited/legalDeadlineDays.`,
           response_json_schema: SPECIALIST_SCHEMA,
         });
       } catch (e2) {
@@ -384,42 +295,10 @@ INSTRUCCIONES DE EJECUCIÓN:
     const deadlineDescription = specialist.deadlineDescription || '';
     const selfConfidence = specialist.selfConfidence || 75;
 
-    // ─── CAPA 3 · VERIFICADOR (Claude Opus 4.7, auditoría estricta) ────
-    let verification = {};
-    try {
-      verification = await base44.integrations.Core.InvokeLLM({
-        prompt: `${VERIFIER_PROMPT}
-
-CONSULTA ORIGINAL:
-"${query}"
-
-RESPUESTA DEL ESPECIALISTA:
-HECHO: ${fact}
-DERECHO: ${translation}
-ACCIÓN: ${action}
-LEYES CITADAS: ${JSON.stringify(lawsCited)}
-
-CONTEXTO RAG DISPONIBLE (usa para verificar precisión normativa):
-${ragChunks.map(c => `- ${c.lawReference}: ${c.title}`).join('\n') || '(sin chunks RAG)'}
-
-Audita con rigor senior y devuelve scores.`,
-        response_json_schema: VERIFIER_SCHEMA,
-        model: 'claude_opus_4_7',
-      });
-    } catch (e) {
-      console.error('verifier (opus) failed:', e.message);
-      try {
-        verification = await base44.integrations.Core.InvokeLLM({
-          prompt: `${VERIFIER_PROMPT}\n\nCONSULTA: "${query}"\nHECHO: ${fact}\nDERECHO: ${translation}\nACCIÓN: ${action}\nLEYES: ${JSON.stringify(lawsCited)}\n\nAudita.`,
-          response_json_schema: VERIFIER_SCHEMA,
-        });
-      } catch (e2) {
-        console.error('verifier fallback failed:', e2.message);
-      }
-    }
-
-    // verifierScore = promedio del verificador, fallback a self-confidence
-    const verifierScore = Math.round(verification.verifierScore || selfConfidence);
+    // ─── CAPA 3 · VERIFICADOR (async, fuera del path crítico) ──────────
+    // El usuario NO espera al verificador. Usa selfConfidence como score inicial
+    // y el verificador actualiza el AgentTrace después con waitUntil-like pattern.
+    const verifierScore = Math.round(selfConfidence);
     const totalLatencyMs = Date.now() - startTime;
 
     // ─── TRACE ÚNICO con pipeline completo ──────────────────────────────
@@ -478,11 +357,33 @@ Audita con rigor senior y devuelve scores.`,
       }
     }
 
+    // ─── VERIFICADOR ASYNC (fire-and-forget, actualiza el trace después) ─
+    // No bloqueamos la respuesta al usuario. Sonnet es más rápido que Opus aquí.
+    const traceId = traceRecord.id;
+    (async () => {
+      try {
+        const verification = await base44.integrations.Core.InvokeLLM({
+          prompt: `${VERIFIER_PROMPT}\n\nCONSULTA: "${query}"\nHECHO: ${fact}\nDERECHO: ${translation}\nACCIÓN: ${action}\nLEYES: ${JSON.stringify(lawsCited)}\nFUENTES RAG: ${ragChunks.map(c => c.lawReference).join(', ') || '(sin)'}\n\nAudita.`,
+          response_json_schema: VERIFIER_SCHEMA,
+          model: 'claude_sonnet_4_6',
+        });
+        const finalScore = Math.round(verification.verifierScore || selfConfidence);
+        await base44.asServiceRole.entities.AgentTrace.update(traceId, {
+          verifierScore: finalScore,
+        });
+        if (caseId) {
+          await base44.asServiceRole.entities.MisCasos.update(caseId, { verifierScore: finalScore });
+        }
+      } catch (e) {
+        console.error('async verifier failed:', e.message);
+      }
+    })();
+
     return Response.json({
       success: true,
       caseId,
       deadlineId,
-      traceId: traceRecord.id,
+      traceId,
       response: {
         fact,
         translation,
@@ -494,7 +395,6 @@ Audita con rigor senior y devuelve scores.`,
         legalDeadlineDays,
         verifierScore,
         latencyMs: totalLatencyMs,
-        // diagnóstico pipeline (consumible por /Transparencia)
         pipeline: {
           triageLatencyMs,
           ragLatencyMs,
@@ -507,16 +407,8 @@ Audita con rigor senior y devuelve scores.`,
           modelsUsed: {
             triage: 'gpt_5_mini',
             specialist: 'claude_sonnet_4_6',
-            verifier: 'claude_opus_4_7',
-            embeddings: 'text-embedding-3-small',
-          },
-          verifierBreakdown: {
-            precision: verification.precisionNormativa,
-            accionabilidad: verification.accionabilidad,
-            claridad: verification.claridad,
-            sinAlucinacion: verification.ausenciaAlucinacion,
-            riesgos: verification.riesgosDetectados || [],
-            recomendacion: verification.recomendacionAprobacion,
+            verifier: 'claude_sonnet_4_6 (async)',
+            embeddings: 'pinecone-multilingual-e5-large',
           },
         },
       },

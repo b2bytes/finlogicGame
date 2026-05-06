@@ -1,6 +1,5 @@
-// lyaKnowledgeQuery
-// Recuperación semántica del corpus normativo FinLogic (12 módulos).
-// Mandato §3 Lya Integration · Knowledge Files sin vector DB.
+// lyaKnowledgeQuery — Lya conversacional con RAG Pinecone.
+// Mandato §3 Lya Integration · ahora compartiendo el mismo corpus que processConsultation.
 // Retorna { response, sources, confidence, suggestedAction }.
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
@@ -24,7 +23,7 @@ const SISTEMA_LYA = `Eres Lya, asistente IA de FinLogic. Respondes en español c
 
 REGLAS:
 - NUNCA inventes artículos legales.
-- Cita solo normativa que conozcas con certeza.
+- Cita SOLO normativa que aparece en el CONTEXTO RAG (cuando esté disponible) o que conozcas con certeza.
 - Termina con una acción concreta que el usuario puede hacer HOY.
 - Máximo 600 palabras (texto) / 800 caracteres (voz).
 - Estructura: ⚖️ Derecho · 📋 Acción · ⏰ Plazo.`;
@@ -38,31 +37,54 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const { query, mode = 'text', userProfile = 'general' } = await req.json();
 
-    if (!query || typeof query !== 'string') {
-      return Response.json({ error: 'query requerido' }, { status: 400 });
+    if (!query || typeof query !== 'string' || query.trim().length < 3) {
+      return Response.json({ error: 'query requerido (mín 3 caracteres)' }, { status: 400 });
     }
 
     const startTime = Date.now();
 
-    // Detección heurística simple del módulo normativo
-    const queryLower = query.toLowerCase();
-    const detectedModules = [];
-    if (/fraud|cargo|cobro|robo|tarjet/.test(queryLower)) detectedModules.push('ley_20009_fraude');
-    if (/dato|arco|privacidad|borrar/.test(queryLower)) detectedModules.push('ley_21719_datos');
-    if (/cae|tir|ter|cr[eé]dito|tasa/.test(queryLower)) detectedModules.push('ley_20555');
-    if (/sernac|consumidor|reclamo/.test(queryLower)) detectedModules.push('ley_19496_sernac');
-    if (/cmf|fintech|open finance/.test(queryLower)) detectedModules.push('ley_fintech_21521');
-    if (/cyber|ciber|phishing|csirt/.test(queryLower)) detectedModules.push('csirt');
-    if (/sii|impuesto|tribut|iva|f29/.test(queryLower)) detectedModules.push('ley_21713_tributaria');
-    if (/cripto|bitcoin|ethereum/.test(queryLower)) detectedModules.push('tributacion_cripto');
-
-    if (detectedModules.length === 0) {
-      detectedModules.push('ley_19496_sernac', 'ley_fintech_21521');
+    // ─── RAG · Pinecone (compartido con processConsultation) ─────────────
+    let ragChunks = [];
+    let ragLatencyMs = 0;
+    const ragStart = Date.now();
+    try {
+      const ragRes = await base44.functions.invoke('vectorSearch', {
+        query,
+        topK: 4,
+        minScore: 0.25,
+        diversify: true,
+      });
+      if (ragRes.data?.success) ragChunks = ragRes.data.chunks || [];
+    } catch (e) {
+      console.error('Lya RAG failed:', e.message);
     }
+    ragLatencyMs = Date.now() - ragStart;
 
-    const sources = detectedModules.map((k) => NORMATIVA_MAP[k]).filter(Boolean);
+    // Si RAG vacío, fallback heurístico para mantener experiencia
+    let modulesUsed = ragChunks.map(c => c.module).filter(Boolean);
+    if (modulesUsed.length === 0) {
+      const queryLower = query.toLowerCase();
+      if (/fraud|cargo|cobro|robo|tarjet/.test(queryLower)) modulesUsed.push('ley_20009_fraude');
+      if (/dato|arco|privacidad|borrar/.test(queryLower)) modulesUsed.push('ley_21719_datos');
+      if (/cae|tir|ter|cr[eé]dito|tasa/.test(queryLower)) modulesUsed.push('ley_20555');
+      if (/sernac|consumidor|reclamo/.test(queryLower)) modulesUsed.push('ley_19496_sernac');
+      if (/cmf|fintech|open finance/.test(queryLower)) modulesUsed.push('ley_fintech_21521');
+      if (/cyber|ciber|phishing|csirt/.test(queryLower)) modulesUsed.push('csirt');
+      if (/sii|impuesto|tribut|iva|f29/.test(queryLower)) modulesUsed.push('ley_21713_tributaria');
+      if (/cripto|bitcoin|ethereum/.test(queryLower)) modulesUsed.push('tributacion_cripto');
+      if (modulesUsed.length === 0) modulesUsed = ['ley_19496_sernac', 'ley_fintech_21521'];
+    }
+    modulesUsed = [...new Set(modulesUsed)];
 
-    // Profile-tuned system prompt
+    const sources = ragChunks.length > 0
+      ? ragChunks.map(c => `${c.lawReference} — ${c.title}`)
+      : modulesUsed.map(k => NORMATIVA_MAP[k]).filter(Boolean);
+
+    const ragContext = ragChunks.length > 0
+      ? `\n\n═══ NORMATIVA VERIFICADA (corpus FinLogic) ═══\n${ragChunks.map((c, i) => `[${i + 1}] ${c.lawReference} — ${c.title}\n${c.content}`).join('\n\n')}\n═══════════════════════════════════════════════════════`
+      : `\n\nNORMATIVA RELEVANTE DETECTADA: ${modulesUsed.map(k => NORMATIVA_MAP[k]).filter(Boolean).join(' · ')}`;
+
+    // Profile-tuned tone
     const profileTone = {
       don_luis: 'Usuario adulto mayor (68a). Lenguaje muy simple, frases cortas, evita anglicismos.',
       camila: 'Estudiante 22a. Tono cercano, puede usar términos técnicos básicos con explicación.',
@@ -80,9 +102,7 @@ Deno.serve(async (req) => {
 
 CONTEXTO USUARIO: ${profileTone}
 ${modeInstructions}
-
-NORMATIVA DETECTADA RELEVANTE:
-${sources.map((s, i) => `${i + 1}. ${s}`).join('\n')}
+${ragContext}
 
 CONSULTA DEL CIUDADANO:
 ${query}
@@ -116,11 +136,13 @@ Responde como Lya:`;
     return Response.json({
       response: llmResponse.response,
       sources,
-      confidence: llmResponse.confidence ?? 0.85,
+      confidence: llmResponse.confidence ?? (ragChunks.length > 0 ? 0.92 : 0.78),
       suggestedAction: llmResponse.suggestedAction,
       regulatoryBody: llmResponse.regulatoryBody || 'ninguno',
       detectedProfile: llmResponse.detectedProfile || userProfile || 'general',
-      modulesUsed: detectedModules,
+      modulesUsed,
+      ragChunksFound: ragChunks.length,
+      ragLatencyMs,
       latencyMs,
     });
   } catch (error) {
