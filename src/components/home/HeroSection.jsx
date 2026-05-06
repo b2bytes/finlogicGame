@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { Mic, ArrowRight } from 'lucide-react';
 import HeroIllustration from './HeroIllustration';
 import HeroTrustStrip from './HeroTrustStrip';
 
