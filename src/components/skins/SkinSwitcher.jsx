@@ -30,13 +30,22 @@ export default function SkinSwitcher({ compact = false }) {
         aria-expanded={open}
         aria-label={`Cambiar skin · actual: ${current.label}`}
         title={`Skin: ${current.label}`}
-        className={`flex items-center justify-center rounded-full border-2 transition-all min-w-[48px] min-h-[48px] ${
+        className={`relative flex items-center justify-center rounded-full border-2 transition-all min-w-[48px] min-h-[48px] hover:scale-105 active:scale-95 ${
           skin !== 'auto'
             ? 'bg-mint-50 border-mint-300 text-mint-700'
             : 'bg-card border-border text-foreground hover:border-mint-300 hover:bg-mint-50'
         }`}
       >
         <Palette className="w-5 h-5" strokeWidth={2.4} />
+        {skin !== 'auto' && (
+          <span
+            className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-background flex items-center justify-center text-[8px]"
+            style={{ background: current.color }}
+            aria-hidden
+          >
+            {current.emoji}
+          </span>
+        )}
       </button>
 
       {open && (

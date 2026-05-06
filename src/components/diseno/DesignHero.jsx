@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Layers, Workflow, Palette, Frame, Sparkles, MessageCircle, Play } from 'lucide-react';
+import { ArrowLeft, Layers, Workflow, Palette, Frame, Sparkles, MessageCircle, Play, UserCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Logo from '@/components/home/Logo';
 
 const SECTIONS = [
+  { id: 'skins', label: 'Skins Adaptativos', icon: UserCircle2, desc: '4 perfiles · auto-detección por triage · CSS variables' },
   { id: 'flows', label: 'Mapa de flujos', icon: Workflow, desc: '5 arquetipos · 23 pantallas · navegación end-to-end' },
   { id: 'system', label: 'Sistema de diseño', icon: Palette, desc: 'Color, tipografía, radios, sombras, componentes' },
   { id: 'wireframes', label: 'Wireframes faltantes', icon: Frame, desc: 'Mockups de pantallas pendientes en alta fidelidad' },

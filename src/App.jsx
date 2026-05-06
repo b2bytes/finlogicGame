@@ -29,6 +29,7 @@ import SystemMetrics from '@/pages/SystemMetrics';
 import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
 import FloatingLyaCTA from '@/components/lya/FloatingLyaCTA';
+import SkinAutoDetectToast from '@/components/skins/SkinAutoDetectToast.jsx';
 import EmbedLya from '@/pages/EmbedLya';
 import Diseno from '@/pages/Diseno';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -91,6 +92,7 @@ const AuthenticatedApp = () => {
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     <FloatingLyaCTA />
+    <SkinAutoDetectToast />
     <PWAInstallBanner />
     <QuickAdminPanel />
     </>

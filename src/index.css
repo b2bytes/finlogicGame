@@ -197,8 +197,28 @@
 /* ============================================================
    SKINS ADAPTATIVOS — 4 perfiles canónicos del mandato
    Cada skin altera tokens vía clase en <html>: skin-{key}
+   Transición fluida entre skins (Apple-style cross-fade de tokens)
    ============================================================ */
 @layer base {
+  html, body {
+    transition:
+      background-color 600ms cubic-bezier(0.22, 1, 0.36, 1),
+      color 400ms cubic-bezier(0.22, 1, 0.36, 1),
+      font-size 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Elementos UI heredan transición de tokens */
+  button, a, .rounded-3xl, .rounded-2xl, .rounded-full, [class*="bg-mint"],
+  [class*="bg-card"], [class*="border-mint"], [class*="text-mint"],
+  [class*="bg-primary"], [class*="text-primary"] {
+    transition-property: background-color, border-color, color, border-radius, box-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html, body, button, a {
+      transition: none !important;
+    }
+  }
   /* CAMILA — 22 Stgo · móvil-first · vibrante · acento púrpura */
   html.skin-camila {
     --primary: 280 60% 55%;
