@@ -93,7 +93,7 @@ export default function Pyme() {
       <main>
         <PymeHero />
 
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 pb-20">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
           <div className="mb-6 flex items-center justify-between">
             <Link
               to="/"

@@ -38,21 +38,22 @@ export default function SmartSearch() {
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="flex items-center gap-2 bg-secondary/40 rounded-full border border-border p-1.5 pl-5">
-        <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+      <form onSubmit={handleSearch} className="flex items-center gap-1.5 bg-secondary/40 rounded-full border border-border p-1.5 pl-4">
+        <Search className="w-4 h-4 text-muted-foreground flex-shrink-0 hidden sm:block" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ej: cuánto cuesta el plan Pro, o cobro raro en tarjeta…"
+          placeholder="Ej: ¿cuánto cuesta el Pro?"
           className="flex-1 bg-transparent outline-none text-sm py-2 min-w-0"
           disabled={loading}
         />
         <button
           type="submit"
           disabled={loading || !query.trim()}
-          className="h-9 px-4 rounded-full bg-foreground hover:bg-foreground/90 text-background text-xs font-semibold disabled:opacity-50 inline-flex items-center gap-1.5"
+          aria-label="Buscar"
+          className="h-9 px-4 rounded-full bg-foreground hover:bg-foreground/90 text-background text-xs font-semibold disabled:opacity-50 inline-flex items-center gap-1.5 flex-shrink-0"
         >
-          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Buscar'}
+          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Search className="w-3.5 h-3.5 sm:hidden" /><span className="hidden sm:inline">Buscar</span></>}
         </button>
       </form>
 

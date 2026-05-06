@@ -61,7 +61,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-background">
       <HeroNav />
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 pt-12 pb-20 md:pt-20 md:pb-28">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20 md:pt-20 md:pb-28">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <p className="text-sm font-semibold text-mint-600 mb-3 uppercase tracking-wide">
             Precios honestos

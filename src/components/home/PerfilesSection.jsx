@@ -40,35 +40,35 @@ export default function PerfilesSection() {
   return (
     <section id="perfiles" className="py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-2xl mb-10">
+        <div className="max-w-2xl mb-8 sm:mb-10">
           <p className="text-xs font-semibold text-mint-600 mb-3 tracking-wider uppercase">
             Para todos
           </p>
-          <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.05]">
+          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.05]">
             Tu derecho.{' '}
             <span className="text-muted-foreground">En tu idioma. Ahora.</span>
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           {perfiles.map((p) => (
             <div
               key={p.name}
               className={`relative overflow-hidden rounded-[28px] ${p.color} hover:shadow-soft-lg hover:-translate-y-1 transition-all duration-300 flex flex-col`}
             >
-              <div className="relative h-52 overflow-hidden">
+              <div className="relative h-44 sm:h-52 overflow-hidden">
                 <img
                   src={p.avatar}
                   alt={p.name}
                   className="w-full h-full object-cover object-top"
                 />
-                <div className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur shadow-soft">
+                <div className="absolute top-3 right-3 sm:top-4 sm:right-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur shadow-soft">
                   <Languages className="w-3 h-3 text-mint-700" />
                   <span className="text-[10px] font-bold text-mint-700">Lenguaje simple</span>
                 </div>
               </div>
 
-              <div className="p-6 flex-1 flex flex-col">
+              <div className="p-5 sm:p-6 flex-1 flex flex-col">
                 <p className="text-[11px] font-semibold text-foreground/60 mb-1">
                   {p.age} años · {p.location}
                 </p>

@@ -76,7 +76,7 @@ export default function Consulta() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 glass border-b border-border/40">
-        <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Volver
@@ -92,7 +92,7 @@ export default function Consulta() {
         </div>
       </header>
 
-      <main className={`mx-auto px-6 py-10 md:py-16 ${response || loading ? 'max-w-3xl' : 'max-w-6xl'}`}>
+      <main className={`mx-auto px-4 sm:px-6 py-8 md:py-16 ${response || loading ? 'max-w-3xl' : 'max-w-6xl'}`}>
         {!response && !loading && (
           <div className="grid lg:grid-cols-[1fr_320px] gap-10 lg:gap-12">
             <div>

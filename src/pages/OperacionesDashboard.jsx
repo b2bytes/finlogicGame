@@ -59,7 +59,7 @@ export default function OperacionesDashboard() {
     return (
       <div className="min-h-screen bg-background">
         <HeroNav />
-        <main className="max-w-7xl mx-auto px-6 py-10">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
           <div className="grid lg:grid-cols-2 gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="h-64 bg-card rounded-3xl border border-border animate-pulse-soft" />
@@ -74,7 +74,7 @@ export default function OperacionesDashboard() {
     return (
       <div className="min-h-screen bg-background">
         <HeroNav />
-        <main className="max-w-2xl mx-auto px-6 py-20 text-center">
+        <main className="max-w-2xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
           <h1 className="font-display text-3xl font-bold text-foreground">Acceso restringido</h1>
           <p className="mt-3 text-muted-foreground">El panel COO Digital es solo para administradores.</p>
           <Button asChild className="mt-6 rounded-full">
@@ -91,7 +91,7 @@ export default function OperacionesDashboard() {
     <div className="min-h-screen bg-background">
       <HeroNav />
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10 md:py-14">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-14">
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
             <Link

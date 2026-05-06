@@ -81,7 +81,7 @@ export default function CasoDetalle() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 glass border-b border-border/40">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/MisCasos" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Mis casos
@@ -91,7 +91,7 @@ export default function CasoDetalle() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-10 md:py-14">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-14">
         <div className="mb-8 animate-fade-up">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-mint-50 border border-mint-200 text-mint-700">

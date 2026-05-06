@@ -77,7 +77,7 @@ export default function Insights() {
       <main>
         <InsightHero />
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-16 space-y-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-8">
           {stats ? (
             <>
               <InsightMetrics stats={stats} />
@@ -94,8 +94,8 @@ export default function Insights() {
             </div>
           )}
 
-          <div className="bg-foreground text-background rounded-3xl p-8 md:p-12 mt-10 text-center">
-            <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
+          <div className="bg-foreground text-background rounded-3xl p-6 sm:p-8 md:p-12 mt-10 text-center">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight">
               ¿Necesitas insights agregados para tu organización?
             </h2>
             <p className="mt-3 text-background/70 max-w-2xl mx-auto">

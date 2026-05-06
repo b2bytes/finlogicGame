@@ -28,28 +28,28 @@ export default function HeroSection() {
         <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-[#F0E5FF]/40 rounded-full blur-[120px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1.05fr_1fr] gap-8 lg:gap-12 items-center">
           {/* Left — Title + input + trust */}
           <div className="animate-fade-up">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-7">
-              <Sparkles className="w-3.5 h-3.5 text-mint-700" />
-              <span className="text-xs font-semibold text-mint-700">
+              <Sparkles className="w-3.5 h-3.5 text-mint-700 flex-shrink-0" />
+              <span className="text-[11px] sm:text-xs font-semibold text-mint-700">
                 Sistema operativo financiero del pueblo de Chile
               </span>
             </div>
 
-            <h1 className="font-display text-5xl md:text-6xl lg:text-[68px] font-bold tracking-tight text-foreground leading-[1.02]">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-bold tracking-tight text-foreground leading-[1.05]">
               ¿Sabes cuánto te van a cobrar el día <span className="text-mint-600">28</span>?
             </h1>
 
             {/* Inline input row — pill estilo mockup */}
-            <div className="mt-8 flex items-center gap-2 bg-card rounded-full border border-border shadow-soft p-1.5 pl-5 max-w-xl">
+            <div className="mt-7 sm:mt-8 flex items-center gap-1.5 sm:gap-2 bg-card rounded-full border border-border shadow-soft p-1.5 pl-4 sm:pl-5 max-w-xl">
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && goToConsulta(query)}
-                placeholder="Cuéntanos qué está pasando con tus finanzas…"
+                placeholder="Cuéntanos qué pasa con tus finanzas…"
                 className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground/70 outline-none py-2 min-w-0"
               />
               <button
@@ -61,9 +61,10 @@ export default function HeroSection() {
               </button>
               <button
                 onClick={() => goToConsulta(query)}
-                className="h-10 px-5 rounded-full bg-mint-600 hover:bg-mint-700 text-white text-sm font-semibold transition-colors inline-flex items-center gap-1.5 flex-shrink-0"
+                className="h-10 px-3 sm:px-5 rounded-full bg-mint-600 hover:bg-mint-700 text-white text-xs sm:text-sm font-semibold transition-colors inline-flex items-center gap-1.5 flex-shrink-0"
               >
-                Consultar gratis
+                <span className="hidden xs:inline sm:inline">Consultar</span>
+                <span className="xs:hidden sm:hidden">Ir</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>

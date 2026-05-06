@@ -33,27 +33,27 @@ export default function MisCasos() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 glass border-b border-border/40">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+          <Link to="/" aria-label="Volver" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            Volver
+            <span className="hidden sm:inline">Volver</span>
           </Link>
           <Logo size="sm" />
-          <Button asChild size="sm" className="rounded-full bg-mint-500 hover:bg-mint-600 text-white h-9">
+          <Button asChild size="sm" className="rounded-full bg-mint-500 hover:bg-mint-600 text-white h-9 px-3 sm:px-4">
             <Link to="/Consulta">
-              <Plus className="w-4 h-4 mr-1" />
-              Nueva
+              <Plus className="w-4 h-4 sm:mr-1" />
+              <span className="hidden sm:inline">Nueva</span>
             </Link>
           </Button>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-10 md:py-14">
-        <div className="mb-8 animate-fade-up">
-          <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-14">
+        <div className="mb-6 sm:mb-8 animate-fade-up">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
             Mis Casos
           </h1>
-          <p className="mt-3 text-muted-foreground text-lg">
+          <p className="mt-2 sm:mt-3 text-muted-foreground text-base sm:text-lg">
             Cada consulta resuelta queda registrada con su plazo legal y organismo competente.
           </p>
         </div>

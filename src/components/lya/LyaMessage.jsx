@@ -8,19 +8,19 @@ export default function LyaMessage({ role, content, sources, confidence }) {
   if (isUser) {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[80%] bg-foreground text-background rounded-3xl rounded-tr-md px-5 py-3 shadow-soft">
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
+        <div className="max-w-[88%] sm:max-w-[80%] bg-foreground text-background rounded-3xl rounded-tr-md px-4 sm:px-5 py-3 shadow-soft">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{content}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-2.5 sm:gap-3">
       <div className="w-8 h-8 rounded-full bg-mint-500 flex items-center justify-center flex-shrink-0 shadow-mint">
         <Sparkles className="w-4 h-4 text-white" strokeWidth={2.4} />
       </div>
-      <div className="max-w-[85%] bg-card border border-border rounded-3xl rounded-tl-md px-5 py-3 shadow-soft">
+      <div className="flex-1 min-w-0 max-w-[88%] sm:max-w-[85%] bg-card border border-border rounded-3xl rounded-tl-md px-4 sm:px-5 py-3 shadow-soft">
         <ReactMarkdown
           className="text-sm prose prose-sm max-w-none text-foreground [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
           components={{

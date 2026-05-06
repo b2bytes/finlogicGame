@@ -45,7 +45,7 @@ export default function FinancialDashboard() {
     return (
       <div className="min-h-screen bg-background">
         <HeroNav />
-        <main className="max-w-7xl mx-auto px-6 py-10">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
           <div className="h-32 bg-muted rounded-3xl animate-pulse" />
         </main>
       </div>
@@ -56,7 +56,7 @@ export default function FinancialDashboard() {
     return (
       <div className="min-h-screen bg-background">
         <HeroNav />
-        <main className="max-w-2xl mx-auto px-6 py-20 text-center">
+        <main className="max-w-2xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
           <h1 className="font-display text-3xl font-bold text-foreground">Acceso restringido</h1>
           <p className="mt-3 text-muted-foreground">El dashboard financiero es solo para administradores.</p>
           <Button asChild className="mt-6 rounded-full">
@@ -84,8 +84,8 @@ export default function FinancialDashboard() {
     <div className="min-h-screen bg-background">
       <HeroNav />
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10 md:py-14">
-        <div className="flex items-center justify-between mb-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-14">
+        <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
             <Link
               to="/"

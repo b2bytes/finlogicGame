@@ -32,7 +32,7 @@ export default function Embajadores() {
       <main>
         <EmbajadoresHero />
 
-        <div className="max-w-3xl mx-auto px-6 pb-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pb-8">
           {loading ? (
             <div className="bg-card rounded-3xl p-8 border border-border animate-pulse h-48" />
           ) : user ? (
@@ -56,7 +56,7 @@ export default function Embajadores() {
           )}
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ImpactList />
         </div>
       </main>

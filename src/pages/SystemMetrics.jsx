@@ -72,7 +72,7 @@ export default function SystemMetrics() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 glass border-b border-border/40">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link
             to="/"
             className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -85,7 +85,7 @@ export default function SystemMetrics() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
         <div className="mb-8 animate-fade-up">
           <p className="text-xs font-semibold text-mint-600 mb-2 tracking-wider uppercase">
             Admin · Auto-evolución del sistema

@@ -97,15 +97,15 @@ export default function StatsBar() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
           {items.map((stat) => (
             <div
               key={stat.label}
-              className={`${stat.bg} rounded-[28px] p-6 md:p-7 hover:shadow-soft-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden`}
+              className={`${stat.bg} rounded-[24px] md:rounded-[28px] p-4 md:p-7 hover:shadow-soft-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden`}
             >
-              <div className="flex items-start justify-between mb-5">
-                <div className="w-11 h-11 rounded-2xl bg-white/70 backdrop-blur flex items-center justify-center">
-                  <stat.icon className={`w-5 h-5 ${stat.iconColor}`} strokeWidth={2.2} />
+              <div className="flex items-start justify-between mb-3 md:mb-5">
+                <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl bg-white/70 backdrop-blur flex items-center justify-center">
+                  <stat.icon className={`w-4 h-4 md:w-5 md:h-5 ${stat.iconColor}`} strokeWidth={2.2} />
                 </div>
                 <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-mint-700 bg-white/70 backdrop-blur px-2 py-1 rounded-full">
                   <ArrowUpRight className="w-2.5 h-2.5" />
@@ -113,12 +113,12 @@ export default function StatsBar() {
                 </span>
               </div>
 
-              <div className="font-display text-[34px] md:text-[42px] font-bold tracking-tight text-foreground leading-[0.95] tabular-nums">
+              <div className="font-display text-[26px] md:text-[42px] font-bold tracking-tight text-foreground leading-[0.95] tabular-nums">
                 {stat.value}
               </div>
 
-              <p className="mt-2 text-sm font-semibold text-foreground/80">{stat.label}</p>
-              <p className="text-xs text-foreground/55">{stat.sub}</p>
+              <p className="mt-1.5 md:mt-2 text-xs md:text-sm font-semibold text-foreground/80 leading-tight">{stat.label}</p>
+              <p className="text-[11px] md:text-xs text-foreground/55">{stat.sub}</p>
             </div>
           ))}
         </div>

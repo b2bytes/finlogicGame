@@ -28,7 +28,7 @@ export default function Casos() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 glass border-b border-border/40">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Volver
@@ -40,8 +40,8 @@ export default function Casos() {
 
       <CasosPublicHero count={casos.length} casos={casos} />
 
-      <main className="max-w-6xl mx-auto px-6 pb-20">
-        <div className="flex flex-wrap gap-2 mb-8 justify-center">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
+        <div className="flex gap-2 mb-8 justify-center flex-wrap overflow-x-auto">
           {ORGANISMS.map((o) => (
             <button
               key={o}
