@@ -3,10 +3,11 @@ import ReactMarkdown from 'react-markdown';
 import { Scale, Clock, CheckCircle2, ShieldCheck } from 'lucide-react';
 import UrgencyBadge from './UrgencyBadge';
 import ShareWhatsApp from './ShareWhatsApp';
+import PipelineBreakdown from './PipelineBreakdown';
 
 export default function ResponseCard({ response, traceId, query }) {
   if (!response) return null;
-  const { fact, translation, action, lawsCited = [], legalDeadlineDays, verifierScore, urgencyLevel } = response;
+  const { fact, translation, action, lawsCited = [], legalDeadlineDays, verifierScore, urgencyLevel, pipeline } = response;
 
   return (
     <div className="space-y-5 animate-fade-up">
@@ -62,6 +63,9 @@ export default function ResponseCard({ response, traceId, query }) {
           </p>
         </div>
       )}
+
+      {/* Pipeline transparente — diferenciador FinLogic */}
+      <PipelineBreakdown pipeline={pipeline} />
 
       {/* Compartir WhatsApp — loop viral */}
       <ShareWhatsApp response={response} query={query} />
