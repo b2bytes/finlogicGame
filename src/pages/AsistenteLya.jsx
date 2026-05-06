@@ -6,6 +6,7 @@ import Logo from '@/components/home/Logo';
 import LyaMessage from '@/components/lya/LyaMessage';
 import LyaSources from '@/components/lya/LyaSources';
 import LyaActionCTA from '@/components/lya/LyaActionCTA';
+import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
 
 const SUGERENCIAS = [
   '¿Qué hago si no reconozco un cobro en mi tarjeta?',
@@ -39,6 +40,28 @@ export default function AsistenteLya() {
     setLoading(true);
 
     try {
+      // 1. Pre-filtro FAQ (deflection rápido <1s en preguntas frecuentes)
+      const faqResult = await base44.functions
+        .invoke('autoResolveFAQ', { query: q, channel: 'web' })
+        .catch(() => ({ data: { matched: false } }));
+
+      if (faqResult.data?.matched && faqResult.data.confidence >= 0.25) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: faqResult.data.response,
+            sources: ['FAQ canónica · ' + faqResult.data.faqQuestion],
+            confidence: 0.95,
+            regulatoryBody: 'ninguno',
+            query: q,
+            isFaq: true,
+          },
+        ]);
+        return;
+      }
+
+      // 2. Pipeline normativo completo
       const { data } = await base44.functions.invoke('lyaKnowledgeQuery', {
         query: q,
         mode: 'text',
@@ -116,12 +139,19 @@ export default function AsistenteLya() {
                     confidence={m.confidence}
                     regulatoryBody={m.regulatoryBody}
                   />
-                  <LyaActionCTA
-                    query={m.query}
-                    response={m.content}
-                    regulatoryBody={m.regulatoryBody}
-                    suggestedAction={m.suggestedAction}
-                  />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <LyaActionCTA
+                      query={m.query}
+                      response={m.content}
+                      regulatoryBody={m.regulatoryBody}
+                      suggestedAction={m.suggestedAction}
+                    />
+                    <LyaShareWhatsApp
+                      query={m.query}
+                      response={m.content}
+                      sources={m.sources}
+                    />
+                  </div>
                 </div>
               )}
             </div>

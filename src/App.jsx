@@ -61,6 +61,7 @@ const AuthenticatedApp = () => {
       <Route path="/Soporte" element={<Soporte />} />
       <Route path="/B2B/APIKeys" element={<B2BAPIKeys />} />
       <Route path="/Casos" element={<Casos />} />
+      <Route path="/CasosResueltos" element={<Casos />} />
       <Route path="/api-compliance" element={<APICompliance />} />
       <Route path="/Pyme" element={<Pyme />} />
       <Route path="/Pricing" element={<Pricing />} />

@@ -5,6 +5,7 @@ import Logo from '@/components/home/Logo';
 import FAQAccordion from '@/components/soporte/FAQAccordion';
 import TicketForm from '@/components/soporte/TicketForm';
 import SoporteChannels from '@/components/soporte/SoporteChannels';
+import SmartSearch from '@/components/soporte/SmartSearch';
 
 const PROFILE_TABS = [
   { key: 'all', label: 'Todas' },
@@ -48,6 +49,11 @@ export default function Soporte() {
             abajo y te respondemos según urgencia.
           </p>
         </div>
+
+        {/* Smart Search */}
+        <section className="mb-10">
+          <SmartSearch />
+        </section>
 
         {/* FAQs */}
         <section className="mb-12">
