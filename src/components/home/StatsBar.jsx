@@ -82,18 +82,25 @@ export default function StatsBar() {
   return (
     <section className="py-10 md:py-12">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-end justify-between flex-wrap gap-3 mb-7">
-          <div>
-            <p className="text-xs font-semibold text-mint-600 mb-2 uppercase tracking-wider">
-              Datos en producción
-            </p>
-            <h2 className="font-display text-3xl md:text-[40px] font-bold tracking-tight text-foreground leading-[1.05]">
+        <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 mb-3">
+              <span className="relative flex w-1.5 h-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-mint-500 opacity-60" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-mint-600" />
+              </span>
+              <p className="text-xs font-semibold text-mint-600 uppercase tracking-wider">
+                Tracción real · Producción
+              </p>
+            </div>
+            <h2 className="font-display text-3xl md:text-[44px] font-bold tracking-tight text-foreground leading-[1.02]">
               Justicia financiera<br />
-              <span className="text-mint-600">en tiempo real.</span>
+              <span className="text-mint-600">medida en segundos.</span>
             </h2>
           </div>
-          <p className="text-xs text-muted-foreground max-w-xs">
-            Métricas auditadas en vivo desde nuestro pipeline IA. Cada número es un caso real.
+          <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
+            Cada número viene del pipeline IA — sin mocks, sin estimaciones. Auditable en{' '}
+            <span className="font-semibold text-foreground">/Transparencia</span>.
           </p>
         </div>
 

@@ -11,9 +11,8 @@ import TrustSection from '@/components/home/TrustSection';
 import B2BSection from '@/components/home/B2BSection';
 import CTASection from '@/components/home/CTASection';
 import AntesDespues from '@/components/home/AntesDespues';
-import LiveActivityFeed from '@/components/home/LiveActivityFeed';
-import GuaranteeStrip from '@/components/home/GuaranteeStrip';
 import Footer from '@/components/home/Footer';
+import ImpactPullQuote from '@/components/home/ImpactPullQuote';
 import { useReferralCapture } from '@/lib/useReferralCapture';
 
 export default function Home() {
@@ -25,15 +24,14 @@ export default function Home() {
         <HeroSection />
         <MediaLogos />
         <StatsBar />
-        <LiveActivityFeed />
+        <ImpactPullQuote />
+        <AntesDespues />
         <HowItWorks />
         <RecentCasos />
-        <AntesDespues />
         <PerfilesSection />
         <TestimoniosSection />
-        <GuaranteeStrip />
-        <B2BSection />
         <TrustSection />
+        <B2BSection />
         <CTASection />
       </main>
       <Footer />
