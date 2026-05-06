@@ -2,30 +2,28 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Copy, Check } from 'lucide-react';
 
-const SAMPLE_REQUEST = `curl -X POST https://api.finlogic.one/v1/check-tmc \\
-  -H "Authorization: Bearer fl_live_••••••••" \\
+const SAMPLE_REQUEST = `curl -X POST https://api.finlogic.one/v1/lyaComplianceAPIEndpoint \\
+  -H "x-api-key: fl_live_••••••••" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "loanType": "consumo_no_reajustable",
-    "amountClp": 5000000,
-    "termMonths": 24,
-    "annualRate": 0.65
+    "endpoint": "check-tmc",
+    "payload": {
+      "rate": 65,
+      "productType": "consumo_no_reajustable"
+    }
   }'`;
 
 const SAMPLE_RESPONSE = {
-  isWithinTMC: false,
-  proposedAnnualRate: 0.65,
-  tmcCeilingAnnual: 0.4992,
-  excessPercentagePoints: 15.08,
-  legalBasis: 'Art. 6 bis, Ley 18.010',
-  riskFlags: ['tasa_excede_tmc', 'posible_usura'],
-  recommendedActions: [
-    'Ajustar tasa al máximo legal (49,92%)',
-    'Reemitir cotización al cliente',
-    'Documentar revisión interna',
-  ],
-  complianceScore: 18,
-  processedAt: '2026-05-06T15:34:21Z',
+  success: true,
+  endpoint: 'check-tmc',
+  latencyMs: 340,
+  callsRemaining: 9847,
+  data: {
+    compliant: false,
+    currentTMC: 49.92,
+    excess: 15.08,
+    legalBasis: 'Art. 6 bis Ley 18.010 · TMC publicada CMF',
+  },
 };
 
 export default function DemoCheckTMC() {
@@ -57,7 +55,7 @@ export default function DemoCheckTMC() {
             <div className="flex items-center justify-between px-5 py-3 bg-white/5 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-mint-500 text-white tracking-wider">POST</span>
-                <code className="text-xs font-mono text-white/80">/v1/check-tmc</code>
+                <code className="text-xs font-mono text-white/80">endpoint: check-tmc</code>
               </div>
               <button
                 onClick={handleCopy}
