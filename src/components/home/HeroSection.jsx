@@ -61,14 +61,15 @@ export default function HeroSection() {
               <LegalPill variant="law" size="sm">Ley 21.719</LegalPill>
             </div>
 
-            {/* Inline input row — pill estilo mockup */}
-            <div className="mt-7 sm:mt-8 flex items-center gap-1.5 sm:gap-2 bg-card rounded-full border border-border shadow-soft p-1.5 pl-4 sm:pl-5 max-w-xl">
+            {/* Inline input row — pill estilo mockup.
+                w-full + min-w-0 en input garantizan que NUNCA se desborde el viewport mobile. */}
+            <div className="mt-7 sm:mt-8 flex items-center gap-1 sm:gap-2 bg-card rounded-full border border-border shadow-soft p-1.5 pl-3 sm:pl-5 w-full max-w-xl">
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && goToConsulta(query)}
                 placeholder="Cuéntanos qué pasa…"
-                className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground/70 outline-none py-2 min-w-0"
+                className="flex-1 min-w-0 bg-transparent text-sm placeholder:text-muted-foreground/70 outline-none py-2"
               />
               <button
                 onClick={() => navigate('/Consulta?modo=voz')}
@@ -80,7 +81,7 @@ export default function HeroSection() {
               <button
                 onClick={() => goToConsulta(query)}
                 aria-label="Consultar"
-                className="h-10 px-4 sm:px-5 rounded-full bg-mint-600 hover:bg-mint-700 text-white text-sm font-semibold transition-colors inline-flex items-center gap-1.5 flex-shrink-0"
+                className="h-10 px-3.5 sm:px-5 rounded-full bg-mint-600 hover:bg-mint-700 text-white text-sm font-semibold transition-colors inline-flex items-center gap-1 sm:gap-1.5 flex-shrink-0"
               >
                 <span>Consultar</span>
                 <ArrowRight className="w-3.5 h-3.5" />
