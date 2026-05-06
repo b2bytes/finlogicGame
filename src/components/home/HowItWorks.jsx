@@ -42,18 +42,21 @@ export default function HowItWorks() {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="relative grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {/* Connector line — desktop only */}
+          <div aria-hidden="true" className="hidden lg:block absolute top-12 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-mint-200 to-transparent" />
+
           {steps.map((step, idx) => (
             <div
               key={step.number}
               className="group relative bg-card rounded-3xl p-7 border border-border/60 hover:border-mint-300 hover:shadow-soft transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-2xl bg-mint-50 flex items-center justify-center mb-5 group-hover:bg-mint-500 transition-colors">
+              <div className="relative w-12 h-12 rounded-2xl bg-mint-50 flex items-center justify-center mb-5 group-hover:bg-mint-500 transition-colors">
                 <step.icon className="w-6 h-6 text-mint-600 group-hover:text-white transition-colors" />
+                <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-foreground text-background text-[10px] font-bold flex items-center justify-center">
+                  {step.number}
+                </span>
               </div>
-              <p className="text-xs font-bold text-muted-foreground mb-2 tracking-wider">
-                {step.number}
-              </p>
               <h3 className="font-display text-xl font-bold text-foreground mb-2">
                 {step.title}
               </h3>

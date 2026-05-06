@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Mic, ShieldCheck, Heart, ArrowRight } from 'lucide-react';
+import { Mic, ShieldCheck, Heart, ArrowRight, Sparkles } from 'lucide-react';
 
 const QUICK_PILLS = [
   { label: 'Cobros indebidos', query: 'Tengo un cobro que no reconozco en mi tarjeta' },
@@ -46,11 +46,23 @@ export default function HeroSection() {
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-10 items-center">
-          {/* Left — Title + trust badge */}
+          {/* Left — Title + trust badge + sub-copy */}
           <div className="animate-fade-up">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-50 border border-mint-200 mb-6">
+              <Sparkles className="w-3.5 h-3.5 text-mint-700" />
+              <span className="text-xs font-semibold text-mint-700">
+                Sistema operativo financiero del pueblo de Chile
+              </span>
+            </div>
+
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05]">
               ¿Sabes cuánto te van a cobrar el día <span className="text-mint-600">28</span>?
             </h1>
+
+            <p className="mt-6 text-lg text-muted-foreground leading-relaxed max-w-xl">
+              Resolvemos cobros indebidos, fraudes y dudas financieras en lenguaje simple.
+              <span className="block mt-1 font-semibold text-foreground">Sin abogado. Sin letra chica. Gratis.</span>
+            </p>
 
             <div className="mt-8 inline-flex items-start gap-3 px-4 py-3 rounded-2xl bg-card border border-border shadow-soft">
               <div className="w-10 h-10 rounded-xl bg-mint-50 flex items-center justify-center flex-shrink-0">
@@ -59,6 +71,17 @@ export default function HeroSection() {
               <div className="text-sm">
                 <p className="font-semibold text-foreground">Registrada CMF · Ley Fintech 21.521</p>
                 <p className="text-muted-foreground text-xs mt-0.5">Tu seguridad protegida</p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center gap-6 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-mint-500 animate-pulse-soft" />
+                <span><span className="font-semibold text-foreground">12.847</span> consultas resueltas</span>
+              </div>
+              <div className="hidden sm:flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-mint-500" />
+                <span><span className="font-semibold text-foreground">49s</span> respuesta promedio</span>
               </div>
             </div>
           </div>

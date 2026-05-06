@@ -32,9 +32,9 @@ export default function TrustSection() {
           <p className="text-sm font-semibold text-mint-600 mb-3 tracking-wide uppercase">
             Por qué confiar
           </p>
-          <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            Construido con la misma rigurosidad
-            <span className="text-muted-foreground"> que un banco. Para defenderte de uno.</span>
+          <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.05]">
+            Mismo rigor que un banco.
+            <span className="block text-muted-foreground"> Para defenderte de uno.</span>
           </h2>
         </div>
 
