@@ -7,8 +7,7 @@ import { ArrowLeft, Send, ShieldCheck, AlertTriangle } from 'lucide-react';
 import Logo from '@/components/home/Logo';
 import PipelineLoader from '@/components/consulta/PipelineLoader';
 import ResponseCard from '@/components/consulta/ResponseCard';
-import AccessibilityToggle from '@/components/a11y/AccessibilityToggle';
-import SkinSwitcher from '@/components/skins/SkinSwitcher.jsx';
+import PreferencesMenu from '@/components/a11y/PreferencesMenu.jsx';
 import VoiceInput from '@/components/consulta/VoiceInput';
 import ConsultaSidePanel from '@/components/consulta/ConsultaSidePanel';
 import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
@@ -100,13 +99,12 @@ export default function Consulta() {
             Volver
           </Link>
           <Logo size="sm" />
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground mr-1">
               <ShieldCheck className="w-3.5 h-3.5 text-mint-600" />
               Sin login
             </div>
-            <SkinSwitcher />
-            <AccessibilityToggle />
+            <PreferencesMenu />
           </div>
         </div>
       </header>

@@ -12,7 +12,7 @@ import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
 import { useLyaNavigator } from '@/lib/useLyaNavigator.jsx';
 import { useLyaActions } from '@/lib/useLyaActions.jsx';
 import { useSkin } from '@/lib/SkinContext.jsx';
-import SkinSwitcher from '@/components/skins/SkinSwitcher.jsx';
+import PreferencesMenu from '@/components/a11y/PreferencesMenu.jsx';
 
 const SUGERENCIAS = [
   '¿Cuánto vale la UF hoy?',
@@ -184,11 +184,11 @@ export default function AsistenteLya() {
           </Link>
           <Logo size="sm" />
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-full bg-mint-50 border border-mint-200">
+            <div className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded-full bg-mint-50 border border-mint-200">
               <ShieldCheck className="w-3 h-3 text-mint-700" />
               <span className="text-[10px] font-semibold text-mint-700">Ley 21.521</span>
             </div>
-            <SkinSwitcher />
+            <PreferencesMenu />
           </div>
         </div>
       </header>
