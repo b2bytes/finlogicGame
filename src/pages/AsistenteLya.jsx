@@ -7,6 +7,7 @@ import LyaMessage from '@/components/lya/LyaMessage';
 import LyaSources from '@/components/lya/LyaSources';
 import LyaActionCTA from '@/components/lya/LyaActionCTA';
 import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
+import LyaTrustBadge from '@/components/lya/LyaTrustBadge';
 import LyaVoiceControls from '@/components/lya/LyaVoiceControls';
 import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
 import { useLyaNavigator } from '@/lib/useLyaNavigator.jsx';
@@ -150,6 +151,8 @@ export default function AsistenteLya() {
           content: finalContent,
           sources: data?.sources,
           confidence: data?.confidence,
+          verifierScore: data?.verifierScore,
+          hallucinationRisk: data?.hallucinationRisk,
           regulatoryBody: data?.regulatoryBody,
           suggestedAction: data?.suggestedAction,
           query: q,
@@ -219,7 +222,11 @@ export default function AsistenteLya() {
                     confidence={m.confidence}
                     regulatoryBody={m.regulatoryBody}
                   />
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <LyaTrustBadge
+                      verifierScore={m.verifierScore}
+                      hallucinationRisk={m.hallucinationRisk}
+                    />
                     <LyaActionCTA
                       query={m.query}
                       response={m.content}

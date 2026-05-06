@@ -5,6 +5,7 @@ import { Sparkles, X, Send, ArrowUpRight, Loader2, ShieldCheck } from 'lucide-re
 import ReactMarkdown from 'react-markdown';
 import { base44 } from '@/api/base44Client';
 import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
+import LyaTrustBadge from '@/components/lya/LyaTrustBadge';
 
 /**
  * LyaChatWidget — widget de chat flotante global de Lya (FinLogic).
@@ -95,6 +96,8 @@ export default function LyaChatWidget() {
           content: data.response || 'No pude procesar tu consulta. Intenta nuevamente.',
           sources: data.sources || [],
           confidence: data.confidence,
+          verifierScore: data.verifierScore,
+          hallucinationRisk: data.hallucinationRisk,
           regulatoryBody: data.regulatoryBody,
           suggestedAction: data.suggestedAction,
           ts: Date.now(),
@@ -462,10 +465,14 @@ function ChatBubble({ message, userQuery }) {
         )}
       </div>
 
-      {/* Sources (RAG) */}
-      {message.sources && message.sources.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pl-1 max-w-full">
-          {message.sources.slice(0, 3).map((src, i) => (
+      {/* Trust badge (verificador anti-alucinación) + Sources (RAG) */}
+      {(typeof message.verifierScore === 'number' || (message.sources && message.sources.length > 0)) && (
+        <div className="flex flex-wrap gap-1.5 pl-1 max-w-full items-center">
+          <LyaTrustBadge
+            verifierScore={message.verifierScore}
+            hallucinationRisk={message.hallucinationRisk}
+          />
+          {message.sources && message.sources.slice(0, 2).map((src, i) => (
             <span
               key={i}
               className="text-[10px] px-2 py-0.5 rounded-full bg-mint-50 text-mint-700 border border-mint-200 font-mono-editorial max-w-full truncate"
