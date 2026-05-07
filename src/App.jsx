@@ -30,6 +30,7 @@ import SystemMetrics from '@/pages/SystemMetrics';
 import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
 import LyaChatWidget from '@/components/lya/LyaChatWidget';
+import LyaVoiceCard from '@/components/lya/LyaVoiceCard';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import SkinAutoDetectToast from '@/components/skins/SkinAutoDetectToast.jsx';
 import EmbedLya from '@/pages/EmbedLya';
@@ -108,6 +109,16 @@ const AuthenticatedApp = () => {
     <ErrorBoundary scope="lya-widget" variant="silent">
       <LyaChatWidget />
     </ErrorBoundary>
+    {/* Lya voz global — card flotante bottom-left.
+        Excluida en rutas que ya tienen su propio widget de voz dedicado
+        (PitchDeck, AsistenteLya, Consulta, EmbedLya). */}
+    {!['/PitchDeck', '/AsistenteLya', '/Consulta', '/Embed/Lya'].some((p) =>
+      location?.pathname?.startsWith(p)
+    ) && (
+      <ErrorBoundary scope="lya-voice-card" variant="silent">
+        <LyaVoiceCard position="bottom-left" />
+      </ErrorBoundary>
+    )}
     <ErrorBoundary scope="shell" variant="silent">
       <SkinAutoDetectToast />
       <PWAInstallBanner />
