@@ -433,3 +433,9 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+@layer utilities {
+  /* Newsticker editorial: scroll horizontal limpio sin barra visible */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
