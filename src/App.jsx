@@ -46,11 +46,18 @@ import Demo from '@/pages/Demo';
 import Entregables from '@/pages/Entregables';
 import AdminCRM from '@/pages/AdminCRM';
 import Lanzamiento from '@/pages/Lanzamiento';
+import HealthCheck from '@/pages/HealthCheck';
 import SafeRoute from '@/components/SafeRoute';
+import { useVisitTracker } from '@/lib/useVisitTracker';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
   const location = useLocation();
+
+  // Tracker privado del recorrido del visitante. Falla en silencio si el
+  // backend no responde — NUNCA bloquea la app. Solo admin puede ver los
+  // datos resultantes en /Admin/HealthCheck.
+  useVisitTracker();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -108,6 +115,7 @@ const AuthenticatedApp = () => {
         <Route path="/Entregables" element={<SafeRoute name="Entregables"><Entregables /></SafeRoute>} />
         <Route path="/Admin/CRM" element={<SafeRoute name="AdminCRM"><AdminCRM /></SafeRoute>} />
         <Route path="/Admin/Lanzamiento" element={<SafeRoute name="Lanzamiento"><Lanzamiento /></SafeRoute>} />
+        <Route path="/Admin/HealthCheck" element={<SafeRoute name="HealthCheck"><HealthCheck /></SafeRoute>} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </ErrorBoundary>

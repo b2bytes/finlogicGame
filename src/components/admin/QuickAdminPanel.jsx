@@ -70,6 +70,7 @@ const SECTIONS = [
       { path: '/Admin/CRM', label: 'CRM · Bandeja personas', icon: Users, desc: 'Pipeline B2C/B2B/B2G unificado' },
       { path: '/OperacionesDashboard', label: 'Ops Dashboard', icon: Activity, desc: 'Pipeline KPIs + alertas' },
       { path: '/FinancialDashboard', label: 'FinOps · MRR', icon: DollarSign, desc: 'Métricas financieras' },
+      { path: '/Admin/HealthCheck', label: 'Health Check + Recorridos', icon: Activity, desc: 'Tester sistema + sesiones reales' },
       { path: '/Admin/SystemMetrics', label: 'System Metrics', icon: Zap, desc: 'Latencia + scores' },
       { path: '/Admin/ContentStudio', label: 'Content Studio', icon: FileText, desc: 'Generador social' },
       { path: '/Embed/Lya', label: 'Embed Lya', icon: Code2, desc: 'Widget embebible' },

@@ -1,0 +1,138 @@
+{
+  "name": "VisitTrace",
+  "type": "object",
+  "description": "Trace privado del recorrido de un visitante por la plataforma. Una fila por sesi\u00f3n (sessionId), con array de hits de p\u00e1ginas. Solo admin puede leer. Sirve para entender c\u00f3mo navegan los usuarios y detectar p\u00e1ginas con bounce alto.",
+  "properties": {
+    "sessionId": {
+      "type": "string",
+      "description": "ID an\u00f3nimo persistido en localStorage del visitante"
+    },
+    "userEmail": {
+      "type": "string",
+      "format": "email",
+      "description": "Email si el usuario est\u00e1 logueado al iniciar sesi\u00f3n"
+    },
+    "userRole": {
+      "type": "string",
+      "description": "Rol del usuario al inicio de la sesi\u00f3n: anonymous, user, admin"
+    },
+    "firstSeenAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lastSeenAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "totalPageviews": {
+      "type": "number",
+      "default": 0
+    },
+    "totalDurationSec": {
+      "type": "number",
+      "default": 0,
+      "description": "Suma de duraciones por p\u00e1gina (segundos)"
+    },
+    "uniquePaths": {
+      "type": "number",
+      "default": 0
+    },
+    "entryPath": {
+      "type": "string",
+      "description": "Primera ruta vista en la sesi\u00f3n"
+    },
+    "exitPath": {
+      "type": "string",
+      "description": "\u00daltima ruta vista en la sesi\u00f3n"
+    },
+    "referrer": {
+      "type": "string",
+      "description": "document.referrer al inicio"
+    },
+    "utmSource": {
+      "type": "string"
+    },
+    "utmMedium": {
+      "type": "string"
+    },
+    "utmCampaign": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "string"
+    },
+    "deviceType": {
+      "type": "string",
+      "enum": [
+        "mobile",
+        "tablet",
+        "desktop",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "language": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string",
+      "description": "Pa\u00eds detectado por header (cf-ipcountry / x-country)"
+    },
+    "hits": {
+      "type": "array",
+      "description": "Recorrido completo: cada elemento es un hit de p\u00e1gina",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "ts": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationSec": {
+            "type": "number",
+            "description": "Tiempo en la p\u00e1gina antes de salir"
+          },
+          "scrollDepthPct": {
+            "type": "number",
+            "description": "M\u00e1ximo scroll alcanzado (0-100)"
+          },
+          "errors": {
+            "type": "number",
+            "default": 0,
+            "description": "Errores JS reportados durante esta visita a la p\u00e1gina"
+          }
+        }
+      }
+    },
+    "errorsTotal": {
+      "type": "number",
+      "default": 0,
+      "description": "Total de errores acumulados en la sesi\u00f3n"
+    },
+    "interactedWithLya": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si abri\u00f3 el chat o voz de Lya en alg\u00fan momento"
+    }
+  },
+  "required": [
+    "sessionId",
+    "firstSeenAt"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    },
+    "write": {}
+  }
+}

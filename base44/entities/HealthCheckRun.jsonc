@@ -1,0 +1,103 @@
+{
+  "name": "HealthCheckRun",
+  "type": "object",
+  "description": "Resultado de una corrida del tester de salud de FinLogic. Recorre backend functions cr\u00edticas y reporta cu\u00e1les funcionan, cu\u00e1les fallan y con qu\u00e9 error. Solo admin puede ejecutar y leer.",
+  "properties": {
+    "runId": {
+      "type": "string",
+      "description": "ID legible de la corrida"
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "totalChecks": {
+      "type": "number",
+      "default": 0
+    },
+    "passed": {
+      "type": "number",
+      "default": 0
+    },
+    "failed": {
+      "type": "number",
+      "default": 0
+    },
+    "warnings": {
+      "type": "number",
+      "default": 0
+    },
+    "overallStatus": {
+      "type": "string",
+      "enum": [
+        "healthy",
+        "degraded",
+        "critical"
+      ],
+      "default": "healthy"
+    },
+    "checks": {
+      "type": "array",
+      "description": "Detalle por chequeo individual",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "backend",
+              "entity",
+              "integration",
+              "frontend",
+              "config"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ]
+          },
+          "latencyMs": {
+            "type": "number"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errorDetails": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "runId",
+    "startedAt"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": {
+          "$eq": "admin"
+        }
+      }
+    }
+  }
+}
