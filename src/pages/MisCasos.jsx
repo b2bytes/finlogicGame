@@ -15,9 +15,14 @@ export default function MisCasos() {
   const [filter, setFilter] = useState('all');
 
   const load = async () => {
-    const data = await base44.entities.MisCasos.list('-created_date', 50);
-    setCasos(data || []);
-    setLoading(false);
+    try {
+      const data = await base44.entities.MisCasos.list('-created_date', 50).catch(() => []);
+      setCasos(Array.isArray(data) ? data : []);
+    } catch (_) {
+      setCasos([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

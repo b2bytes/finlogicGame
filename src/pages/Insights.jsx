@@ -21,8 +21,9 @@ export default function Insights() {
       base44.entities.AgentTrace.list('-created_date', 500).catch(() => []),
       base44.entities.MisCasos.list('-created_date', 500).catch(() => []),
     ]).then(([traces, casos]) => {
-      const tracesArr = traces || [];
-      const casosArr = casos || [];
+      try {
+      const tracesArr = Array.isArray(traces) ? traces : [];
+      const casosArr = Array.isArray(casos) ? casos : [];
 
       // Agregaciones anónimas
       const breakdownMap = DEFAULT_BODIES.reduce((acc, b) => ({ ...acc, [b]: 0 }), {});
@@ -68,6 +69,11 @@ export default function Insights() {
       });
       setBreakdown(breakdownMap);
       setNormatives(normativeMap);
+      } catch (_) {
+        setStats({ totalConsultas: 0, criticalCases: 0, avgScore: 80, uniqueCitizens: 0 });
+      }
+    }).catch(() => {
+      setStats({ totalConsultas: 0, criticalCases: 0, avgScore: 80, uniqueCitizens: 0 });
     });
   }, []);
 

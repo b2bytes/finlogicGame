@@ -40,6 +40,7 @@ import QuickAdminPanel from '@/components/admin/QuickAdminPanel';
 import Rubrica from '@/pages/Rubrica';
 import Demo from '@/pages/Demo';
 import Entregables from '@/pages/Entregables';
+import SafeRoute from '@/components/SafeRoute';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
@@ -69,36 +70,36 @@ const AuthenticatedApp = () => {
     <ScrollToTop />
     <ErrorBoundary scope="routes" key={location?.pathname || 'routes'}>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/Consulta" element={<Consulta />} />
-        <Route path="/Transparencia" element={<Transparencia />} />
-        <Route path="/MisCasos" element={<MisCasos />} />
-        <Route path="/Soporte" element={<Soporte />} />
-        <Route path="/MisSoporte" element={<MisSoporte />} />
-        <Route path="/B2B/APIKeys" element={<B2BAPIKeys />} />
-        <Route path="/Casos" element={<Casos />} />
-        <Route path="/CasosResueltos" element={<Casos />} />
-        <Route path="/api-compliance" element={<APICompliance />} />
-        <Route path="/Pyme" element={<Pyme />} />
-        <Route path="/Pricing" element={<Pricing />} />
-        <Route path="/FinancialDashboard" element={<FinancialDashboard />} />
-        <Route path="/Marca" element={<Marca />} />
-        <Route path="/MisCasos/:id" element={<CasoDetalle />} />
-        <Route path="/PitchDeck" element={<PitchDeck />} />
-        <Route path="/OperacionesDashboard" element={<OperacionesDashboard />} />
-        <Route path="/Embajadores" element={<Embajadores />} />
-        <Route path="/Insights" element={<Insights />} />
-        <Route path="/Pro" element={<Pro />} />
-        <Route path="/Admin/SystemMetrics" element={<SystemMetrics />} />
-        <Route path="/AsistenteLya" element={<AsistenteLya />} />
-        <Route path="/Admin/ContentStudio" element={<ContentStudio />} />
-        <Route path="/Embed/Lya" element={<EmbedLya />} />
-        <Route path="/Diseno" element={<Diseno />} />
-        <Route path="/Diseño" element={<Diseno />} />
-        <Route path="/Rubrica" element={<Rubrica />} />
-        <Route path="/Rúbrica" element={<Rubrica />} />
-        <Route path="/Demo" element={<Demo />} />
-        <Route path="/Entregables" element={<Entregables />} />
+        <Route path="/" element={<SafeRoute name="Home"><Home /></SafeRoute>} />
+        <Route path="/Consulta" element={<SafeRoute name="Consulta"><Consulta /></SafeRoute>} />
+        <Route path="/Transparencia" element={<SafeRoute name="Transparencia"><Transparencia /></SafeRoute>} />
+        <Route path="/MisCasos" element={<SafeRoute name="MisCasos"><MisCasos /></SafeRoute>} />
+        <Route path="/Soporte" element={<SafeRoute name="Soporte"><Soporte /></SafeRoute>} />
+        <Route path="/MisSoporte" element={<SafeRoute name="MisSoporte"><MisSoporte /></SafeRoute>} />
+        <Route path="/B2B/APIKeys" element={<SafeRoute name="B2BAPIKeys"><B2BAPIKeys /></SafeRoute>} />
+        <Route path="/Casos" element={<SafeRoute name="Casos"><Casos /></SafeRoute>} />
+        <Route path="/CasosResueltos" element={<SafeRoute name="CasosResueltos"><Casos /></SafeRoute>} />
+        <Route path="/api-compliance" element={<SafeRoute name="APICompliance"><APICompliance /></SafeRoute>} />
+        <Route path="/Pyme" element={<SafeRoute name="Pyme"><Pyme /></SafeRoute>} />
+        <Route path="/Pricing" element={<SafeRoute name="Pricing"><Pricing /></SafeRoute>} />
+        <Route path="/FinancialDashboard" element={<SafeRoute name="FinancialDashboard"><FinancialDashboard /></SafeRoute>} />
+        <Route path="/Marca" element={<SafeRoute name="Marca"><Marca /></SafeRoute>} />
+        <Route path="/MisCasos/:id" element={<SafeRoute name="CasoDetalle"><CasoDetalle /></SafeRoute>} />
+        <Route path="/PitchDeck" element={<SafeRoute name="PitchDeck"><PitchDeck /></SafeRoute>} />
+        <Route path="/OperacionesDashboard" element={<SafeRoute name="OperacionesDashboard"><OperacionesDashboard /></SafeRoute>} />
+        <Route path="/Embajadores" element={<SafeRoute name="Embajadores"><Embajadores /></SafeRoute>} />
+        <Route path="/Insights" element={<SafeRoute name="Insights"><Insights /></SafeRoute>} />
+        <Route path="/Pro" element={<SafeRoute name="Pro"><Pro /></SafeRoute>} />
+        <Route path="/Admin/SystemMetrics" element={<SafeRoute name="SystemMetrics"><SystemMetrics /></SafeRoute>} />
+        <Route path="/AsistenteLya" element={<SafeRoute name="AsistenteLya"><AsistenteLya /></SafeRoute>} />
+        <Route path="/Admin/ContentStudio" element={<SafeRoute name="ContentStudio"><ContentStudio /></SafeRoute>} />
+        <Route path="/Embed/Lya" element={<SafeRoute name="EmbedLya"><EmbedLya /></SafeRoute>} />
+        <Route path="/Diseno" element={<SafeRoute name="Diseno"><Diseno /></SafeRoute>} />
+        <Route path="/Diseño" element={<SafeRoute name="Diseno"><Diseno /></SafeRoute>} />
+        <Route path="/Rubrica" element={<SafeRoute name="Rubrica"><Rubrica /></SafeRoute>} />
+        <Route path="/Rúbrica" element={<SafeRoute name="Rubrica"><Rubrica /></SafeRoute>} />
+        <Route path="/Demo" element={<SafeRoute name="Demo"><Demo /></SafeRoute>} />
+        <Route path="/Entregables" element={<SafeRoute name="Entregables"><Entregables /></SafeRoute>} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </ErrorBoundary>

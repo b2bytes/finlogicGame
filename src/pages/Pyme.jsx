@@ -21,23 +21,32 @@ export default function Pyme() {
 
   const loadPymes = async () => {
     setLoading(true);
-    const list = await base44.entities.PymeProfile.list('-created_date', 20);
-    setPymes(list);
-    if (list.length > 0 && !activePyme) {
-      await selectPyme(list[0]);
+    try {
+      const list = await base44.entities.PymeProfile.list('-created_date', 20).catch(() => []);
+      setPymes(list || []);
+      if (list && list.length > 0 && !activePyme) {
+        await selectPyme(list[0]);
+      }
+    } catch (_) {
+      setPymes([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const selectPyme = async (pyme) => {
     setActivePyme(pyme);
     setSummary('');
-    const a = await base44.entities.TaxAlert.filter(
-      { pymeProfileId: pyme.id },
-      '-created_date',
-      50
-    );
-    setAlerts(a);
+    try {
+      const a = await base44.entities.TaxAlert.filter(
+        { pymeProfileId: pyme.id },
+        '-created_date',
+        50
+      ).catch(() => []);
+      setAlerts(a || []);
+    } catch (_) {
+      setAlerts([]);
+    }
   };
 
   useEffect(() => {
@@ -47,41 +56,51 @@ export default function Pyme() {
 
   const handleCreate = async (form) => {
     setAnalyzing(true);
-    const created = await base44.entities.PymeProfile.create(form);
-    const res = await base44.functions.invoke('analyzeTaxSituation', {
-      pymeProfileId: created.id,
-    });
-    if (res?.data?.summary) setSummary(res.data.summary);
-    const refreshed = await base44.entities.PymeProfile.get(created.id);
-    setActivePyme(refreshed);
-    const a = await base44.entities.TaxAlert.filter(
-      { pymeProfileId: created.id },
-      '-created_date',
-      50
-    );
-    setAlerts(a);
-    const list = await base44.entities.PymeProfile.list('-created_date', 20);
-    setPymes(list);
-    setShowForm(false);
-    setAnalyzing(false);
+    try {
+      const created = await base44.entities.PymeProfile.create(form);
+      const res = await base44.functions.invoke('analyzeTaxSituation', {
+        pymeProfileId: created.id,
+      }).catch(() => ({ data: {} }));
+      if (res?.data?.summary) setSummary(res.data.summary);
+      const refreshed = await base44.entities.PymeProfile.get(created.id).catch(() => created);
+      setActivePyme(refreshed);
+      const a = await base44.entities.TaxAlert.filter(
+        { pymeProfileId: created.id },
+        '-created_date',
+        50
+      ).catch(() => []);
+      setAlerts(a || []);
+      const list = await base44.entities.PymeProfile.list('-created_date', 20).catch(() => []);
+      setPymes(list || []);
+      setShowForm(false);
+    } catch (_) {
+      // Silent: usuario sin permiso o sin sesión
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const handleReanalyze = async () => {
     if (!activePyme) return;
     setAnalyzing(true);
-    const res = await base44.functions.invoke('analyzeTaxSituation', {
-      pymeProfileId: activePyme.id,
-    });
-    if (res?.data?.summary) setSummary(res.data.summary);
-    const refreshed = await base44.entities.PymeProfile.get(activePyme.id);
-    setActivePyme(refreshed);
-    const a = await base44.entities.TaxAlert.filter(
-      { pymeProfileId: activePyme.id },
-      '-created_date',
-      50
-    );
-    setAlerts(a);
-    setAnalyzing(false);
+    try {
+      const res = await base44.functions.invoke('analyzeTaxSituation', {
+        pymeProfileId: activePyme.id,
+      }).catch(() => ({ data: {} }));
+      if (res?.data?.summary) setSummary(res.data.summary);
+      const refreshed = await base44.entities.PymeProfile.get(activePyme.id).catch(() => activePyme);
+      setActivePyme(refreshed);
+      const a = await base44.entities.TaxAlert.filter(
+        { pymeProfileId: activePyme.id },
+        '-created_date',
+        50
+      ).catch(() => []);
+      setAlerts(a || []);
+    } catch (_) {
+      // Silent
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const showOnboarding = !loading && (pymes.length === 0 || showForm);

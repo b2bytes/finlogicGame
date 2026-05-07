@@ -17,10 +17,13 @@ export default function Casos() {
     base44.entities.MisCasos
       .filter({ status: 'resuelto' }, '-created_date', 60)
       .then((data) => {
-        setCasos(data || []);
+        setCasos(Array.isArray(data) ? data : []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setCasos([]);
+        setLoading(false);
+      });
   }, []);
 
   const filtered = filter === 'all' ? casos : casos.filter((c) => c.regulatoryBody === filter);
