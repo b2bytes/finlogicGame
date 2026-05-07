@@ -1,6 +1,7 @@
 // lyaNavigationTools.js — Catálogo central de páginas y secciones que Lya
 // puede usar para navegar la plataforma. Mantiene su conocimiento sincronizado
 // entre frontend (client tools) y backend (system prompt del agente).
+// v1.1 · cache-bust HMR — incluye fillField, clickByLyaAction, triggerLyaToast, openLyaChat.
 
 // Páginas principales con descripción para el agente.
 export const LYA_PAGES = [
