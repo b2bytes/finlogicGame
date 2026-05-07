@@ -69,8 +69,8 @@ function AgentNode({ agent }) {
         )}
       </div>
       <div className="text-center">
-        <p className="text-[11px] font-bold text-white leading-tight">{agent.name}</p>
-        <p className="text-[10px] text-white/50 leading-tight">{agent.role}</p>
+        <p className="text-[11px] font-geist font-bold text-white leading-tight">{agent.name}</p>
+        <p className="text-[10px] font-geist text-white/50 leading-tight">{agent.role}</p>
       </div>
     </motion.div>
   );
@@ -90,7 +90,7 @@ function ConnectionLine({ from, to, label, labelX, labelY }) {
         opacity="0.5"
       />
       <foreignObject x={`${labelX - 12}%`} y={`${labelY - 2}%`} width="120" height="20">
-        <div className="text-[9px] font-mono uppercase tracking-wider text-mint-300/80 bg-[#0a1410]/90 px-1.5 py-0.5 rounded inline-block whitespace-nowrap">
+        <div className="text-[9px] font-grotesk uppercase tracking-[0.15em] text-mint-300/80 bg-[#0a1410]/90 px-1.5 py-0.5 rounded inline-block whitespace-nowrap font-medium">
           {label}
         </div>
       </foreignObject>
@@ -106,11 +106,11 @@ export default function AgentNetworkPanel() {
 
       {/* Header pill */}
       <div className="relative z-20 flex items-center justify-between mb-4">
-        <div className="inline-flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.15em] text-mint-300 bg-mint-500/10 border border-mint-400/20 px-2.5 py-1 rounded-full">
+        <div className="inline-flex items-center gap-2 text-[10px] font-grotesk uppercase tracking-[0.18em] text-mint-300 bg-mint-500/10 border border-mint-400/20 px-2.5 py-1 rounded-full font-medium">
           <span className="w-1.5 h-1.5 rounded-full bg-mint-400 animate-pulse" />
           IMPACT LAB
         </div>
-        <div className="text-[10px] font-mono text-white/50 tabular-nums">
+        <div className="text-[10px] font-geist-mono text-white/50 tabular-nums">
           9 consultas · <span className="text-mint-300">90/100</span>
         </div>
       </div>
@@ -139,14 +139,14 @@ export default function AgentNetworkPanel() {
       <div className="relative z-10 mt-4 pt-4 border-t border-white/5">
         <div className="flex items-center gap-1.5 mb-2">
           <CheckCircle2 className="w-3.5 h-3.5 text-mint-400" />
-          <span className="text-[12px] font-semibold text-white">Verifiable metatags</span>
+          <span className="text-[12px] font-geist font-semibold text-white">Verifiable metatags</span>
         </div>
-        <p className="text-[10px] text-white/40 mb-2.5">Click to verify.</p>
+        <p className="text-[10px] font-geist text-white/40 mb-2.5">Click to verify.</p>
         <div className="flex flex-wrap gap-1.5">
           {['Ley 19.496', 'Ley 21.713', 'Ley 21.719'].map((l) => (
             <span
               key={l}
-              className="text-[10px] font-mono text-mint-200 bg-mint-500/10 border border-mint-400/20 px-2 py-0.5 rounded-full"
+              className="text-[10px] font-geist-mono text-mint-200 bg-mint-500/10 border border-mint-400/20 px-2 py-0.5 rounded-full"
             >
               <CheckCircle2 className="w-2.5 h-2.5 inline mr-1 text-mint-400" />
               {l}
@@ -157,7 +157,7 @@ export default function AgentNetworkPanel() {
 
       {/* Bottom-left corner pill — equipo */}
       <div className="absolute bottom-3 left-3 z-20">
-        <div className="inline-flex items-center gap-1.5 text-[10px] font-mono text-white/60 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">
+        <div className="inline-flex items-center gap-1.5 text-[10px] font-grotesk text-white/60 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">
           <ShieldCheck className="w-3 h-3" />
           Equipo · <span className="text-mint-300">+K</span>
         </div>

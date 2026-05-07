@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fraunces:opsz,wght,SOFT@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fraunces:opsz,wght,SOFT@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -173,6 +173,32 @@
 }
 
 @layer utilities {
+  /* Instrument Serif — serif elegante alto contraste estilo Opus 4.7 / Apple
+     Para headlines hero, frases editoriales con pull elegante */
+  .font-instrument {
+    font-family: 'Instrument Serif', 'Fraunces', Georgia, serif;
+    font-feature-settings: "ss01";
+    letter-spacing: -0.02em;
+  }
+  .font-instrument-italic {
+    font-family: 'Instrument Serif', 'Fraunces', Georgia, serif;
+    font-style: italic;
+    letter-spacing: -0.015em;
+  }
+  /* Geist — sans premium tech (Vercel) para UI moderna y legible */
+  .font-geist {
+    font-family: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11", "tnum";
+  }
+  .font-geist-mono {
+    font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+    font-feature-settings: "tnum", "zero";
+  }
+  /* Space Grotesk — sans geométrico para eyebrows técnicos y data labels */
+  .font-grotesk {
+    font-family: 'Space Grotesk', 'Inter', ui-sans-serif, sans-serif;
+    letter-spacing: 0.005em;
+  }
   /* Editorial serif — headlines tipo deck v11 (Fraunces alto contraste) */
   .font-editorial {
     font-family: 'Fraunces', 'Tiempos Headline', Georgia, serif;

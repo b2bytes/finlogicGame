@@ -34,9 +34,9 @@ export default function OpusNav() {
         {/* Logo FL — adaptado dark */}
         <Link to="/" aria-label="FinLogic — Ir al inicio" className="flex items-center gap-2.5 flex-shrink-0">
           <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-mint-400 to-mint-600 flex items-center justify-center shadow-[0_0_24px_rgba(34,197,94,0.35)]">
-            <span className="text-white font-display font-bold text-[15px] tracking-tight">FL</span>
+            <span className="text-white font-geist font-bold text-[14px] tracking-tight">FL</span>
           </div>
-          <span className="font-display font-bold tracking-tight text-white text-lg">
+          <span className="font-geist font-bold tracking-tight text-white text-lg">
             FinLogic
           </span>
         </Link>
@@ -49,7 +49,7 @@ export default function OpusNav() {
                 key={item.to}
                 to={item.to}
                 aria-current={active ? 'page' : undefined}
-                className={`text-[13px] font-medium px-3.5 py-1.5 rounded-full transition-colors ${
+                className={`text-[13px] font-geist font-medium px-3.5 py-1.5 rounded-full transition-colors ${
                   active
                     ? 'text-mint-300 bg-mint-500/10'
                     : 'text-white/70 hover:text-white hover:bg-white/5'
@@ -63,7 +63,7 @@ export default function OpusNav() {
 
         <div className="flex items-center gap-2">
           {/* Pill Ley 21.521 */}
-          <div className="hidden md:inline-flex items-center gap-1.5 text-[11px] text-mint-200 bg-mint-500/10 border border-mint-400/20 px-3 py-1.5 rounded-full">
+          <div className="hidden md:inline-flex items-center gap-1.5 text-[11px] text-mint-200 bg-mint-500/10 border border-mint-400/20 px-3 py-1.5 rounded-full font-geist">
             <ShieldCheck className="w-3 h-3 text-mint-300" aria-hidden />
             <span className="font-semibold tracking-tight">Ley 21.521</span>
           </div>
@@ -71,7 +71,7 @@ export default function OpusNav() {
           {/* Preferencias */}
           <button
             type="button"
-            className="hidden md:inline-flex items-center gap-1.5 text-[12px] text-white/80 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-full transition-colors"
+            className="hidden md:inline-flex items-center gap-1.5 text-[12px] font-geist text-white/80 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-full transition-colors"
           >
             <SlidersHorizontal className="w-3 h-3" aria-hidden />
             <span className="font-medium">Preferencias</span>
@@ -80,7 +80,7 @@ export default function OpusNav() {
           {/* CTA principal */}
           <Link
             to="/Consulta"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-white hover:bg-white/95 text-[#0a1410] h-9 px-4 text-[13px] font-bold transition-all hover:scale-[1.02]"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-white hover:bg-white/95 text-[#0a1410] h-9 px-4 text-[13px] font-geist font-bold transition-all hover:scale-[1.02]"
           >
             Consultar gratis
             <ArrowRight className="w-3.5 h-3.5" aria-hidden />

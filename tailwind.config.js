@@ -8,7 +8,10 @@ module.exports = {
   			sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
   			display: ['Plus Jakarta Sans', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
   			editorial: ['Fraunces', 'Tiempos Headline', 'Georgia', 'serif'],
-  			mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+  			instrument: ['"Instrument Serif"', 'Fraunces', 'Georgia', 'serif'],
+  			geist: ['Geist', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  			grotesk: ['"Space Grotesk"', 'Inter', 'ui-sans-serif', 'sans-serif'],
+  			mono: ['"Geist Mono"', '"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
   		},
   		borderRadius: {
   			'2xs': '0.375rem',

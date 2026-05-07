@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mic, ArrowRight } from 'lucide-react';
-import HeroVortex from './HeroVortex';
+import LyaOrb from './LyaOrb';
 
 /**
  * HeroCenterPanel — el panel central de la home Opus.
@@ -34,7 +34,7 @@ export default function HeroCenterPanel() {
           {['REGISTRADA CMF', 'LEY FINTECH 21.521', 'PIPELINE IA EN VIVO'].map((tag, i) => (
             <React.Fragment key={tag}>
               {i > 0 && <span className="text-mint-400/40 text-[10px]">·</span>}
-              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-mint-300/90">
+              <span className="text-[10px] font-grotesk uppercase tracking-[0.22em] text-mint-300/90 font-medium">
                 <span className="text-mint-400 mr-1.5">●</span>
                 {tag}
               </span>
@@ -42,26 +42,26 @@ export default function HeroCenterPanel() {
           ))}
         </motion.div>
 
-        {/* Headline editorial */}
+        {/* Headline Instrument Serif — alto contraste estilo Opus */}
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
-          className="font-editorial text-white text-center text-[40px] sm:text-[52px] lg:text-[60px] leading-[1.05] tracking-tight mb-4"
+          className="font-instrument text-white text-center text-[44px] sm:text-[56px] lg:text-[64px] leading-[1.02] tracking-[-0.025em] mb-4"
         >
           Tu derecho financiero,
           <br />
-          en tu idioma. <span className="font-editorial-italic text-mint-200">Ahora.</span>
+          en tu idioma. <span className="font-instrument-italic text-mint-200">Ahora.</span>
         </motion.h1>
 
-        {/* Vortex IA */}
+        {/* LYA ORB — el orbe ES Lya. Click → conversación de voz */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="relative flex items-center justify-center mt-2 sm:mt-4"
+          className="relative flex items-center justify-center mt-2 sm:mt-4 pb-6"
         >
-          <HeroVortex size={300} />
+          <LyaOrb size={300} />
         </motion.div>
       </div>
 
@@ -71,9 +71,9 @@ export default function HeroCenterPanel() {
           {/* Texto + waveform */}
           <div className="flex items-center gap-4 min-w-0">
             <div className="flex-1 min-w-0">
-              <p className="text-[14px] sm:text-[15px] text-white/80 leading-snug">
-                Banco, SII, fraude, cripto, datos personales o pyme. Cuéntanos qué te pasa: lo traduce tu derecho y identifica tu deuda.{' '}
-                <span className="text-white font-semibold">La Gratis. Ahora.</span>
+              <p className="font-geist text-[14px] sm:text-[15px] text-white/80 leading-snug">
+                Banco, SII, fraude, cripto, datos personales o pyme. Cuéntanos qué te pasa: lo traducimos a tu derecho e identificamos tu defensa.{' '}
+                <span className="text-white font-semibold">Gratis. Ahora.</span>
               </p>
             </div>
             {/* Waveform visual */}
@@ -93,7 +93,7 @@ export default function HeroCenterPanel() {
 
             <Link
               to="/Consulta"
-              className="inline-flex items-center gap-2 rounded-full bg-white hover:bg-white/95 text-[#0a1410] h-12 px-5 sm:px-6 text-[14px] font-bold transition-all hover:scale-[1.02] shadow-[0_0_24px_rgba(255,255,255,0.15)]"
+              className="inline-flex items-center gap-2 rounded-full bg-white hover:bg-white/95 text-[#0a1410] h-12 px-5 sm:px-6 text-[14px] font-geist font-bold transition-all hover:scale-[1.02] shadow-[0_0_24px_rgba(255,255,255,0.15)]"
             >
               Iniciar caso
               <ArrowRight className="w-4 h-4" />

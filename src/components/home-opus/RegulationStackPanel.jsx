@@ -38,13 +38,13 @@ export default function RegulationStackPanel() {
             />
             {/* Texto del sello */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-[11px] font-mono text-mint-300/80 uppercase tracking-wider leading-tight">
+              <span className="text-[10px] font-grotesk text-mint-300/80 uppercase tracking-[0.2em] leading-tight font-medium">
                 Ley
               </span>
-              <span className="font-display font-extrabold text-white text-[22px] leading-tight">
+              <span className="font-instrument italic text-white text-[24px] leading-[1.05]">
                 Fintech
               </span>
-              <span className="font-display font-extrabold text-mint-300 text-[24px] leading-tight tabular-nums">
+              <span className="font-geist font-extrabold text-mint-300 text-[24px] leading-tight tabular-nums tracking-tight">
                 21.521
               </span>
             </div>
@@ -59,11 +59,11 @@ export default function RegulationStackPanel() {
         <div className="relative space-y-2">
           <div className="flex items-start gap-2">
             <CheckCircle2 className="w-4 h-4 text-mint-400 flex-shrink-0 mt-0.5" />
-            <h3 className="text-[17px] font-bold text-white leading-tight">
+            <h3 className="text-[17px] font-geist font-bold text-white leading-tight tracking-tight">
               Ley Fintech 21.521
             </h3>
           </div>
-          <div className="flex items-center gap-3 text-[11px] pl-6">
+          <div className="flex items-center gap-3 text-[11px] pl-6 font-geist">
             <span className="text-white/60">
               <span className="text-mint-400 mr-1">●</span>Registrada CMF
             </span>
@@ -83,14 +83,14 @@ export default function RegulationStackPanel() {
       >
         <div className="flex items-start justify-between mb-3">
           <div>
-            <h3 className="font-display font-bold text-[#0a1410] text-[17px] leading-tight">
+            <h3 className="font-instrument text-[#0a1410] text-[20px] leading-[1.05]">
               Mandato Ciudadano
             </h3>
-            <p className="font-display font-bold text-[#0a1410] text-[17px] leading-tight">
+            <p className="font-instrument italic text-mint-700 text-[20px] leading-[1.05]">
               Smart Contract
             </p>
           </div>
-          <div className="inline-flex items-center gap-1 text-[10px] font-mono uppercase text-mint-700 bg-mint-100 border border-mint-300 px-2 py-0.5 rounded-full">
+          <div className="inline-flex items-center gap-1 text-[10px] font-grotesk uppercase tracking-wider text-mint-700 bg-mint-100 border border-mint-300 px-2 py-0.5 rounded-full font-medium">
             <FileSignature className="w-2.5 h-2.5" />
             Ready firmar
           </div>
@@ -99,25 +99,25 @@ export default function RegulationStackPanel() {
         {/* Items verificación */}
         <ul className="space-y-2 mb-4">
           {[
-            'Conselvos corilcoisms e a velinclane aunce neecotaro con es la sadda ciudadana.',
-            'Cuanviten confirmada arende mnetar o ses spcenia podera el la sevella ciudadama.',
+            'Tu consulta queda registrada con sello de tiempo y vinculada a la normativa chilena vigente.',
+            'Cualquier ciudadano puede auditar la trazabilidad completa del caso desde Transparencia.',
           ].map((line, i) => (
             <li key={i} className="flex items-start gap-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-mint-600 flex-shrink-0 mt-0.5" />
-              <span className="text-[11px] text-slate-600 leading-snug">{line}</span>
+              <span className="text-[11px] font-geist text-slate-600 leading-snug">{line}</span>
             </li>
           ))}
         </ul>
 
         {/* Verificación ciudadana */}
         <div className="space-y-2">
-          <p className="text-[11px] font-semibold text-[#0a1410]">Verificación ciudadana</p>
+          <p className="text-[11px] font-geist font-semibold text-[#0a1410]">Verificación ciudadana</p>
           <div className="relative">
             <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mint-600" />
             <input
               readOnly
-              value="Verificado ciudadano"
-              className="w-full h-10 pl-9 pr-3 rounded-xl bg-mint-50 border border-mint-200 text-[12px] font-medium text-mint-800 cursor-default"
+              value="Verificado · ciudadano"
+              className="w-full h-10 pl-9 pr-3 rounded-xl bg-mint-50 border border-mint-200 text-[12px] font-geist font-medium text-mint-800 cursor-default"
             />
           </div>
         </div>
@@ -125,7 +125,7 @@ export default function RegulationStackPanel() {
         {/* CTA sutil */}
         <Link
           to="/Transparencia"
-          className="mt-4 block text-center text-[11px] font-semibold text-mint-700 hover:text-mint-800 underline-offset-2 hover:underline"
+          className="mt-4 block text-center text-[11px] font-geist font-semibold text-mint-700 hover:text-mint-800 underline-offset-2 hover:underline"
         >
           Ver auditoría pública →
         </Link>
