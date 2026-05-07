@@ -11,7 +11,7 @@ import { useReferralCapture } from '@/lib/useReferralCapture.jsx';
 export default function HomeOpus() {
   useReferralCapture();
   return (
-    <div className="min-h-screen bg-[#050b08] text-white overflow-x-clip relative">
+    <div className="lg:h-screen lg:overflow-hidden bg-[#050b08] text-white overflow-x-clip relative">
       {/* Background base con gradiente sutil */}
       <div
         aria-hidden
@@ -21,9 +21,9 @@ export default function HomeOpus() {
             'radial-gradient(ellipse at top, rgba(13,31,23,0.8) 0%, rgba(5,11,8,1) 60%)',
         }}
       />
-      <div className="relative z-10">
+      <div className="relative z-10 lg:h-screen lg:flex lg:flex-col">
         <OpusNav />
-        <main>
+        <main className="lg:flex-1 lg:min-h-0">
           <OpusHero />
         </main>
       </div>

@@ -1,19 +1,20 @@
 import React from 'react';
-import AgentNetworkPanel from './AgentNetworkPanel';
+import LiveImpactPanel from './LiveImpactPanel';
 import HeroCenterPanel from './HeroCenterPanel';
 import RegulationStackPanel from './RegulationStackPanel';
 
 /**
- * OpusHero — composición principal de la home Opus 4.7.
- * Grid 3 columnas en desktop: agents (3) | center (6) | regulation (3).
- * Mobile: stack vertical, center-panel primero.
+ * OpusHero — composición principal de la home Opus 4.7 SIN SCROLL.
+ * Llena exactamente el viewport (h-[calc(100vh-64px)]) en lg+.
+ * Grid 3 cols: live impact (3) | center hero+orb+voz (6) | regulation (3).
+ * Mobile: stack vertical scrollable (necesario para usabilidad).
  */
 
 export default function OpusHero() {
   return (
     <section
       id="main"
-      className="relative min-h-[calc(100vh-64px)] py-6 sm:py-8 px-3 sm:px-5 lg:px-6"
+      className="relative lg:h-[calc(100vh-64px)] lg:overflow-hidden py-4 lg:py-4 px-3 sm:px-5 lg:px-5"
     >
       {/* Aurora de fondo */}
       <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -27,19 +28,19 @@ export default function OpusHero() {
         />
       </div>
 
-      <div className="relative max-w-[1280px] mx-auto grid lg:grid-cols-12 gap-4 lg:gap-5">
-        {/* Center primero en mobile, en col-2 en desktop */}
-        <div className="lg:col-span-6 lg:order-2">
+      <div className="relative max-w-[1320px] mx-auto h-full grid lg:grid-cols-12 gap-3 lg:gap-4">
+        {/* Center primero en mobile */}
+        <div className="lg:col-span-6 lg:order-2 lg:h-full lg:min-h-0">
           <HeroCenterPanel />
         </div>
 
-        {/* Left — agents */}
-        <div className="lg:col-span-3 lg:order-1">
-          <AgentNetworkPanel />
+        {/* Left — live impact (real data) */}
+        <div className="lg:col-span-3 lg:order-1 lg:h-full lg:min-h-0">
+          <LiveImpactPanel />
         </div>
 
-        {/* Right — regulation */}
-        <div className="lg:col-span-3 lg:order-3">
+        {/* Right — regulation + smart contract */}
+        <div className="lg:col-span-3 lg:order-3 lg:h-full lg:min-h-0">
           <RegulationStackPanel />
         </div>
       </div>

@@ -49,10 +49,15 @@ export default function LyaOrb({ size = 300 }) {
     await startConversation();
   };
 
+  // Si no se pasa size, ocupa el 100% del contenedor padre (responsive)
+  const containerStyle = size
+    ? { width: size, height: size }
+    : { width: '100%', height: '100%' };
+
   return (
     <div
       className="relative mx-auto select-none"
-      style={{ width: size, height: size }}
+      style={containerStyle}
     >
       {/* Halo aurora externo — varía con intensidad */}
       <motion.div

@@ -14,9 +14,9 @@ import LyaOrb from './LyaOrb';
 
 export default function HeroCenterPanel() {
   return (
-    <div className="relative h-full min-h-[600px] flex flex-col gap-4">
-      {/* Card superior — headline + vortex */}
-      <div className="relative flex-1 rounded-[28px] bg-gradient-to-br from-[#0d1f17]/90 via-[#0a1410]/85 to-[#081210]/90 border border-mint-500/10 overflow-hidden p-7 sm:p-9">
+    <div className="relative h-full flex flex-col gap-3">
+      {/* Card superior — headline + orb (compact viewport-fit) */}
+      <div className="relative flex-1 min-h-0 rounded-[24px] bg-gradient-to-br from-[#0d1f17]/90 via-[#0a1410]/85 to-[#081210]/90 border border-mint-500/10 overflow-hidden p-5 sm:p-6 flex flex-col">
         {/* Glow centro */}
         <div className="absolute inset-0 pointer-events-none">
           <div
@@ -29,74 +29,80 @@ export default function HeroCenterPanel() {
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative flex items-center justify-center gap-2 mb-6 flex-wrap"
+          className="relative flex items-center justify-center gap-2 mb-3 flex-wrap flex-shrink-0"
         >
           {['REGISTRADA CMF', 'LEY FINTECH 21.521', 'PIPELINE IA EN VIVO'].map((tag, i) => (
             <React.Fragment key={tag}>
               {i > 0 && <span className="text-mint-400/40 text-[10px]">·</span>}
-              <span className="text-[10px] font-grotesk uppercase tracking-[0.22em] text-mint-300/90 font-medium">
-                <span className="text-mint-400 mr-1.5">●</span>
+              <span className="text-[9px] font-grotesk uppercase tracking-[0.22em] text-mint-300/90 font-medium">
+                <span className="text-mint-400 mr-1">●</span>
                 {tag}
               </span>
             </React.Fragment>
           ))}
         </motion.div>
 
-        {/* Headline Instrument Serif — alto contraste estilo Opus */}
+        {/* Headline Instrument Serif — viewport-aware (clamp) */}
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.6 }}
-          className="font-instrument text-white text-center text-[44px] sm:text-[56px] lg:text-[64px] leading-[1.02] tracking-[-0.025em] mb-4"
+          className="font-instrument text-white text-center leading-[1.02] tracking-[-0.025em] mb-2 flex-shrink-0"
+          style={{ fontSize: 'clamp(28px, 4.2vw, 56px)' }}
         >
           Tu derecho financiero,
           <br />
           en tu idioma. <span className="font-instrument-italic text-mint-200">Ahora.</span>
         </motion.h1>
 
-        {/* LYA ORB — el orbe ES Lya. Click → conversación de voz */}
+        {/* LYA ORB — flex-1 absorbe el espacio sobrante con orb centrado */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="relative flex items-center justify-center mt-2 sm:mt-4 pb-6"
+          className="relative flex-1 min-h-0 flex items-center justify-center"
         >
-          <LyaOrb size={300} />
+          <div
+            style={{
+              width: 'min(260px, 28vh)',
+              height: 'min(260px, 28vh)',
+              position: 'relative',
+            }}
+          >
+            <LyaOrb size={undefined} />
+          </div>
         </motion.div>
       </div>
 
-      {/* Card inferior — descripción + voice + CTA */}
-      <div className="relative rounded-[24px] bg-gradient-to-br from-[#0d1f17]/95 via-[#0a1410]/90 to-[#081210]/95 border border-mint-500/10 overflow-hidden p-5 sm:p-6">
-        <div className="grid sm:grid-cols-[1fr_auto] gap-4 sm:gap-6 items-center">
-          {/* Texto + waveform */}
-          <div className="flex items-center gap-4 min-w-0">
+      {/* Card inferior — descripción + voice + CTA (compact) */}
+      <div className="relative rounded-[20px] bg-gradient-to-br from-[#0d1f17]/95 via-[#0a1410]/90 to-[#081210]/95 border border-mint-500/10 overflow-hidden p-4 flex-shrink-0">
+        <div className="grid sm:grid-cols-[1fr_auto] gap-3 sm:gap-4 items-center">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="flex-1 min-w-0">
-              <p className="font-geist text-[14px] sm:text-[15px] text-white/80 leading-snug">
-                Banco, SII, fraude, cripto, datos personales o pyme. Cuéntanos qué te pasa: lo traducimos a tu derecho e identificamos tu defensa.{' '}
+              <p className="font-geist text-[12px] sm:text-[13px] text-white/80 leading-snug line-clamp-2">
+                Banco, SII, fraude, cripto, datos o pyme. Cuéntanos qué pasó: traducimos a tu derecho.{' '}
                 <span className="text-white font-semibold">Gratis. Ahora.</span>
               </p>
             </div>
-            {/* Waveform visual */}
             <Waveform />
           </div>
 
-          {/* Acciones — mic + CTA */}
-          <div className="flex items-center gap-2.5 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               type="button"
               aria-label="Hablar"
-              className="relative w-12 h-12 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 flex items-center justify-center transition-all hover:scale-105 group"
+              className="relative w-10 h-10 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 flex items-center justify-center transition-all hover:scale-105"
             >
-              <span className="absolute inset-0 rounded-full bg-mint-400/30 animate-ping opacity-50" />
-              <Mic className="relative w-5 h-5 text-white" />
+              <span className="absolute inset-0 rounded-full bg-mint-400/30 animate-ping opacity-40" />
+              <Mic className="relative w-4 h-4 text-white" />
             </button>
 
             <Link
               to="/Consulta"
-              className="inline-flex items-center gap-2 rounded-full bg-white hover:bg-white/95 text-[#0a1410] h-12 px-5 sm:px-6 text-[14px] font-geist font-bold transition-all hover:scale-[1.02] shadow-[0_0_24px_rgba(255,255,255,0.15)]"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white hover:bg-white/95 text-[#0a1410] h-10 px-4 sm:px-5 text-[13px] font-geist font-bold transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(255,255,255,0.15)]"
             >
               Iniciar caso
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
@@ -106,10 +112,10 @@ export default function HeroCenterPanel() {
 }
 
 function Waveform() {
-  // 22 barras animadas tipo equalizer
+  // 16 barras animadas tipo equalizer (compact)
   return (
-    <div className="hidden sm:flex items-center gap-[3px] h-10 flex-shrink-0" aria-hidden="true">
-      {Array.from({ length: 22 }).map((_, i) => (
+    <div className="hidden md:flex items-center gap-[3px] h-8 flex-shrink-0" aria-hidden="true">
+      {Array.from({ length: 16 }).map((_, i) => (
         <motion.span
           key={i}
           className="w-[2px] rounded-full bg-mint-300/80"
