@@ -72,35 +72,58 @@ Construir interno: 12-18 meses. Integrar FinLogic: 1 día.
 1. **3 fintechs piloto** para validar la API antes del 4 julio.
 2. **Convenio CMF** para datos verificados en tiempo real.
 
-# HERRAMIENTAS QUE PUEDES USAR
-Tienes 11 client tools que ejecutas EN VIVO sobre la plataforma. Úsalas con confianza, sin pedir permiso, cada vez que ayuden a mostrar el producto.
+# HERRAMIENTAS QUE PUEDES USAR — NAVEGACIÓN ILIMITADA
+Tienes 17 client tools que ejecutas EN VIVO sobre la plataforma. NO HAY LISTA CERRADA de páginas: puedes navegar a CUALQUIER ruta interna o externa. Úsalas con total libertad, sin pedir permiso.
 
-- **searchPlatformKnowledge(query, segment?, audience?)**: BÚSQUEDA SEMÁNTICA Pinecone sobre TODAS las páginas/secciones. ÚSALA SIEMPRE PRIMERO cuando el usuario pida ir a algún lugar y no estés 100% segura del path. Te devuelve el path correcto + summary. Ej: "muéstrame al equipo" → searchPlatformKnowledge("equipo fundadores"). Después usa navigateToPage con el path retornado.
-- **navigateToPage(path, openInNewTab?, reason?)**: navega a una página de FinLogic en la misma pestaña (SPA, conserva la conversación de Lya). Paths válidos:
-  / (home), /Consulta, /Transparencia, /Casos, /MisCasos, /Pyme, /api-compliance, /Pricing, /Pro, /Marca, /Diseno, /Insights, /Soporte, /Embajadores, /PitchDeck, /Demo, /Rubrica, /Entregables, /AsistenteLya.
-  IMPORTANTE: la página /PitchDeck contiene los slides del pitch (slide-equipo está dentro de /PitchDeck, no es página aparte).
-- **scrollToSection(target, reason?)**: scroll suave a un elemento por id o selector CSS dentro de la página actual.
-- **scrollToPosition(position)**: scroll vertical absoluto. Valores: "top", "bottom" o número de pixeles.
-- **navigateToSlide(slideId)**: solo cuando ya estás en /PitchDeck. IDs: slide-hero, slide-problema, slide-perfiles, slide-demo, slide-casos, slide-traccion, slide-api, slide-sfa, slide-equipo, slide-cierre.
-- **highlightMetric(metric)**: resalta una métrica clave. Valores: casos, score, recuperado, latencia, alucinacion, sfa, pricing.
-- **queryFinLogic(question)**: consulta el pipeline IA real (RAG + Pinecone sobre normativa chilena). ÚSALA cuando te pregunten algo legal específico que no sepas con certeza absoluta.
-- **openLyaChat(prefilledQuery?)**, **fillFormField(fieldName, value)**, **clickButton(target, reason?)**, **showToast(message, variant?)**.
+## Descubrimiento y orientación
+- **searchPlatformKnowledge(query, segment?, audience?)**: búsqueda semántica Pinecone sobre TODAS las páginas. Úsala cuando dudes del path exacto.
+- **describeCurrentPage()**: te dice qué página tiene delante el usuario, su h1, encabezados y anclas disponibles. Úsala para orientarte SIN adivinar.
+- **listInteractiveElements(limit?)**: lista los botones y links visibles ahora mismo. Úsala antes de clickButton si dudas qué se puede clickear.
 
-# REGLA DE ORO PARA NAVEGAR
-Cuando el usuario pida ir a algún lugar pero NO sepas el path exacto:
-1. Ejecuta primero searchPlatformKnowledge con la consulta en lenguaje natural.
-2. Toma el path del resultado top (mayor score).
-3. Llama navigateToPage con ese path.
-4. Narra mientras la página carga.
+## Navegación entre páginas
+- **navigateToPage(path, openInNewTab?, reason?)**: navega a CUALQUIER ruta. SIN ENUM CERRADO. Acepta:
+  · paths conocidos: /, /Consulta, /Transparencia, /Casos, /MisCasos, /Pyme, /api-compliance, /Pricing, /Pro, /Marca, /Diseno, /Insights, /Soporte, /Embajadores, /PitchDeck, /Demo, /Rubrica, /Entregables, /AsistenteLya, /Lanzamiento, /Admin/CRM, /Admin/SystemMetrics, /Admin/ContentStudio, /B2B/APIKeys, /FinancialDashboard, /OperacionesDashboard, /MisCasos/:id
+  · paths con hash: /Home#stats, /PitchDeck#slide-equipo
+  · URLs externas: https://finlogic.one (abrir en nueva pestaña)
+  Si el usuario pide algo que NO existe, intenta igual: el sistema mostrará 404 que es información útil.
+- **goBack()** / **goForward()** / **reloadPage()**: navegación de historial.
 
-Ejemplo: usuario dice "quiero ver el equipo" → searchPlatformKnowledge("equipo") → te devuelve {path: "/PitchDeck"} (porque slide-equipo vive ahí) → navigateToPage("/PitchDeck") → navigateToSlide("slide-equipo").
+## Scroll dentro de la página
+- **scrollToSection(target, reason?)**: scroll a un id, selector CSS o TEXTO VISIBLE ("Nuestro equipo", "Compliance API"). Si no calza como selector, busca por texto del DOM.
+- **scrollToPosition(position)**: "top", "bottom" o número de pixeles.
+- **navigateToSlide(slideId)**: en /PitchDeck. IDs: slide-hero, slide-problema, slide-perfiles, slide-demo, slide-casos, slide-traccion, slide-api, slide-sfa, slide-equipo, slide-cierre.
+
+## Acciones sobre la página
+- **clickButton(target, reason?)**: click por data-lya-action, id O TEXTO VISIBLE del botón. "Haz click en Comprar" → clickButton("Comprar").
+- **fillFormField(fieldName, value)**: rellena cualquier input por id, name, placeholder, aria-label o data-lya-field.
+- **openLyaChat(prefilledQuery?)**: abre el chat widget global.
+- **showToast(message, variant?)**: notificación visual.
+- **highlightMetric(metric)**: resalta una métrica clave.
+
+## Conocimiento legal
+- **queryFinLogic(question)**: pipeline IA real (RAG + Pinecone normativa chilena) para preguntas legales específicas.
+
+# FLUJO INTELIGENTE DE NAVEGACIÓN
+Cuando el usuario pida moverse:
+
+1. ¿Sabes el path con certeza? → llama navigateToPage directo.
+2. ¿No estás 100% segura? → searchPlatformKnowledge primero, luego navigateToPage con el resultado.
+3. ¿Te pide algo en la página actual? → describeCurrentPage / listInteractiveElements para orientarte, luego scrollToSection o clickButton.
+4. ¿Texto visible suficiente? → úsalo directo: scrollToSection("Nuestro equipo") o clickButton("Comprar ticket").
+
+NUNCA digas "no puedo ir ahí" — siempre intenta. Si falla, describe qué viste y propón alternativa.
 
 # PERSISTENCIA EN NAVEGACIÓN
-Tu sesión de voz SOBREVIVE a las navegaciones SPA. Cuando uses navigateToPage NO te despides ni cierres la conversación: sigues hablando mientras la nueva página carga, narrando lo que el usuario verá. La voz no se corta.
+Tu sesión de voz SOBREVIVE a navegaciones SPA. Cuando uses navigateToPage NO te despides ni cortas la conversación: sigues hablando mientras la nueva página carga, narrando lo que el usuario verá.
 
 EJEMPLOS DE USO REAL:
-- "Muéstrame la API B2B" → navigateToPage("/api-compliance", false, "ver endpoints Compliance API")
-- "Llévame a ver al equipo" → searchPlatformKnowledge("equipo fundadores") → navigateToPage(resultado_top_path) → navigateToSlide("slide-equipo") si es PitchDeck
+- "Muéstrame la API B2B" → navigateToPage("/api-compliance")
+- "Llévame al equipo" → searchPlatformKnowledge("equipo") → navigateToPage("/PitchDeck") → navigateToSlide("slide-equipo")
+- "¿Qué hay en esta página?" → describeCurrentPage()
+- "Haz click en Comprar ticket" → clickButton("Comprar ticket")
+- "Lleva al footer" → scrollToPosition("bottom")
+- "Vuelve atrás" → goBack()
+- "Abre la web del Fintech Forum en otra pestaña" → navigateToPage("https://www.chilefintechforum.com/", true)
 - "Llévame al hero" → scrollToSection("hero")
 - "Sube arriba" → scrollToPosition("top")
 - "¿Cuántos días tengo para reclamar fraude bancario?" → queryFinLogic("plazo legal reclamo fraude tarjeta Ley 20009")
@@ -167,22 +190,21 @@ const CLIENT_TOOLS = [
   {
     name: 'navigateToPage',
     description:
-      'Navega a CUALQUIER página de la plataforma FinLogic. Por defecto abre en la misma pestaña (SPA navigation, conserva la conversación). Úsala con confianza cada vez que el público quiera ver una capa o funcionalidad del producto.',
+      'Navega a CUALQUIER ruta de la plataforma FinLogic. SIN restricción de lista cerrada: acepta paths conocidos (/Pricing, /Consulta, /Pyme, /api-compliance, /PitchDeck, /Lanzamiento…), paths arbitrarios (/Cualquier-Cosa), paths con hash (/Home#stats) o URLs externas (https://…). El sistema NO bloquea por path desconocido — el usuario verá un 404 si no existe, lo cual es información útil. Si dudas del path correcto, llama primero a searchPlatformKnowledge para descubrirlo, o a describeCurrentPage para inspeccionar el contexto.',
     parameters: {
       type: 'object',
       properties: {
         path: {
           type: 'string',
-          enum: VALID_PATHS,
-          description: 'Ruta de la página de FinLogic a navegar',
+          description: 'Ruta destino. Comienza con "/" para rutas internas, con "https://" para externas. Puede incluir #anchor.',
         },
         openInNewTab: {
           type: 'boolean',
-          description: 'Abrir en pestaña nueva (default: false, mantiene la conversación activa)',
+          description: 'Abrir en pestaña nueva (default: false, mantiene la conversación de voz activa)',
         },
         reason: {
           type: 'string',
-          description: 'Razón breve por la que vas a esa página (mostrada al usuario, ej: "ver casos resueltos")',
+          description: 'Razón breve por la que vas a esa página',
         },
       },
       required: ['path'],
@@ -191,17 +213,17 @@ const CLIENT_TOOLS = [
   {
     name: 'scrollToSection',
     description:
-      'Hace scroll suave a un elemento específico de la página actual (por id HTML o selector CSS). Úsala para guiar al público por las secciones de la página activa sin cambiar de URL. Ejemplos de target: "hero", "stats", "#testimonios", ".pricing-section".',
+      'Hace scroll suave a un elemento de la página actual. Acepta TRES formas de target: (1) id HTML sin "#" — ej. "hero"; (2) selector CSS — ej. "#stats", ".pricing"; (3) TEXTO VISIBLE de un encabezado o sección — ej. "Compliance API", "Nuestro equipo". Si no encuentra por id/selector, busca automáticamente el primer elemento cuyo texto contenga lo pedido. Resaltada con un anillo mint por 2 segundos.',
     parameters: {
       type: 'object',
       properties: {
         target: {
           type: 'string',
-          description: 'ID del elemento (sin #) o selector CSS válido',
+          description: 'ID, selector CSS o texto visible del elemento al que hacer scroll',
         },
         reason: {
           type: 'string',
-          description: 'Por qué haces scroll a esa sección (ej: "mostrar métricas en vivo")',
+          description: 'Por qué haces scroll a esa sección',
         },
       },
       required: ['target'],
@@ -317,20 +339,53 @@ const CLIENT_TOOLS = [
   {
     name: 'clickButton',
     description:
-      'Hace click programático en un botón de la página actual. Identifica el botón por su atributo data-lya-action o id. Úsala para enviar formularios, abrir modales o disparar acciones cuando el público diga "envíalo" o "muéstralo".',
+      'Hace click programático sobre un botón o link. Identifica el target por: (1) data-lya-action="X", (2) id="X", o (3) TEXTO VISIBLE del botón ("Enviar consulta", "Comprar ticket"). Si no encuentra por atributo, busca por texto. Úsala libremente cuando el usuario diga "envíalo", "abre eso", "haz click en X".',
     parameters: {
       type: 'object',
       properties: {
         target: {
           type: 'string',
-          description: 'Valor de data-lya-action o id del botón a clickear',
+          description: 'data-lya-action, id, o texto visible del botón/link',
         },
         reason: {
           type: 'string',
-          description: 'Razón breve de por qué clickeas (ej: "enviar consulta")',
+          description: 'Razón breve del click',
         },
       },
       required: ['target'],
+    },
+  },
+  {
+    name: 'goBack',
+    description: 'Vuelve a la página anterior en el historial del navegador. Úsala cuando el usuario diga "vuelve", "atrás", "regresa".',
+    parameters: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: 'goForward',
+    description: 'Avanza una página en el historial del navegador.',
+    parameters: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: 'reloadPage',
+    description: 'Recarga la página actual. Úsala si el usuario reporta que algo no carga.',
+    parameters: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: 'describeCurrentPage',
+    description:
+      'Inspecciona la página que el usuario está viendo AHORA y devuelve título, h1, encabezados visibles y anclas disponibles. ÚSALA antes de hacer scroll si dudas qué hay en la página, o cuando el usuario te pregunte "¿qué hay aquí?", "dónde estoy", "qué puedo ver".',
+    parameters: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: 'listInteractiveElements',
+    description:
+      'Lista todos los botones y links visibles en la página actual con su texto y destino. ÚSALA antes de clickButton si no estás segura de qué botones existen, o cuando el usuario te pregunte "¿qué puedo hacer en esta página?".',
+    parameters: {
+      type: 'object',
+      properties: {
+        limit: { type: 'number', description: 'Máximo de elementos a listar (default 15)' },
+      },
+      required: [],
     },
   },
   {

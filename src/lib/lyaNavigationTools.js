@@ -83,15 +83,105 @@ export function scrollToPosition(position) {
 }
 
 // Helper: navegar a una página (misma pestaña por defecto).
+// Acepta CUALQUIER path interno: si no comienza con "/" lo agrega.
+// También acepta query strings (?x=1) y hash (#section).
 export function navigateToPath(path, openInNewTab = false) {
+  if (!path) return false;
+  let target = String(path).trim();
+  if (!target.startsWith('/') && !target.startsWith('http')) {
+    target = '/' + target;
+  }
   if (openInNewTab) {
-    window.open(`${window.location.origin}${path}`, '_blank', 'noopener,noreferrer');
+    const url = target.startsWith('http') ? target : `${window.location.origin}${target}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
     return true;
   }
-  // Navegación SPA si estamos dentro de la misma origin
-  window.history.pushState({}, '', path);
+  // Navegación SPA dentro de la misma origin
+  window.history.pushState({}, '', target);
   window.dispatchEvent(new PopStateEvent('popstate'));
+  // Si trae hash, hacer scroll al ancla después del re-render
+  if (target.includes('#')) {
+    const anchor = target.split('#')[1];
+    setTimeout(() => {
+      const el = document.getElementById(anchor);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 350);
+  }
   return true;
+}
+
+// Helper: history navigation
+export function goBackHistory() { try { window.history.back(); return true; } catch (_) { return false; } }
+export function goForwardHistory() { try { window.history.forward(); return true; } catch (_) { return false; } }
+export function reloadPage() { try { window.location.reload(); return true; } catch (_) { return false; } }
+
+// Helper: encontrar elementos por TEXTO VISIBLE (sin requerir id/data-attr).
+// Devuelve el primer match cuyo textContent contenga `text` (case-insensitive).
+export function findByText(text, tagsHint = ['a', 'button', 'h1', 'h2', 'h3', 'h4', 'section', 'nav', 'p']) {
+  if (!text) return null;
+  const needle = String(text).toLowerCase().trim();
+  const candidates = document.querySelectorAll(tagsHint.join(','));
+  let best = null;
+  let bestLen = Infinity;
+  candidates.forEach((el) => {
+    const txt = (el.textContent || '').toLowerCase().trim();
+    if (txt.includes(needle) && txt.length < bestLen && el.offsetParent !== null) {
+      best = el; bestLen = txt.length;
+    }
+  });
+  return best;
+}
+
+// Helper: scroll a elemento por TEXTO VISIBLE
+export function scrollToText(text) {
+  const el = findByText(text);
+  if (!el) return false;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.style.transition = 'box-shadow 0.6s ease';
+  el.style.boxShadow = '0 0 0 4px hsl(var(--mint-400) / 0.55)';
+  setTimeout(() => { el.style.boxShadow = ''; }, 2000);
+  return true;
+}
+
+// Helper: click por TEXTO VISIBLE (botones, links)
+export function clickByText(text) {
+  const el = findByText(text, ['button', 'a', '[role="button"]']);
+  if (!el) return false;
+  el.click();
+  return true;
+}
+
+// Helper: describir página actual (qué ve el usuario)
+export function describeCurrentPage() {
+  const path = window.location.pathname;
+  const title = document.title;
+  const h1 = document.querySelector('h1')?.textContent?.trim() || '';
+  const headings = Array.from(document.querySelectorAll('h2, h3'))
+    .slice(0, 8)
+    .map((h) => h.textContent?.trim())
+    .filter(Boolean);
+  const anchors = Array.from(document.querySelectorAll('[id]'))
+    .filter((el) => el.id && !el.id.startsWith('radix-') && el.offsetParent !== null)
+    .slice(0, 12)
+    .map((el) => el.id);
+  return { path, title, h1, headings, anchors };
+}
+
+// Helper: listar elementos interactivos visibles (links + botones) en la página
+export function listInteractiveElements(limit = 20) {
+  const items = [];
+  const selectors = 'a[href], button, [role="button"], [data-lya-action]';
+  document.querySelectorAll(selectors).forEach((el) => {
+    if (el.offsetParent === null) return;
+    const label = (el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 80);
+    if (!label) return;
+    const kind = el.tagName.toLowerCase() === 'a' ? 'link' : 'button';
+    const href = el.getAttribute('href');
+    const action = el.getAttribute('data-lya-action');
+    items.push({ kind, label, ...(href ? { href } : {}), ...(action ? { action } : {}) });
+    if (items.length >= limit) return;
+  });
+  return items.slice(0, limit);
 }
 
 // ─── Fase 1 · Helpers de interacción avanzada ────────────────────────

@@ -10,11 +10,18 @@ import {
   LYA_SLIDES,
   scrollToElement,
   scrollToPosition,
+  scrollToText,
   navigateToPath,
+  goBackHistory,
+  goForwardHistory,
+  reloadPage,
   fillField,
   clickByLyaAction,
+  clickByText,
   triggerLyaToast,
   openLyaChat,
+  describeCurrentPage,
+  listInteractiveElements,
 } from '@/lib/lyaNavigationTools';
 
 /**
@@ -65,26 +72,27 @@ export default function LyaVoiceCard({
   // Disponibles SIEMPRE (no solo en pitchMode): Lya navega cualquier página
   // y hace scroll a cualquier sección de la app.
   const clientToolsObj = {
-    // Navegar a una página de la plataforma (misma pestaña por defecto)
+    // Navegar a CUALQUIER página de la plataforma — sin lista cerrada.
+    // Acepta paths absolutos (/Pricing), relativos (Pricing), con hash (/#stats)
+    // o URLs externas (https://…). El sistema NUNCA bloquea por path desconocido.
     navigateToPage: ({ path, openInNewTab = false, reason }) => {
-      const validPaths = LYA_PAGES.map((p) => p.path);
-      if (!validPaths.includes(path)) {
-        return `Ruta ${path} no existe. Usa solo: ${validPaths.join(', ')}`;
-      }
+      if (!path) return 'Falta el parámetro "path"';
       navigateToPath(path, openInNewTab);
       const pageName = LYA_PAGES.find((p) => p.path === path)?.name || path;
       showAction(`→ ${pageName}`);
       return `Navegando a ${pageName}${reason ? ` para ${reason}` : ''}`;
     },
 
-    // Scroll suave a un elemento por id o selector CSS
+    // Scroll suave a un elemento por id, selector CSS o por TEXTO VISIBLE.
+    // Si "target" no calza como selector, intenta buscar por texto del DOM.
     scrollToSection: ({ target, reason }) => {
-      const ok = scrollToElement(target);
+      let ok = scrollToElement(target);
+      if (!ok) ok = scrollToText(target);
       if (ok) {
         showAction(`↓ ${target}`);
-        return `OK, scroll a ${target}${reason ? ` (${reason})` : ''}`;
+        return `OK, scroll a "${target}"${reason ? ` (${reason})` : ''}`;
       }
-      return `No encontré el elemento ${target} en esta página`;
+      return `No encontré "${target}" en esta página. Prueba con texto visible exacto o un id.`;
     },
 
     // Scroll a posición vertical (top, bottom, número)
@@ -153,14 +161,38 @@ export default function LyaVoiceCard({
       return `No encontré el campo "${fieldName}" en esta página`;
     },
 
-    // Click programático sobre un botón marcado con data-lya-action
+    // Click sobre un botón: primero por data-lya-action/id, luego por texto visible.
     clickButton: ({ target, reason }) => {
-      const ok = clickByLyaAction(target);
+      let ok = clickByLyaAction(target);
+      if (!ok) ok = clickByText(target);
       if (ok) {
         showAction(`👆 ${target}`);
-        return `Click ejecutado en ${target}${reason ? ` (${reason})` : ''}`;
+        return `Click ejecutado en "${target}"${reason ? ` (${reason})` : ''}`;
       }
       return `No encontré el botón "${target}" en esta página`;
+    },
+
+    // ─── Navegación de historial ───────────────────────────────────
+    goBack: () => { goBackHistory(); showAction('← Atrás'); return 'Volviendo a la página anterior'; },
+    goForward: () => { goForwardHistory(); showAction('→ Adelante'); return 'Avanzando en el historial'; },
+    reloadPage: () => { showAction('↻ Recargando'); reloadPage(); return 'Página recargada'; },
+
+    // ─── Inspección de la página actual ───────────────────────────
+    // Le dice a Lya qué tiene delante para que decida sin adivinar.
+    describeCurrentPage: () => {
+      const info = describeCurrentPage();
+      return `Página actual: ${info.path} ("${info.h1 || info.title}"). Secciones: ${info.headings.join(' · ') || 'sin h2/h3'}. Anclas disponibles: ${info.anchors.join(', ') || 'ninguna'}.`;
+    },
+
+    // Lista los botones y links visibles para que Lya pueda hacer click certero.
+    listInteractiveElements: ({ limit = 15 } = {}) => {
+      const items = listInteractiveElements(limit);
+      if (items.length === 0) return 'No hay elementos interactivos visibles';
+      return items.map((it) => {
+        const tag = it.kind === 'link' ? `[link "${it.label}"${it.href ? ` → ${it.href}` : ''}]`
+                                       : `[button "${it.label}"${it.action ? ` action=${it.action}` : ''}]`;
+        return tag;
+      }).join('\n');
     },
 
     // Mostrar toast visual (notificación elegante)
