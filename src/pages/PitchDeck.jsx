@@ -11,7 +11,7 @@ import SlideSection from '@/components/pitchdeck/SlideSection';
 import PerfilCard from '@/components/pitchdeck/PerfilCard';
 import CasoOutcomeCard from '@/components/pitchdeck/CasoOutcomeCard';
 import MetricCard from '@/components/pitchdeck/MetricCard';
-import LyaPitchPresenter from '@/components/pitchdeck/LyaPitchPresenter';
+import LyaConversationalLive from '@/components/pitchdeck/LyaConversationalLive';
 
 const PERFILES = [
   {
@@ -112,8 +112,8 @@ export default function PitchDeck() {
         <span className="hidden sm:inline">Descargar PDF</span>
       </button>
 
-      {/* === Lya presentando el pitch (compañera de Paula Garcés) === */}
-      <LyaPitchPresenter />
+      {/* === Lya conversacional bidireccional (mediadora de Paula con público) === */}
+      <LyaConversationalLive />
 
       {/* === SLIDE 1 — HERO === */}
       <section id="slide-hero" className="relative min-h-screen flex items-center px-6 lg:px-12 overflow-hidden">
