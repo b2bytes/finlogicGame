@@ -12,6 +12,7 @@ const navItems = [
   { label: 'API B2B', to: '/api-compliance' },
   { label: 'Precios', to: '/Pricing' },
   { label: 'Transparencia', to: '/Transparencia' },
+  { label: '⚡ CFF26', to: '/Lanzamiento' },
 ];
 
 export default function HeroNav() {

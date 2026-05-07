@@ -272,6 +272,17 @@ const PAGES = [
     priority: 80,
     tags: ['lya', 'asistente'],
   },
+  {
+    path: '/Lanzamiento',
+    name: 'Lanzamiento',
+    title: 'Lanzamiento Chile Fintech Forum 2026',
+    summary: 'Plan de marketing táctico para tomar el Chile Fintech Forum 2026 en Espacio Riesco (6-7 mayo). Targets priorizados (Felipe Pizarro, Hugo Guerra, Josefina Movillo, Carlos Prada Nubank, Carlos Urrutia Revolut, Mario Braz Stripe, autoridades CMF/SII/BCN). Timeline 24h, mensajes copy-paste, KPIs medibles.',
+    keywords: ['lanzamiento', 'fintech forum', 'cff26', 'espacio riesco', 'marketing', 'plan', 'pizarro', 'hugo guerra', 'movillo', 'speakers', 'evento'],
+    segment: 'concurso',
+    audience: ['jurado', 'prensa', 'fintech', 'general'],
+    priority: 95,
+    tags: ['lanzamiento', 'cff26', 'marketing'],
+  },
 ];
 
 // ─── Helpers Pinecone ───────────────────────────────────────────────────

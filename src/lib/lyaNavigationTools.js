@@ -23,6 +23,7 @@ export const LYA_PAGES = [
   { path: '/Demo', name: 'Demo', description: 'Demo en video del producto' },
   { path: '/Rubrica', name: 'Rúbrica', description: 'Rúbrica de evaluación del Claude Impact Lab' },
   { path: '/Entregables', name: 'Entregables', description: 'Entregables formales del concurso' },
+  { path: '/Lanzamiento', name: 'Lanzamiento', description: 'Plan de marketing táctico para Chile Fintech Forum 2026' },
 ];
 
 // Slides del pitch deck.

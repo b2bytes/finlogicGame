@@ -33,6 +33,7 @@ import ContentStudio from '@/pages/ContentStudio';
 import LyaChatWidget from '@/components/lya/LyaChatWidget';
 import LyaVoiceCard from '@/components/lya/LyaVoiceCard';
 import LyaActionBus from '@/components/lya/LyaActionBus';
+import SmartAlertsBridge from '@/components/notifications/SmartAlertsBridge';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import SkinAutoDetectToast from '@/components/skins/SkinAutoDetectToast.jsx';
 import EmbedLya from '@/pages/EmbedLya';
@@ -44,6 +45,7 @@ import Rubrica from '@/pages/Rubrica';
 import Demo from '@/pages/Demo';
 import Entregables from '@/pages/Entregables';
 import AdminCRM from '@/pages/AdminCRM';
+import Lanzamiento from '@/pages/Lanzamiento';
 import SafeRoute from '@/components/SafeRoute';
 
 const AuthenticatedApp = () => {
@@ -105,6 +107,7 @@ const AuthenticatedApp = () => {
         <Route path="/Demo" element={<SafeRoute name="Demo"><Demo /></SafeRoute>} />
         <Route path="/Entregables" element={<SafeRoute name="Entregables"><Entregables /></SafeRoute>} />
         <Route path="/Admin/CRM" element={<SafeRoute name="AdminCRM"><AdminCRM /></SafeRoute>} />
+        <Route path="/Lanzamiento" element={<SafeRoute name="Lanzamiento"><Lanzamiento /></SafeRoute>} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </ErrorBoundary>
@@ -128,6 +131,7 @@ const AuthenticatedApp = () => {
       <PWAInstallBanner />
       <QuickAdminPanel />
       <LyaActionBus />
+      <SmartAlertsBridge />
     </ErrorBoundary>
     </>
   );
