@@ -107,7 +107,7 @@ const AuthenticatedApp = () => {
         <Route path="/Demo" element={<SafeRoute name="Demo"><Demo /></SafeRoute>} />
         <Route path="/Entregables" element={<SafeRoute name="Entregables"><Entregables /></SafeRoute>} />
         <Route path="/Admin/CRM" element={<SafeRoute name="AdminCRM"><AdminCRM /></SafeRoute>} />
-        <Route path="/Lanzamiento" element={<SafeRoute name="Lanzamiento"><Lanzamiento /></SafeRoute>} />
+        <Route path="/Admin/Lanzamiento" element={<SafeRoute name="Lanzamiento"><Lanzamiento /></SafeRoute>} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </ErrorBoundary>
