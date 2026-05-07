@@ -26,7 +26,7 @@ const SUGGESTIONS = [
   'Mis derechos ARCO',
 ];
 
-const HIDDEN_ROUTES = ['/AsistenteLya', '/Consulta', '/Embed'];
+const HIDDEN_ROUTES = ['/AsistenteLya', '/Consulta', '/Embed', '/PitchDeck'];
 
 export default function LyaChatWidget() {
   const location = useLocation();

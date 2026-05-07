@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, SkipForward, X, Mic, Sparkles, Radio } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, X, Mic, Sparkles, List, Keyboard } from 'lucide-react';
 import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
 import { PITCH_SCRIPT } from './LyaPitchScript';
+import LyaPitchNav from './LyaPitchNav';
 
 /**
  * LyaPitchPresenter — Lya como mediadora del pitch.
@@ -22,6 +23,8 @@ export default function LyaPitchPresenter() {
   const [active, setActive] = useState(false);
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const [hintShown, setHintShown] = useState(false);
   const voice = useLyaVoice();
   const advanceTimerRef = useRef(null);
   const lastSpokenIdxRef = useRef(-1);
@@ -63,6 +66,21 @@ export default function LyaPitchPresenter() {
       return i + 1;
     });
   }, [stopAll, total, close]);
+
+  const prev = useCallback(() => {
+    stopAll();
+    lastSpokenIdxRef.current = -1;
+    setIdx((i) => Math.max(0, i - 1));
+  }, [stopAll]);
+
+  const jumpTo = useCallback((targetIdx) => {
+    if (targetIdx < 0 || targetIdx >= total) return;
+    stopAll();
+    lastSpokenIdxRef.current = -1;
+    setIdx(targetIdx);
+    setPaused(false);
+    setNavOpen(false);
+  }, [stopAll, total]);
 
   const togglePause = useCallback(() => {
     if (paused) {
@@ -114,6 +132,44 @@ export default function LyaPitchPresenter() {
   }, [voice.speaking, active, paused, next]);
 
   useEffect(() => () => stopAll(), [stopAll]);
+
+  // ─── Atajos de teclado tácticos ──────────────────────────────
+  useEffect(() => {
+    if (!active) return;
+    const onKey = (e) => {
+      // No interferir con campos de texto
+      if (e.target?.tagName === 'INPUT' || e.target?.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        e.preventDefault();
+        next();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prev();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        togglePause();
+      } else if (e.key === 'Escape') {
+        if (navOpen) setNavOpen(false);
+        else close();
+      } else if (e.key === 'l' || e.key === 'L') {
+        setNavOpen((v) => !v);
+      } else if (/^[1-9]$/.test(e.key)) {
+        jumpTo(parseInt(e.key, 10) - 1);
+      } else if (e.key === '0') {
+        jumpTo(9);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [active, navOpen, next, prev, togglePause, close, jumpTo]);
+
+  // Mostrar hint de teclado los primeros 6s
+  useEffect(() => {
+    if (!active) return;
+    setHintShown(true);
+    const t = setTimeout(() => setHintShown(false), 6000);
+    return () => clearTimeout(t);
+  }, [active]);
 
   // ─── FAB inicial editorial ─────────────────────────────────────
   if (!active) {
@@ -258,41 +314,99 @@ export default function LyaPitchPresenter() {
           )}
         </div>
 
-        {/* === CONTROLES === */}
-        <div className="px-5 pb-5 pt-2 flex items-center gap-2 bg-card">
-          <button
-            onClick={togglePause}
-            aria-label={paused ? 'Reanudar pitch' : 'Pausar pitch'}
-            className="flex-1 h-11 rounded-full bg-foreground hover:bg-mint-700 text-background inline-flex items-center justify-center gap-2 text-sm font-semibold transition-colors"
-          >
-            {paused ? <><Play className="w-4 h-4" /> Reanudar</> : <><Pause className="w-4 h-4" /> Pausar</>}
-          </button>
-          <button
-            onClick={next}
-            disabled={idx + 1 >= total}
-            aria-label="Saltar al siguiente slide"
-            className="h-11 px-4 rounded-full bg-secondary hover:bg-mint-50 border border-border text-foreground inline-flex items-center gap-1.5 text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <SkipForward className="w-4 h-4" /> Siguiente
-          </button>
+        {/* === CONTROLES TÁCTICOS === */}
+        <div className="relative px-5 pb-3 pt-2 bg-card">
+          {/* Popover índice (sale hacia arriba desde el botón) */}
+          <LyaPitchNav
+            open={navOpen}
+            currentIdx={idx}
+            onJump={jumpTo}
+            onClose={() => setNavOpen(false)}
+          />
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={prev}
+              disabled={idx === 0}
+              aria-label="Slide anterior"
+              title="Slide anterior (←)"
+              className="h-11 w-11 rounded-full bg-secondary hover:bg-mint-50 border border-border text-foreground inline-flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <SkipBack className="w-4 h-4" />
+            </button>
+            <button
+              onClick={togglePause}
+              aria-label={paused ? 'Reanudar pitch' : 'Pausar pitch'}
+              title={paused ? 'Reanudar (Espacio)' : 'Pausar (Espacio)'}
+              className="flex-1 h-11 rounded-full bg-foreground hover:bg-mint-700 text-background inline-flex items-center justify-center gap-2 text-sm font-semibold transition-colors"
+            >
+              {paused ? <><Play className="w-4 h-4" /> Reanudar</> : <><Pause className="w-4 h-4" /> Pausar</>}
+            </button>
+            <button
+              onClick={next}
+              disabled={idx + 1 >= total}
+              aria-label="Siguiente slide"
+              title="Siguiente slide (→)"
+              className="h-11 w-11 rounded-full bg-secondary hover:bg-mint-50 border border-border text-foreground inline-flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <SkipForward className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setNavOpen((v) => !v)}
+              aria-label="Abrir índice de slides"
+              aria-expanded={navOpen}
+              title="Índice (L)"
+              className={`h-11 w-11 rounded-full border inline-flex items-center justify-center transition-colors ${
+                navOpen
+                  ? 'bg-mint-600 border-mint-600 text-white'
+                  : 'bg-secondary hover:bg-mint-50 border-border text-foreground'
+              }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Mini timeline de slides — 10 puntos */}
-        <div className="px-5 pb-4 pt-1 bg-card flex items-center gap-1">
-          {PITCH_SCRIPT.map((s, i) => (
-            <span
-              key={s.id}
-              aria-hidden
-              className={`flex-1 h-1 rounded-full transition-colors ${
-                i < idx
-                  ? 'bg-mint-600'
-                  : i === idx
-                  ? 'bg-mint-400 animate-pulse'
-                  : 'bg-mint-100'
-              }`}
-            />
-          ))}
+        {/* Mini timeline interactiva — click para saltar */}
+        <div className="px-5 pb-3 pt-1 bg-card">
+          <div className="flex items-center gap-1">
+            {PITCH_SCRIPT.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => jumpTo(i)}
+                aria-label={`Saltar al slide ${i + 1}: ${s.title}`}
+                title={`${i + 1}. ${s.title}`}
+                className={`flex-1 h-1.5 rounded-full transition-all hover:h-2 ${
+                  i < idx
+                    ? 'bg-mint-600'
+                    : i === idx
+                    ? 'bg-mint-400 animate-pulse'
+                    : 'bg-mint-100 hover:bg-mint-300'
+                }`}
+              />
+            ))}
+          </div>
         </div>
+
+        {/* Hint de atajos de teclado (auto-dismiss) */}
+        <AnimatePresence>
+          {hintShown && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="px-5 pb-4 bg-card overflow-hidden"
+            >
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-mint-50/60 border border-mint-100">
+                <Keyboard className="w-3.5 h-3.5 text-mint-700 flex-shrink-0" />
+                <p className="text-[10px] text-mint-700 leading-tight">
+                  Atajos: <kbd className="px-1 py-0.5 bg-white rounded border border-mint-200 font-mono-editorial text-[9px]">←</kbd> <kbd className="px-1 py-0.5 bg-white rounded border border-mint-200 font-mono-editorial text-[9px]">→</kbd> navegar · <kbd className="px-1 py-0.5 bg-white rounded border border-mint-200 font-mono-editorial text-[9px]">Espacio</kbd> pausa · <kbd className="px-1 py-0.5 bg-white rounded border border-mint-200 font-mono-editorial text-[9px]">L</kbd> índice · <kbd className="px-1 py-0.5 bg-white rounded border border-mint-200 font-mono-editorial text-[9px]">1-9</kbd> ir a slide
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </>
   );
