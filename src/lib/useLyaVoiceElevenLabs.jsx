@@ -258,7 +258,7 @@ export function useLyaVoiceElevenLabs() {
     processing,
     interim,
     error,
-    voiceName: 'Lya · ElevenLabs Multilingual v2',
+    voiceName: 'Lya · Camila es-CL',
     startListening,
     stopListening,
     speak,

@@ -59,10 +59,15 @@ Deno.serve(async (req) => {
           text: cleanText,
           model_id: modelId,
           // Calibración Lya: cálida, clara, con leve emoción (amiga abogada chilena).
+          // Calibración Camila (es-CL profesional conversacional):
+          // - stability 0.45: expresiva, natural, con respiraciones (no robótica)
+          // - similarity_boost 0.80: respeta timbre Camila pero deja modular
+          // - style 0.55: tono cálido amiga abogada, con emoción real
+          // - speaker_boost: mejora claridad sobre fondos ruidosos (mobile)
           voice_settings: {
-            stability: 0.55,        // 0.5-0.6 = expresiva pero estable
-            similarity_boost: 0.85, // alto = mantiene timbre clonado
-            style: 0.35,            // toque emocional sin sobreactuar
+            stability: 0.45,
+            similarity_boost: 0.80,
+            style: 0.55,
             use_speaker_boost: true,
           },
         }),
