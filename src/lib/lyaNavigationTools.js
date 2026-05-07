@@ -91,3 +91,76 @@ export function navigateToPath(path, openInNewTab = false) {
   window.dispatchEvent(new PopStateEvent('popstate'));
   return true;
 }
+
+// ─── Fase 1 · Helpers de interacción avanzada ────────────────────────
+
+// Helper: rellenar un input/textarea por id, name, placeholder o data-lya-field.
+// Dispara los eventos correctos para que React detecte el cambio.
+export function fillField(fieldName, value) {
+  if (!fieldName) return false;
+  const selectors = [
+    `[data-lya-field="${fieldName}"]`,
+    `#${fieldName}`,
+    `[name="${fieldName}"]`,
+    `[placeholder*="${fieldName}" i]`,
+    `[aria-label*="${fieldName}" i]`,
+  ];
+  let el = null;
+  for (const sel of selectors) {
+    try { el = document.querySelector(sel); } catch (_) { /* selector inválido */ }
+    if (el) break;
+  }
+  if (!el) return false;
+
+  // React necesita que usemos el setter nativo para detectar el cambio
+  const tag = el.tagName?.toLowerCase();
+  const proto = tag === 'textarea'
+    ? window.HTMLTextAreaElement.prototype
+    : window.HTMLInputElement.prototype;
+  const nativeSetter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+  if (nativeSetter) {
+    nativeSetter.call(el, String(value ?? ''));
+  } else {
+    el.value = String(value ?? '');
+  }
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('change', { bubbles: true }));
+  el.focus();
+  return true;
+}
+
+// Helper: dispara click programático sobre un elemento marcado con
+// data-lya-action="<target>" o por id/selector.
+export function clickByLyaAction(target) {
+  if (!target) return false;
+  const selectors = [
+    `[data-lya-action="${target}"]`,
+    `#${target}`,
+    target.startsWith('.') || target.includes('[') ? target : null,
+  ].filter(Boolean);
+  let el = null;
+  for (const sel of selectors) {
+    try { el = document.querySelector(sel); } catch (_) { /* noop */ }
+    if (el) break;
+  }
+  if (!el) return false;
+  el.click();
+  return true;
+}
+
+// Helper: emitir un toast visual desde Lya (capturado por LyaActionBus).
+export function triggerLyaToast(message, variant = 'info') {
+  if (!message) return false;
+  window.dispatchEvent(
+    new CustomEvent('lya:toast', { detail: { message, variant } })
+  );
+  return true;
+}
+
+// Helper: pedir abrir el chat widget global (con consulta opcional pre-llenada).
+export function openLyaChat(prefilledQuery) {
+  window.dispatchEvent(
+    new CustomEvent('lya:open-chat', { detail: { prefilledQuery } })
+  );
+  return true;
+}

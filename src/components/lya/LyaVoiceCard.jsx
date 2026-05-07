@@ -11,6 +11,10 @@ import {
   scrollToElement,
   scrollToPosition,
   navigateToPath,
+  fillField,
+  clickByLyaAction,
+  triggerLyaToast,
+  openLyaChat,
 } from '@/lib/lyaNavigationTools';
 
 /**
@@ -121,6 +125,42 @@ export default function LyaVoiceCard({
       } catch (err) {
         return `Error consultando pipeline: ${err.message}`;
       }
+    },
+
+    // ─── Fase 1 · Tools nuevas ─────────────────────────────────────
+    // Abrir el chat widget global, opcionalmente pre-llenar consulta
+    openLyaChat: ({ prefilledQuery }) => {
+      openLyaChat(prefilledQuery);
+      showAction(prefilledQuery ? '💬 Chat abierto con consulta' : '💬 Chat abierto');
+      return prefilledQuery
+        ? `Chat abierto con consulta: "${prefilledQuery.slice(0, 80)}"`
+        : 'Chat abierto, listo para escribir';
+    },
+
+    // Llenar un campo de formulario en la página actual
+    fillFormField: ({ fieldName, value }) => {
+      const ok = fillField(fieldName, value);
+      if (ok) {
+        showAction(`✏️ ${fieldName}`);
+        return `Campo "${fieldName}" rellenado`;
+      }
+      return `No encontré el campo "${fieldName}" en esta página`;
+    },
+
+    // Click programático sobre un botón marcado con data-lya-action
+    clickButton: ({ target, reason }) => {
+      const ok = clickByLyaAction(target);
+      if (ok) {
+        showAction(`👆 ${target}`);
+        return `Click ejecutado en ${target}${reason ? ` (${reason})` : ''}`;
+      }
+      return `No encontré el botón "${target}" en esta página`;
+    },
+
+    // Mostrar toast visual (notificación elegante)
+    showToast: ({ message, variant = 'lya' }) => {
+      triggerLyaToast(message, variant);
+      return `Toast mostrado: ${message}`;
     },
   });
 

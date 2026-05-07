@@ -71,6 +71,20 @@ export default function LyaChatWidget() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  // Lya (voz) puede abrir el chat y pre-llenar input vía evento global
+  useEffect(() => {
+    const handler = (e) => {
+      const prefill = e.detail?.prefilledQuery;
+      setOpen(true);
+      if (prefill) {
+        setInput(prefill);
+        setTimeout(() => inputRef.current?.focus(), 300);
+      }
+    };
+    window.addEventListener('lya:open-chat', handler);
+    return () => window.removeEventListener('lya:open-chat', handler);
+  }, []);
+
   if (shouldHide) return null;
 
   const sendQuery = async (text) => {

@@ -31,6 +31,7 @@ import AsistenteLya from '@/pages/AsistenteLya';
 import ContentStudio from '@/pages/ContentStudio';
 import LyaChatWidget from '@/components/lya/LyaChatWidget';
 import LyaVoiceCard from '@/components/lya/LyaVoiceCard';
+import LyaActionBus from '@/components/lya/LyaActionBus';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import SkinAutoDetectToast from '@/components/skins/SkinAutoDetectToast.jsx';
 import EmbedLya from '@/pages/EmbedLya';
@@ -123,6 +124,7 @@ const AuthenticatedApp = () => {
       <SkinAutoDetectToast />
       <PWAInstallBanner />
       <QuickAdminPanel />
+      <LyaActionBus />
     </ErrorBoundary>
     </>
   );

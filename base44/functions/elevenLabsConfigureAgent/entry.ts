@@ -89,6 +89,10 @@ EJEMPLOS DE USO REAL:
 - "Sube arriba" → scrollToPosition("top")
 - "¿Cuántos días tengo para reclamar fraude bancario?" → queryFinLogic("plazo legal reclamo fraude tarjeta Ley 20009")
 - "Vamos al slide de tracción" → navigateToSlide("slide-traccion")
+- "Prefiero escribirlo" → openLyaChat() — abre el chat para que el usuario escriba.
+- "Llena la consulta con mi caso de phishing" → fillFormField("query", "Recibí SMS falso del banco y…")
+- "Envíalo" / "Procesa la consulta" → clickButton("submit-consulta", "enviar consulta")
+- Confirmar acción importante → showToast("Documento generado ✓", "success")
 
 # FLUJO DEL PITCH (10 slides, ~5 minutos total)
 1. **Apertura** (slide-hero, 22s): saluda al jurado, te presentas, presentas a Paula, anuncias la promesa.
@@ -258,6 +262,79 @@ const CLIENT_TOOLS = [
         },
       },
       required: ['question'],
+    },
+  },
+  {
+    name: 'openLyaChat',
+    description:
+      'Abre el widget de chat escrito de Lya (esquina inferior derecha). Útil cuando alguien dice "quiero escribirlo en lugar de hablar" o cuando necesitas que el usuario vea la respuesta por escrito con citas. Puedes pre-llenar la primera consulta.',
+    parameters: {
+      type: 'object',
+      properties: {
+        prefilledQuery: {
+          type: 'string',
+          description: 'Consulta opcional para pre-llenar el campo de texto del chat',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'fillFormField',
+    description:
+      'Rellena un campo de formulario (input/textarea) de la página actual con el valor que indiques. Identifica el campo por su atributo data-lya-field, id, name, placeholder o aria-label. Útil cuando guías al público a llenar la consulta en /Consulta o un formulario.',
+    parameters: {
+      type: 'object',
+      properties: {
+        fieldName: {
+          type: 'string',
+          description: 'Identificador del campo (data-lya-field preferido, también acepta id/name/placeholder)',
+        },
+        value: {
+          type: 'string',
+          description: 'Texto a escribir en el campo',
+        },
+      },
+      required: ['fieldName', 'value'],
+    },
+  },
+  {
+    name: 'clickButton',
+    description:
+      'Hace click programático en un botón de la página actual. Identifica el botón por su atributo data-lya-action o id. Úsala para enviar formularios, abrir modales o disparar acciones cuando el público diga "envíalo" o "muéstralo".',
+    parameters: {
+      type: 'object',
+      properties: {
+        target: {
+          type: 'string',
+          description: 'Valor de data-lya-action o id del botón a clickear',
+        },
+        reason: {
+          type: 'string',
+          description: 'Razón breve de por qué clickeas (ej: "enviar consulta")',
+        },
+      },
+      required: ['target'],
+    },
+  },
+  {
+    name: 'showToast',
+    description:
+      'Muestra una notificación visual elegante (toast) en la parte superior de la pantalla durante 3.5 segundos. Úsala para confirmar acciones importantes, dar feedback rápido o resaltar algo que estás explicando.',
+    parameters: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          description: 'Texto del toast (máximo 80 caracteres recomendado)',
+        },
+        variant: {
+          type: 'string',
+          enum: ['lya', 'success', 'error', 'info'],
+          description: 'Estilo visual del toast (default: lya/mint)',
+        },
+      },
+      required: ['message'],
     },
   },
 ];
