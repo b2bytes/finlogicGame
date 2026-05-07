@@ -8,6 +8,7 @@ import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
 import LyaTrustBadge from '@/components/lya/LyaTrustBadge';
 import LyaGenerateDocButton from '@/components/lya/LyaGenerateDocButton';
 import LyaVoiceControls from '@/components/lya/LyaVoiceControls';
+import ChatTextIcon from '@/components/lya/icons/ChatTextIcon';
 import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
 
 /**
@@ -195,39 +196,16 @@ export default function LyaChatWidget() {
                 className="absolute inset-x-3 top-1.5 h-3 rounded-full bg-white/35 blur-md"
               />
 
-              {/* Avatar Lya: ondas sonoras (asistente IA conversacional) */}
-              <svg
-                viewBox="0 0 48 48"
-                className="relative w-9 h-9 md:w-11 md:h-11 text-white"
-                fill="none"
+              {/* Ícono CHAT DE TEXTO — burbuja con líneas tipo "typing" animadas */}
+              <ChatTextIcon size={40} typing />
+
+              {/* Mini badge "AI" en esquina (estilo iOS app icon) */}
+              <span
                 aria-hidden
+                className="absolute top-1 left-1 text-[8px] font-mono-editorial font-bold text-mint-700 bg-white/95 px-1 py-0.5 rounded-md leading-none tracking-tight shadow-sm"
               >
-                {/* Onda izquierda corta */}
-                <rect x="9" y="20" width="3.5" height="8" rx="1.75" fill="currentColor" opacity="0.7">
-                  <animate attributeName="height" values="8;14;8" dur="1.4s" repeatCount="indefinite" />
-                  <animate attributeName="y" values="20;17;20" dur="1.4s" repeatCount="indefinite" />
-                </rect>
-                {/* Onda media-izquierda */}
-                <rect x="16" y="15" width="3.5" height="18" rx="1.75" fill="currentColor" opacity="0.9">
-                  <animate attributeName="height" values="18;26;18" dur="1.2s" repeatCount="indefinite" />
-                  <animate attributeName="y" values="15;11;15" dur="1.2s" repeatCount="indefinite" />
-                </rect>
-                {/* Onda central alta */}
-                <rect x="23" y="11" width="3.5" height="26" rx="1.75" fill="currentColor">
-                  <animate attributeName="height" values="26;34;26" dur="1s" repeatCount="indefinite" />
-                  <animate attributeName="y" values="11;7;11" dur="1s" repeatCount="indefinite" />
-                </rect>
-                {/* Onda media-derecha */}
-                <rect x="30" y="15" width="3.5" height="18" rx="1.75" fill="currentColor" opacity="0.9">
-                  <animate attributeName="height" values="18;24;18" dur="1.3s" repeatCount="indefinite" />
-                  <animate attributeName="y" values="15;12;15" dur="1.3s" repeatCount="indefinite" />
-                </rect>
-                {/* Onda derecha corta */}
-                <rect x="37" y="20" width="3.5" height="8" rx="1.75" fill="currentColor" opacity="0.7">
-                  <animate attributeName="height" values="8;12;8" dur="1.5s" repeatCount="indefinite" />
-                  <animate attributeName="y" values="20;18;20" dur="1.5s" repeatCount="indefinite" />
-                </rect>
-              </svg>
+                AI
+              </span>
 
               {/* Dot online verde — anclado afuera del círculo */}
               <span
@@ -297,14 +275,8 @@ export default function LyaChatWidget() {
             >
               {/* Header */}
               <div className="relative px-4 md:px-5 py-3.5 bg-gradient-to-br from-mint-500 to-mint-700 text-white flex items-center gap-3">
-                <div className="relative w-10 h-10 rounded-full bg-white/95 flex items-center justify-center shadow-inner overflow-hidden">
-                  <svg viewBox="0 0 48 48" className="w-6 h-6 text-mint-700" fill="none" aria-hidden>
-                    <rect x="9" y="20" width="3.5" height="8" rx="1.75" fill="currentColor" opacity="0.6" />
-                    <rect x="16" y="15" width="3.5" height="18" rx="1.75" fill="currentColor" opacity="0.85" />
-                    <rect x="23" y="11" width="3.5" height="26" rx="1.75" fill="currentColor" />
-                    <rect x="30" y="15" width="3.5" height="18" rx="1.75" fill="currentColor" opacity="0.85" />
-                    <rect x="37" y="20" width="3.5" height="8" rx="1.75" fill="currentColor" opacity="0.6" />
-                  </svg>
+                <div className="relative w-10 h-10 rounded-2xl bg-white/95 flex items-center justify-center shadow-inner overflow-hidden">
+                  <ChatTextIcon size={28} typing />
                   <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-mint-300 ring-2 ring-mint-600 animate-pulse-soft" />
                 </div>
                 <div className="flex-1 min-w-0">

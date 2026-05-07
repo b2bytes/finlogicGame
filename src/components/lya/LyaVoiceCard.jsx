@@ -4,6 +4,7 @@ import { Mic, MicOff, X, Loader2, Sparkles, Maximize2, MessageSquare } from 'luc
 import { base44 } from '@/api/base44Client';
 import LyaVoiceWaves from './LyaVoiceWaves';
 import LyaCyberAvatar from './LyaCyberAvatar';
+import VoiceWaveIcon from './icons/VoiceWaveIcon';
 import LyaConversationModal from './LyaConversationModal';
 import { useLyaPersistent } from '@/lib/LyaPersistentContext.jsx';
 import { useAuth } from '@/lib/AuthContext';
@@ -364,13 +365,21 @@ export default function LyaVoiceCard({
         }}
         aria-label="Hablar con Lya"
         style={baseStyle}
-        className="fixed z-40 group inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-slate-900/95 backdrop-blur-xl border border-white/10 shadow-soft-lg hover:border-mint-300/40 hover:shadow-mint transition-all"
+        className="fixed z-40 group inline-flex items-center gap-2 pl-1 pr-3.5 py-1 rounded-full bg-slate-900/95 backdrop-blur-xl border border-white/10 shadow-soft-lg hover:border-mint-300/40 hover:shadow-mint transition-all"
       >
-        <span className="relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-mint-400/30 to-mint-700/30 ring-1 ring-mint-300/30 overflow-hidden">
-          <span className="absolute inset-0 rounded-full bg-mint-400 animate-ping opacity-25" />
-          <LyaCyberAvatar size={32} />
+        {/* Halo aurora exterior */}
+        <span
+          aria-hidden
+          className="absolute -inset-[3px] rounded-full bg-gradient-to-br from-mint-300/40 via-cyan-400/30 to-mint-600/40 blur-sm opacity-60 group-hover:opacity-100 transition-opacity"
+        />
+        <span className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-mint-500 via-mint-600 to-mint-700 ring-1 ring-white/30 overflow-hidden shadow-inner">
+          {/* Shine Apple-style superior */}
+          <span aria-hidden className="absolute inset-x-1.5 top-1 h-1.5 rounded-full bg-white/40 blur-sm" />
+          {/* Pulso de fondo cuando está en idle */}
+          <span className="absolute inset-0 rounded-full bg-mint-300 animate-ping opacity-20" />
+          <VoiceWaveIcon size={28} active />
         </span>
-        <span className="text-[11px] font-bold text-white whitespace-nowrap tracking-tight">
+        <span className="relative text-[11px] font-bold text-white whitespace-nowrap tracking-tight">
           Hablar con Lya
         </span>
       </motion.button>
