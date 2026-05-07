@@ -439,6 +439,195 @@ const CORPUS = [
     content: `La transferencia internacional de datos personales fuera de Chile sólo procede cuando: (a) el país destinatario otorga nivel adecuado de protección reconocido por la APDP, (b) el responsable adopta cláusulas contractuales tipo aprobadas por la APDP, (c) existen normas corporativas vinculantes para grupos empresariales, (d) media consentimiento expreso del titular específico para esa transferencia, o (e) es estrictamente necesario para ejecutar un contrato con el titular. Las empresas que usan servicios cloud (AWS, Azure, GCP) con datos en regiones extranjeras deben asegurar al menos una de estas bases. La APDP puede suspender transferencias cuando detecte riesgo significativo para los titulares.`,
   },
 
+  // ═══════════════ LEY 21.459 — DELITOS INFORMÁTICOS (Convenio Budapest) ═══════════════
+  {
+    module: 'ley_21663_ciberseguridad',
+    regulatoryBody: 'CSIRT',
+    title: 'Ley 21.459 — Delitos informáticos vigentes en Chile',
+    lawReference: 'Ley 21.459 (vigente 20-jun-2022, deroga Ley 19.223)',
+    sourceUrl: 'https://www.bcn.cl/leychile/navegar?idNorma=1177743',
+    tags: ['delitos_informaticos', 'budapest', 'fraude_informatico', 'phishing'],
+    content: `La Ley 21.459 (vigente desde el 20 de junio de 2022) deroga la antigua Ley 19.223 y adapta el Código Penal chileno al Convenio de Budapest (estándar internacional). Tipos penales cubiertos: (1) ataque a la integridad de sistemas informáticos, (2) ataque a la integridad de los datos, (3) acceso ilícito a sistemas, (4) interceptación ilícita de comunicaciones, (5) fraude informático (relevante para fintech: phishing, spoofing bancario, manipulación de transferencias), (6) falsificación informática, (7) abuso de dispositivos, (8) receptación de datos informáticos. Penas de presidio menor a mayor según gravedad. La denuncia se presenta en PDI Cibercrimen, Fiscalía o vía CSIRT cuando hay impacto en servicios esenciales.`,
+  },
+  {
+    module: 'ley_21663_ciberseguridad',
+    regulatoryBody: 'CSIRT',
+    title: 'Ley 21.459 — Fraude informático: cómo denunciar',
+    lawReference: 'Ley 21.459 Art. 7° (fraude informático)',
+    sourceUrl: 'https://www.bcn.cl/leychile/navegar?idNorma=1177743',
+    tags: ['fraude_informatico', 'denuncia', 'pdi', 'fiscalia'],
+    content: `El fraude informático (Art. 7° Ley 21.459) sanciona a quien causando perjuicio a otro y con ánimo de lucro manipula datos o el funcionamiento de un sistema informático. Aplica a phishing bancario, ingeniería social vía WhatsApp/SMS, manipulación de pagos, suplantación de páginas web. Para denunciar: (1) Conserva todas las pruebas digitales (capturas, mensajes, comprobantes, headers de correo); (2) Denuncia en PDI Brigada Investigadora del Cibercrimen (BRICIB) — cibercrimen.pdi@investigaciones.cl o presencial en cualquier cuartel; (3) En paralelo presenta querella en Fiscalía Local; (4) Si tu banco no devolvió el dinero bajo Ley 20.009, agrega ese antecedente. La acción penal NO sustituye la civil ni el reclamo CMF/SERNAC.`,
+  },
+
+  // ═══════════════ LEY 21.398 — PRO CONSUMIDOR (SERNAC FINANCIERO REFORZADO) ═══════════════
+  {
+    module: 'ley_19496_sernac',
+    regulatoryBody: 'SERNAC',
+    title: 'Ley 21.398 Pro Consumidor — Análisis obligatorio de solvencia',
+    lawReference: 'Ley 21.398 (vigente 24-dic-2021, modifica Ley 19.496 y Ley 20.555)',
+    sourceUrl: 'https://www.bcn.cl/leychile/navegar?idNorma=1170464',
+    tags: ['solvencia', 'credito', 'pro_consumidor', 'sernac'],
+    content: `La Ley 21.398 obliga a todo proveedor financiero a realizar un análisis previo de solvencia del consumidor antes de cursar cualquier operación de crédito (consumo, hipotecario, líneas, tarjetas). El análisis debe considerar ingresos verificables, deudas vigentes (informe Boletín Comercial / Dicom), capacidad de pago y antecedentes personales relevantes. Si el banco otorga el crédito sin evaluar solvencia y el cliente cae en sobre-endeudamiento, el cliente puede demandar nulidad o reducción de la deuda y SERNAC puede sancionar. El sobre-endeudamiento por imprudencia del proveedor se imputa al banco, no al consumidor.`,
+  },
+  {
+    module: 'ley_19496_sernac',
+    regulatoryBody: 'SERNAC',
+    title: 'Ley 21.398 — Certificado de deuda en 5 días hábiles',
+    lawReference: 'Ley 21.398 + Ley 21.236 portabilidad',
+    sourceUrl: 'https://www.bcn.cl/leychile/navegar?idNorma=1170464',
+    tags: ['certificado_deuda', 'portabilidad', 'plazo'],
+    content: `Las instituciones financieras tienen plazo MÁXIMO de 5 días hábiles para entregar el Certificado de Liquidación de deuda al cliente que solicita portabilidad financiera o renegociación. El certificado debe detallar: capital adeudado, intereses devengados, comisiones pendientes, costo total para prepago. Si el banco se demora más de 5 días, el cliente puede reclamar a SERNAC y CMF. El certificado es gratuito. La negativa o demora injustificada constituye infracción al SERNAC Financiero sancionable hasta 1.500 UTM.`,
+  },
+  {
+    module: 'ley_19496_sernac',
+    regulatoryBody: 'SERNAC',
+    title: 'Ley 21.398 — Garantía legal ampliada de 3 a 6 meses',
+    lawReference: 'Ley 21.398 (modifica Art. 21 Ley 19.496)',
+    sourceUrl: 'https://www.bcn.cl/leychile/navegar?idNorma=1170464',
+    tags: ['garantia_legal', 'pro_consumidor', '6_meses'],
+    content: `La Ley 21.398 amplió la garantía legal de productos de 3 meses a 6 meses desde la recepción. Mantiene la triple opción del consumidor (reparación gratuita, cambio de producto o devolución del dinero, a elección del consumidor — no del proveedor). Adicionalmente prohíbe las ofertas crediticias en establecimientos educacionales (universidades, colegios), prohíbe la geo-discriminación de precios online y facilita el término anticipado de contratos financieros sin penalizaciones abusivas. SERNAC puede aplicar multas hasta 1.500 UTM por infracción grave.`,
+  },
+
+  // ═══════════════ NCG 503 + NCG 504 (CMF) — REGULACIÓN COMPLEMENTARIA FINTEC ═══════════════
+  {
+    module: 'ncg_502_cmf',
+    regulatoryBody: 'CMF',
+    title: 'NCG 503 CMF — Requisitos de competencia para roles fintech',
+    lawReference: 'NCG 503 CMF (2024)',
+    sourceUrl: 'https://www.cmfchile.cl/portal/principal/613/w3-propertyvalue-43589.html',
+    tags: ['ncg_503', 'idoneidad', 'roles', 'cmf'],
+    content: `La NCG 503 de la CMF establece los requisitos de competencia, idoneidad y conocimientos exigibles a las personas naturales que desempeñan roles relevantes en prestadores de servicios financieros Fintec: directores, gerente general, oficial de cumplimiento, encargado de ciberseguridad, asesor de inversión, asesor crediticio. Exige certificaciones, experiencia mínima, capacitación continua y régimen de inhabilidades (no condenas por delitos económicos, no resoluciones de quiebra, no sanciones CMF firmes). El RPSF verifica estas exigencias en la inscripción. Modificaciones recientes (oct-2024) ajustaron el procedimiento de acreditación.`,
+  },
+  {
+    module: 'ncg_502_cmf',
+    regulatoryBody: 'CMF',
+    title: 'NCG 504 CMF — Disposiciones Art. 65 LMV en plataformas Fintec',
+    lawReference: 'NCG 504 CMF (2024) + Art. 65 Ley 18.045 LMV',
+    sourceUrl: 'https://www.cmfchile.cl/portal/principal/613/w3-propertyvalue-43589.html',
+    tags: ['ncg_504', 'lmv', 'intermediacion', 'cmf'],
+    content: `La NCG 504 de la CMF aplica disposiciones del Art. 65 de la Ley de Mercado de Valores (Ley 18.045) a las plataformas Fintec autorizadas en el RPSF. Regula obligaciones de información al inversionista, registro de operaciones, medidas anti-conflictos de interés, custodia separada de instrumentos financieros, deber fiduciario en asesoría e intermediación. Las plataformas de financiamiento colectivo, sistemas alternativos de transacción e intermediarios deben observar estándares operativos equivalentes a los corredores de bolsa tradicionales en lo aplicable a su servicio.`,
+  },
+
+  // ═══════════════ SFA — ESTADO DEL REGISTRO RPSF + RUTA AL RECLAMO ═══════════════
+  {
+    module: 'ley_fintech_21521',
+    regulatoryBody: 'CMF',
+    title: 'RPSF — Estado del Registro y consulta pública',
+    lawReference: 'Ley 21.521 + comunicado CMF feb-2025',
+    sourceUrl: 'https://www.cmfchile.cl/institucional/estadisticas/seg_rgpsf.php',
+    tags: ['rpsf', 'consulta_publica', 'estado_registro'],
+    content: `El Registro de Prestadores de Servicios Financieros (RPSF) de la Ley 21.521 al término del período transitorio (4 feb 2025) registró 179 entidades autorizadas y más de 300 solicitudes en revisión. La CMF mantiene actualizado el listado público en cmfchile.cl/institucional/estadisticas/seg_rgpsf.php. Antes de invertir, contratar custodia, recibir asesoría de inversión o usar una plataforma de crowdfunding, el ciudadano DEBE verificar que el prestador esté en el RPSF. Si NO está inscrito y ofrece estos servicios al público, es operación irregular y la víctima puede denunciar a CMF (cmfchile.cl/atencionusuarios) y a Fiscalía por infracción a la Ley 21.521.`,
+  },
+  {
+    module: 'ley_fintech_21521',
+    regulatoryBody: 'CMF',
+    title: 'CMF Educa + Alertas al público — Recursos de prevención',
+    lawReference: 'Ley 21.000 CMF + comunicación al público',
+    sourceUrl: 'https://www.cmfchile.cl/portal/principal/613/w3-propertyvalue-43545.html',
+    tags: ['cmf_educa', 'alertas', 'estafas', 'prevencion'],
+    content: `La CMF mantiene dos servicios públicos clave: (1) CMF Educa (cmfchile.cl/educa) con guías ciudadanas en lenguaje simple sobre productos financieros, derechos del consumidor, cómo invertir, cómo reclamar; (2) Alertas al Público con listado actualizado de entidades NO autorizadas para operar en Chile, esquemas tipo Ponzi, falsos brokers, phishing detectado. Antes de invertir o entregar dinero a cualquier prestador, consulta ambos recursos. Si detectas un esquema sospechoso, denúncialo en cmfchile.cl/atencionusuarios — la denuncia ciudadana es uno de los principales insumos de detección temprana de fraudes masivos.`,
+  },
+
+  // ═══════════════ TRIBUTACIÓN CRIPTO 2026 — DJ 1963/1964 + CARF OCDE ═══════════════
+  {
+    module: 'tributacion_cripto',
+    regulatoryBody: 'SII',
+    title: 'Tributación cripto 2026 — Declaración Jurada 1964 (residentes)',
+    lawReference: 'Resolución Exenta SII N° 114/2025',
+    sourceUrl: 'https://www.sii.cl/normativa_legislacion/resoluciones/2025/reso114.pdf',
+    tags: ['cripto', 'dj_1964', 'residentes', 'sii_2026'],
+    content: `La Resolución Exenta SII N° 114/2025 crea la Declaración Jurada 1964: los proveedores de servicios de activos digitales (exchanges, custodios, OTC, wallets reguladas) que operan en Chile deben reportar anualmente al SII las transacciones de sus usuarios residentes en Chile. Primera presentación: 30 de junio de 2026 (operaciones del año comercial 2025). Datos reportados: identificación del usuario, RUT, montos transados, tipo de criptoactivo, contraparte, fecha. La obligación recae en el proveedor, NO en el usuario, pero los datos llegarán igual al SII. El usuario residente debe declarar las ganancias por compra-venta en su F22 anual como rentas afectas a Global Complementario o Primera Categoría según corresponda.`,
+  },
+  {
+    module: 'tributacion_cripto',
+    regulatoryBody: 'SII',
+    title: 'Tributación cripto 2026 — DJ 1963 (no residentes) + CARF OCDE',
+    lawReference: 'Res. Ex. SII N° 113/2025 + Crypto-Asset Reporting Framework OCDE',
+    sourceUrl: 'https://www.sii.cl/normativa_legislacion/resoluciones/2025/reso113.pdf',
+    tags: ['cripto', 'dj_1963', 'no_residentes', 'carf', 'ocde'],
+    content: `La Res. Ex. SII N° 113/2025 crea la Declaración Jurada 1963: proveedores chilenos de servicios de activos digitales reportan al SII las transacciones de usuarios NO residentes en Chile. Primera presentación: 30 junio 2026. Esta obligación está alineada con el Crypto-Asset Reporting Framework (CARF) de la OCDE — estándar global de intercambio automático de información tributaria sobre criptoactivos análogo al CRS bancario. Permite al SII chileno intercambiar información con +50 jurisdicciones. Al 22 sep 2025 el SII reportó 13 casos fiscalizados sobre criptoactivos con rendimiento aproximado CLP 5.000 millones. Mantén registros detallados de cada operación cripto con fecha, valor en CLP, costo de adquisición y plataforma usada.`,
+  },
+  {
+    module: 'tributacion_cripto',
+    regulatoryBody: 'SII',
+    title: 'Cripto — Régimen tributario actual (LIR + IVA)',
+    lawReference: 'LIR + Oficio SII 963/2018 + FAQ SII criptomonedas',
+    sourceUrl: 'https://www.sii.cl/preguntas_frecuentes/criptomonedas/arbol_faqs_criptomonedas_1653.htm',
+    tags: ['cripto', 'lir', 'iva', 'compraventa'],
+    content: `Tratamiento tributario del criptoactivo en Chile (FAQ oficial SII): (1) NO está afecto a IVA la compra-venta de criptomonedas (no es bien corporal mueble ni servicio gravado); (2) Las GANANCIAS por compra-venta SÍ están afectas a Impuesto a la Renta — se determinan por la diferencia entre valor de venta y costo de adquisición, ambos en pesos chilenos a la fecha de cada operación; (3) Persona natural sin giro: tributa en Global Complementario (F22) en categoría rentas del capital; (4) Persona con giro o empresa: tributa en Primera Categoría según régimen aplicable (Pro-Pyme, general); (5) Mining: ingreso afecto desde su generación, valorizado al valor de mercado; (6) Staking y airdrops: tributan al momento de obtener disposición.`,
+  },
+
+  // ═══════════════ ANCI — REPORTES AL CSIRT NACIONAL (vigente 2025-2026) ═══════════════
+  {
+    module: 'ley_21663_ciberseguridad',
+    regulatoryBody: 'CSIRT',
+    title: 'ANCI — Plazos exigibles de reporte al CSIRT Nacional',
+    lawReference: 'Ley 21.663 + normativa ANCI vigente 2025',
+    sourceUrl: 'https://anci.gob.cl/normativa/leyes/',
+    tags: ['anci', 'csirt', 'plazos', 'reporte_incidente'],
+    content: `La Agencia Nacional de Ciberseguridad (ANCI) opera plenamente desde enero 2025. Las fintech reguladas por CMF están dentro del perímetro de "servicios esenciales" y "operadores de importancia vital" (OIV). Plazos exigibles de reporte al CSIRT Nacional ante un incidente significativo: (1) ALERTA TEMPRANA dentro de 3 horas desde el conocimiento del incidente — descripción mínima preliminar; (2) DESCRIPCIÓN DETALLADA dentro de 72 horas — naturaleza, alcance, datos comprometidos, medidas iniciales; (3) INFORME COMPLETO dentro de 15 días corridos — análisis forense, causas raíz, lecciones aprendidas, plan de remediación. Reporte vía csirt.gob.cl. Omisión o tardanza: infracción gravísima hasta 40.000 UTM.`,
+  },
+  {
+    module: 'ley_21663_ciberseguridad',
+    regulatoryBody: 'CSIRT',
+    title: 'ANCI — Obligaciones permanentes para fintech y servicios esenciales',
+    lawReference: 'Ley 21.663 + estándares técnicos ANCI',
+    sourceUrl: 'https://anci.gob.cl',
+    tags: ['anci', 'obligaciones', 'continuidad', 'fintech'],
+    content: `Las entidades dentro del perímetro ANCI (incluye fintech CMF, bancos, telecom, energía, salud, transporte, infraestructura digital crítica) deben mantener: (1) Medidas técnicas y organizativas de prevención, detección y respuesta a incidentes; (2) Cumplimiento de los estándares técnicos publicados por ANCI; (3) Designación de un responsable de ciberseguridad con dedicación efectiva; (4) Planes documentados de continuidad operacional y recuperación ante desastres; (5) Auditorías periódicas y pruebas de penetración; (6) Capacitación del personal. Las fintech recién inscritas en RPSF tienen calendarios escalonados durante 2025-2026 para alcanzar cumplimiento pleno.`,
+  },
+
+  // ═══════════════ FRAUDE DIGITAL — CHILE 2026 (datos sectoriales) ═══════════════
+  {
+    module: 'ley_20009_fraude',
+    regulatoryBody: 'CSIRT',
+    title: 'Fraude digital Chile 2026 — Tipologías más comunes',
+    lawReference: 'Datos sectoriales CSIRT/CMF/SERNAC 2026',
+    sourceUrl: 'https://csirt.gob.cl',
+    tags: ['phishing', 'vishing', 'smishing', 'estadisticas'],
+    content: `Chile registra más de 800.000 intentos de fraude digital al año. El 70% de las víctimas no denuncia, lo que distorsiona las estadísticas oficiales. Tipologías más frecuentes: (1) PHISHING financiero (45% del total) — correos falsos suplantando bancos pidiendo claves; (2) VISHING (voice phishing) — llamadas suplantando ejecutivo bancario o "soporte CMF"; (3) SMISHING (SMS phishing) — Chile en top 5 de Latinoamérica, mensajes con enlaces falsos; (4) Suplantación de identidad digital — uso de RUT robado para abrir productos; (5) Estafas cripto en redes sociales tipo "duplica tu dinero", esquemas Ponzi y rug pulls; (6) Adultos mayores son el grupo MÁS vulnerable. Si caíste, denuncia inmediatamente al banco (Ley 20.009 → 5 días hábiles), reporta en csirt.gob.cl, denuncia en PDI Cibercrimen.`,
+  },
+
+  // ═══════════════ DATASETS Y APIs PÚBLICAS PARA CONSTRUIR ═══════════════
+  {
+    module: 'ley_19496_sernac',
+    regulatoryBody: 'BCN',
+    title: 'API Banco Central BDE — Series estadísticas oficiales',
+    lawReference: 'Banco Central Ley 18.840 + servicio público BDE',
+    sourceUrl: 'https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx',
+    tags: ['api', 'banco_central', 'bde', 'datos_oficiales'],
+    content: `La Base de Datos Estadísticos (BDE) del Banco Central de Chile expone una API REST pública en si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx. Métodos: GetSeries (recupera series específicas: UF, dólar, IPC, TPM, IMACEC, agregados monetarios) y SearchSeries (búsqueda por palabra clave). Requiere registro gratuito (usuario + contraseña). Soporta integración Python y R. Documentación: si3.bcentral.cl/estadisticas/Principal1/Web_Services/doc_es.htm. Es la fuente OFICIAL para indicadores macro y reemplaza scrapers no oficiales en producción. Para consultas frecuentes alternativas, mindicador.cl agrega los mismos datos sin auth (no oficial pero confiable).`,
+  },
+  {
+    module: 'ley_19496_sernac',
+    regulatoryBody: 'BCN',
+    title: 'API BCN Ley Fácil — Explicación normativa simple',
+    lawReference: 'BCN — Ley Fácil API pública',
+    sourceUrl: 'https://www.bcn.cl/api-leyfacil/',
+    tags: ['api', 'bcn', 'ley_facil', 'educacion'],
+    content: `La Biblioteca del Congreso Nacional (BCN) ofrece la API Ley Fácil — un servicio JSON gratuito y sin autenticación que entrega explicaciones en lenguaje ciudadano simple sobre las principales leyes chilenas. Ideal para integrar en chatbots, asistentes ciudadanos y herramientas de literacy financiera/legal. Cubre temas: derechos del consumidor, vivienda, familia, trabajo, salud, justicia. Documentación y endpoints en bcn.cl/api-leyfacil/. Es complementaria al texto oficial de la ley en leychile.cl — la API entrega versión simplificada, leychile.cl entrega texto vigente con artículos enlazados.`,
+  },
+  {
+    module: 'ley_fintech_21521',
+    regulatoryBody: 'CMF',
+    title: 'CMF — Ausencia de API REST pública: datos en CSV/PDF',
+    lawReference: 'Política institucional CMF (2026)',
+    sourceUrl: 'https://www.cmfchile.cl/portal/principal/613/w3-propertyname-702.html',
+    tags: ['cmf', 'datos_publicos', 'csv', 'scraping'],
+    content: `La CMF NO publica actualmente una API REST documentada. Los datasets oficiales (registro de prestadores Fintec, normativa NCG buscable, estadísticas de reclamos por institución, alertas al público) están disponibles como descargas CSV/PDF/HTML desde cmfchile.cl. Para productos que requieren consultas frecuentes: (1) cachear localmente con TTL razonable, (2) respetar robots.txt y rate limit conservador (1 req/segundo), (3) atribuir la fuente en cualquier visualización pública. Endpoints útiles: cmfchile.cl/portal/principal/613/w3-propertyname-702.html (normativa), cmfchile.cl/institucional/estadisticas/ (estadísticas), cmfchile.cl/portal/principal/613/w3-propertyvalue-43545.html (alertas estafas).`,
+  },
+
+  // ═══════════════ PRINCIPIOS DE DISEÑO PRIVACY-BY-DESIGN ═══════════════
+  {
+    module: 'ley_21719_datos',
+    regulatoryBody: 'BCN',
+    title: 'Principios de diseño Privacy by Design — Ley 21.719',
+    lawReference: 'Ley 21.719 Art. 14 ter (privacy by design + by default)',
+    sourceUrl: 'https://www.bcn.cl/leychile/navegar?idNorma=1209272',
+    tags: ['privacy_by_design', 'minimizacion', 'cifrado', 'mfa'],
+    content: `Aunque la Ley 21.719 entra en vigencia plena el 1 de diciembre de 2026, los productos digitales chilenos deben adoptar Privacy by Design desde el día uno. Principios transversales exigibles: (1) MINIMIZACIÓN — recolectar SOLO los datos estrictamente necesarios para la finalidad declarada; (2) CONSENTIMIENTO informado — explícito, granular, revocable; nada de cláusulas pre-marcadas; (3) SEGURIDAD por defecto — cifrado at-rest y in-transit, autenticación multifactor (MFA), control de acceso por roles; (4) TRANSPARENCIA algorítmica — si usas IA en decisiones financieras (scoring, fraude, asesoría), explica el criterio al titular; (5) ACCESIBILIDAD regulatoria — si tu servicio cae en Título II Ley 21.521, el producto debe estar listo para inscribirse en el RPSF; (6) PIPELINE de detección y reporte de incidentes ANCI desde el día uno.`,
+  },
+
   // ═══════════════ INDICADORES ECONÓMICOS ═══════════════
   {
     module: 'ley_19496_sernac',
