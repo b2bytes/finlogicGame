@@ -7,6 +7,8 @@ import { base44 } from '@/api/base44Client';
 import LyaShareWhatsApp from '@/components/lya/LyaShareWhatsApp';
 import LyaTrustBadge from '@/components/lya/LyaTrustBadge';
 import LyaGenerateDocButton from '@/components/lya/LyaGenerateDocButton';
+import LyaVoiceControls from '@/components/lya/LyaVoiceControls';
+import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
 
 /**
  * LyaChatWidget — widget de chat flotante global de Lya (FinLogic).
@@ -33,9 +35,11 @@ export default function LyaChatWidget() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(false);
   const sessionIdRef = useRef(null);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+  const voice = useLyaVoice();
 
   const shouldHide = HIDDEN_ROUTES.some((p) => location.pathname.startsWith(p));
 
@@ -96,11 +100,12 @@ export default function LyaChatWidget() {
       if (data.sessionId && !sessionIdRef.current) {
         sessionIdRef.current = data.sessionId;
       }
+      const lyaContent = data.response || 'No pude procesar tu consulta. Intenta nuevamente.';
       setMessages((m) => [
         ...m,
         {
           role: 'lya',
-          content: data.response || 'No pude procesar tu consulta. Intenta nuevamente.',
+          content: lyaContent,
           sources: data.sources || [],
           confidence: data.confidence,
           verifierScore: data.verifierScore,
@@ -110,6 +115,7 @@ export default function LyaChatWidget() {
           ts: Date.now(),
         },
       ]);
+      if (autoSpeak && voice.ttsSupported) voice.speak(lyaContent);
     } catch (e) {
       setMessages((m) => [
         ...m,
@@ -365,6 +371,23 @@ export default function LyaChatWidget() {
 
               {/* Footer · Input + CTA full-page */}
               <div className="border-t border-border bg-card px-3 md:px-4 py-3 space-y-2">
+                <LyaVoiceControls
+                  sttSupported={voice.sttSupported}
+                  ttsSupported={voice.ttsSupported}
+                  listening={voice.listening}
+                  speaking={voice.speaking}
+                  autoSpeak={autoSpeak}
+                  voiceName={voice.voiceName}
+                  interim={voice.interim}
+                  disabled={loading}
+                  onToggleAutoSpeak={() => setAutoSpeak((v) => !v)}
+                  onStopSpeaking={voice.stopSpeaking}
+                  onStopListening={voice.stopListening}
+                  onStartListening={() => {
+                    if (!autoSpeak) setAutoSpeak(true);
+                    voice.startListening((finalText) => sendQuery(finalText));
+                  }}
+                />
                 <form onSubmit={handleSubmit} className="flex items-center gap-2">
                   <input
                     ref={inputRef}
