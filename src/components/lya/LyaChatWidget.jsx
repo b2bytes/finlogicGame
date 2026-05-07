@@ -256,21 +256,24 @@ export default function LyaChatWidget() {
 
             <motion.div
               key="panel"
-              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              initial={{ opacity: 0, y: 16, scale: 0.92 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 16, scale: 0.96 }}
+              exit={{ opacity: 0, y: 12, scale: 0.94 }}
               transition={{ type: 'spring', stiffness: 320, damping: 28 }}
               role="dialog"
               aria-label="Chat con Lya"
               style={{
-                // Mobile: usa svh (small viewport height) que ya excluye barras de browser
-                // y deja respiro arriba. Desktop: alto fluido con cap.
-                paddingBottom: 'env(safe-area-inset-bottom)',
+                // Ancla el panel a la esquina inferior derecha (donde está el FAB)
+                // tanto en mobile como en desktop, con safe-area en iOS.
+                bottom: 'max(1rem, env(safe-area-inset-bottom))',
+                right: 'max(0.75rem, env(safe-area-inset-right))',
+                transformOrigin: 'bottom right',
               }}
               className="fixed z-50 bg-card border border-border shadow-soft-lg overflow-hidden flex flex-col
-                         inset-x-0 bottom-0 top-auto h-[88svh] max-h-[88svh] rounded-t-3xl
-                         md:inset-auto md:bottom-6 md:right-6 md:left-auto md:top-auto
-                         md:w-[400px] md:h-auto md:max-h-[min(640px,calc(100vh-4rem))] md:rounded-3xl"
+                         w-[calc(100vw-1.5rem)] max-w-[400px]
+                         h-[min(85svh,640px)]
+                         rounded-3xl
+                         md:w-[400px] md:h-auto md:max-h-[min(640px,calc(100vh-6rem))]"
             >
               {/* Header */}
               <div className="relative px-4 md:px-5 py-3.5 bg-gradient-to-br from-mint-500 to-mint-700 text-white flex items-center gap-3">
