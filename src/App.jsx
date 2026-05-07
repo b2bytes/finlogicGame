@@ -48,6 +48,7 @@ import AdminCRM from '@/pages/AdminCRM';
 import Lanzamiento from '@/pages/Lanzamiento';
 import HealthCheck from '@/pages/HealthCheck';
 import HomeOpus from '@/pages/HomeOpus';
+import EditorLegal from '@/pages/EditorLegal';
 import SafeRoute from '@/components/SafeRoute';
 import { useVisitTracker } from '@/lib/useVisitTracker';
 
@@ -118,6 +119,7 @@ const AuthenticatedApp = () => {
         <Route path="/Admin/Lanzamiento" element={<SafeRoute name="Lanzamiento"><Lanzamiento /></SafeRoute>} />
         <Route path="/Admin/HealthCheck" element={<SafeRoute name="HealthCheck"><HealthCheck /></SafeRoute>} />
         <Route path="/HomeOpus" element={<SafeRoute name="HomeOpus"><HomeOpus /></SafeRoute>} />
+        <Route path="/EditorLegal" element={<SafeRoute name="EditorLegal"><EditorLegal /></SafeRoute>} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </ErrorBoundary>

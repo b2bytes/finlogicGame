@@ -1,0 +1,169 @@
+{
+  "name": "LegalDocumentDraft",
+  "type": "object",
+  "description": "Borrador de documento legal colaborativo entre Lya (IA) y el ciudadano. Lya rellena plantillas autom\u00e1ticamente usando datos de la consulta; el usuario revisa, edita inline y firma. Soporta demandas SERNAC, recursos CMF, denuncias CSIRT, cartas ARCO.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del documento (ej: 'Demanda SERNAC contra Banco X')"
+    },
+    "templateId": {
+      "type": "string",
+      "enum": [
+        "demanda_sernac",
+        "recurso_reposicion_cmf",
+        "denuncia_csirt",
+        "carta_arco",
+        "reclamo_cmf",
+        "denuncia_fraude_ley_20009",
+        "recurso_proteccion",
+        "carta_cobro_indebido"
+      ],
+      "description": "Plantilla legal base sobre la que Lya rellena"
+    },
+    "casoRef": {
+      "type": "string",
+      "description": "Reference \u2192 MisCasos.id si proviene de un caso"
+    },
+    "consultaQuery": {
+      "type": "string",
+      "description": "Consulta original del usuario que origin\u00f3 el documento"
+    },
+    "fields": {
+      "type": "object",
+      "description": "Campos rellenados por Lya: fullName, rut, address, recipient, factsSummary, amount, date, etc.",
+      "additionalProperties": true
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenido completo del documento en markdown editable"
+    },
+    "lawsCited": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Leyes y art\u00edculos citados (ej: 'Ley 20.009 Art. 5\u00b0')"
+    },
+    "regulatoryBody": {
+      "type": "string",
+      "enum": [
+        "CMF",
+        "SERNAC",
+        "SII",
+        "CSIRT",
+        "BCN",
+        "FOGAPE",
+        "SERCOTEC",
+        "tribunal",
+        "multiple"
+      ],
+      "description": "Organismo destinatario"
+    },
+    "addressedTo": {
+      "type": "string",
+      "description": "Destinatario espec\u00edfico (ej: 'BancoEstado', 'SERNAC RM')"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "filling",
+        "review",
+        "user_editing",
+        "signed",
+        "sent"
+      ],
+      "default": "draft",
+      "description": "Estado del documento en el workflow colaborativo"
+    },
+    "lyaConfidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Confianza de Lya en el rellenado (0-100)"
+    },
+    "verifierScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Score del verificador anti-alucinaci\u00f3n"
+    },
+    "userEdits": {
+      "type": "array",
+      "description": "Historial de ediciones del usuario sobre el contenido de Lya",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ts": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fieldOrSection": {
+            "type": "string"
+          },
+          "previousValue": {
+            "type": "string"
+          },
+          "newValue": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "signatureDataUrl": {
+      "type": "string",
+      "description": "Firma del usuario como dataURL base64 (PNG)"
+    },
+    "signedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signedBy": {
+      "type": "string",
+      "description": "Email del firmante"
+    },
+    "pdfUrl": {
+      "type": "string",
+      "description": "URL del PDF firmado generado"
+    },
+    "sentTo": {
+      "type": "string",
+      "description": "Email/destinatario al que se envi\u00f3 el doc firmado"
+    }
+  },
+  "required": [
+    "title",
+    "templateId"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": {
+              "$eq": "admin"
+            }
+          }
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    }
+  }
+}

@@ -81,7 +81,7 @@ function drawLogo(doc, x, y) {
   doc.text('FL', x + 3.5, y + 4.7, { align: 'center' });
 }
 
-export function generateDocPDF({ title, content, addressedTo, legalBasis }) {
+export function generateDocPDF({ title, content, addressedTo, legalBasis, signatureDataUrl, signedBy }) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   doc.setFont('helvetica');
 
@@ -239,12 +239,20 @@ export function generateDocPDF({ title, content, addressedTo, legalBasis }) {
     y += 1;
   }
 
-  // ─── Línea de firma ───────────────────────────────────────────────
-  if (y > PAGE_H - MARGIN_BOTTOM - 36) {
+  // ─── Bloque de firma (con firma real si existe) ────────────────────
+  if (y > PAGE_H - MARGIN_BOTTOM - 50) {
     doc.addPage();
     y = 30;
   }
-  y += 16;
+  y += 12;
+  if (signatureDataUrl) {
+    try {
+      // Incrusta firma como PNG, 60mm ancho, 22mm alto sobre la línea
+      doc.addImage(signatureDataUrl, 'PNG', MARGIN_X, y - 18, 60, 22);
+    } catch (e) {
+      // ignora si la firma falla
+    }
+  }
   doc.setDrawColor(...INK);
   doc.setLineWidth(0.3);
   doc.line(MARGIN_X, y, MARGIN_X + 70, y);
@@ -252,6 +260,12 @@ export function generateDocPDF({ title, content, addressedTo, legalBasis }) {
   doc.setFontSize(9);
   doc.setTextColor(...MUTED);
   doc.text('Firma del titular', MARGIN_X, y);
+  if (signedBy) {
+    y += 4;
+    doc.setFontSize(7.5);
+    doc.setTextColor(...MINT);
+    doc.text(`Firmado digitalmente por ${signedBy} · ${new Date().toLocaleString('es-CL')}`, MARGIN_X, y);
+  }
 
   // ─── Footer institucional en cada página ─────────────────────────
   const total = doc.getNumberOfPages();

@@ -10,6 +10,7 @@ import { ShieldCheck, Menu, X, ArrowRight, SlidersHorizontal } from 'lucide-reac
 
 const navItems = [
   { label: 'Lya IA', to: '/AsistenteLya' },
+  { label: 'Editor legal', to: '/EditorLegal' },
   { label: 'Casos', to: '/Casos' },
   { label: 'Pyme', to: '/Pyme' },
   { label: 'API B2B', to: '/api-compliance' },
