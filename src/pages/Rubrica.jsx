@@ -145,6 +145,26 @@ const RUBRICA = [
       },
     ],
   },
+  {
+    id: 'pipeline_crm',
+    title: 'Pipeline CRM unificado (+4)',
+    description: 'Recepción inteligente B2C + B2B + B2G con upsert automático y bandeja única.',
+    weight: 4,
+    criteria: [
+      {
+        id: 'crm_zero_friction',
+        title: 'Zero-friction: lead se crea al 1er mensaje sin pedir email',
+        description: 'crmRegisterLead upserta por sessionId/email/phone. Cumple §GrowthMarketing "primera victoria <60s sin registro".',
+        weight: 50,
+      },
+      {
+        id: 'crm_lifecycle_evolutivo',
+        title: 'Lifecycle stages evolucionan automáticamente',
+        description: 'visitor → activated (1ra victoria) → engaged (3+ msgs) → retained (vuelve >24h) → converted (Pro/B2B). Score de prioridad sube con urgencia/fraude/plazo crítico.',
+        weight: 50,
+      },
+    ],
+  },
 ];
 
 export default function Rubrica() {

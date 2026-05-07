@@ -385,6 +385,15 @@ Responde como Lya (continuando el hilo si aplica):`;
             regulatoryBodyIdentified: llmResponse.regulatoryBody || 'ninguno',
             inputChannel: mode === 'voice' ? 'voice' : 'web',
           }),
+          // Pipeline CRM: registra/actualiza Lead en cada turno (zero-friction).
+          base44.asServiceRole.functions.invoke('crmRegisterLead', {
+            sessionId,
+            query: query.substring(0, 500),
+            archetype: llmResponse.detectedProfile || userProfile || 'general',
+            regulatoryBody: llmResponse.regulatoryBody || 'ninguno',
+            source: 'lya_widget',
+            event: 'message',
+          }).catch(() => null),
         ]);
       } catch (e) {
         console.warn('lya persistence skipped:', e.message);

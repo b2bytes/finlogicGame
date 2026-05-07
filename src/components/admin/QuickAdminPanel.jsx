@@ -67,6 +67,7 @@ const SECTIONS = [
     title: 'Admin · Operaciones',
     color: 'rose',
     pages: [
+      { path: '/Admin/CRM', label: 'CRM · Bandeja personas', icon: Users, desc: 'Pipeline B2C/B2B/B2G unificado' },
       { path: '/OperacionesDashboard', label: 'Ops Dashboard', icon: Activity, desc: 'Pipeline KPIs + alertas' },
       { path: '/FinancialDashboard', label: 'FinOps · MRR', icon: DollarSign, desc: 'Métricas financieras' },
       { path: '/Admin/SystemMetrics', label: 'System Metrics', icon: Zap, desc: 'Latencia + scores' },

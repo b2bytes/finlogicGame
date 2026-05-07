@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Cpu, Mic, ExternalLink, ShieldCheck, Download, ChevronRight, FileDown } from 'lucide-react';
+import { ArrowLeft, FileText, Cpu, Mic, ExternalLink, ShieldCheck, Download, ChevronRight, FileDown, Sparkles } from 'lucide-react';
 import Logo from '@/components/home/Logo';
 import CopyField from '@/components/entregables/CopyField';
 import SectionHeader from '@/components/entregables/SectionHeader';
@@ -386,8 +386,10 @@ export default function Entregables() {
               {[
                 { to: '/PitchDeck', icon: Mic, title: 'PitchDeck navegable', desc: '12 slides editorial Apple-style. Listo para presentar en vivo o exportar a PDF.' },
                 { to: '/Demo', icon: FileText, title: 'Workflow video demo', desc: 'Guion canónico 3 min, shot list, prompts y specs broadcast 4K/60fps.' },
-                { to: '/Rubrica', icon: ShieldCheck, title: 'Rúbrica auto-validada', desc: '12 criterios oficiales validados en vivo contra el sistema. 95+/100 técnico.' },
+                { to: '/Rubrica', icon: ShieldCheck, title: 'Rúbrica auto-validada', desc: '14 criterios oficiales + bonus CRM validados en vivo contra el sistema.' },
                 { to: '/Transparencia', icon: Cpu, title: 'AgentTrace público', desc: 'Cada respuesta de Lya con su pipeline IA auditable. Diferenciador único.' },
+                { to: '/Admin/CRM', icon: FileText, title: 'CRM unificado · NUEVO', desc: 'Bandeja inteligente B2C + B2B + B2G. Upsert automático al primer mensaje con Lya.' },
+                { to: '/AsistenteLya', icon: Sparkles, title: 'Asistente Lya', desc: 'Chat conversacional con voz, citas RAG verificadas y skin adaptativo por arquetipo.' },
               ].map((c) => {
                 const Icon = c.icon;
                 return (

@@ -40,6 +40,7 @@ import QuickAdminPanel from '@/components/admin/QuickAdminPanel';
 import Rubrica from '@/pages/Rubrica';
 import Demo from '@/pages/Demo';
 import Entregables from '@/pages/Entregables';
+import AdminCRM from '@/pages/AdminCRM';
 import SafeRoute from '@/components/SafeRoute';
 
 const AuthenticatedApp = () => {
@@ -100,6 +101,7 @@ const AuthenticatedApp = () => {
         <Route path="/Rúbrica" element={<SafeRoute name="Rubrica"><Rubrica /></SafeRoute>} />
         <Route path="/Demo" element={<SafeRoute name="Demo"><Demo /></SafeRoute>} />
         <Route path="/Entregables" element={<SafeRoute name="Entregables"><Entregables /></SafeRoute>} />
+        <Route path="/Admin/CRM" element={<SafeRoute name="AdminCRM"><AdminCRM /></SafeRoute>} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </ErrorBoundary>

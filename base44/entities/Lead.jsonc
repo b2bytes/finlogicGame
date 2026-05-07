@@ -1,8 +1,12 @@
 {
   "name": "Lead",
   "type": "object",
-  "description": "Lead capturado en el flywheel de adquisici\u00f3n. Una fila por email/tel\u00e9fono \u00fanico. Tracking del funnel desde primera visita hasta conversi\u00f3n Pro o B2B.",
+  "description": "Lead/persona en el CRM unificado FinLogic. Una fila por email/tel\u00e9fono/sessionId \u00fanico. Captura zero-friction al primer mensaje con Lya, evoluciona a Pro o B2B. Soporta B2C, B2B fintech y B2G institucional.",
   "properties": {
+    "fullName": {
+      "type": "string",
+      "description": "Nombre completo si lo conocemos (logueado, formulario, o detectado)"
+    },
     "email": {
       "type": "string",
       "format": "email"
@@ -11,6 +15,23 @@
       "type": "string",
       "pattern": "^\\+56[0-9]{9}$",
       "description": "WhatsApp formato +56XXXXXXXXX"
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Session ID an\u00f3nimo (asignado al primer mensaje en Lya, persistido en localStorage). Sirve de PK cuando a\u00fan no hay email."
+    },
+    "accountType": {
+      "type": "string",
+      "enum": [
+        "b2c",
+        "b2b_fintech",
+        "b2g_institucional",
+        "pyme",
+        "prensa",
+        "otro"
+      ],
+      "default": "b2c",
+      "description": "Tipo de cuenta para segmentar bandeja CRM"
     },
     "segment": {
       "type": "string",
@@ -23,6 +44,18 @@
       ],
       "default": "general"
     },
+    "archetype": {
+      "type": "string",
+      "enum": [
+        "camila",
+        "don_luis",
+        "maria_jose",
+        "roberto",
+        "general"
+      ],
+      "default": "general",
+      "description": "Arquetipo can\u00f3nico detectado por Lya"
+    },
     "source": {
       "type": "string",
       "enum": [
@@ -33,10 +66,13 @@
         "organic_seo",
         "referral",
         "casos_publicos",
-        "direct"
+        "direct",
+        "lya_widget",
+        "asistente_lya",
+        "consulta_form",
+        "embed"
       ],
-      "default": "direct",
-      "description": "Canal de origen del lead"
+      "default": "direct"
     },
     "utmCampaign": {
       "type": "string"
@@ -51,19 +87,81 @@
       "type": "string",
       "description": "Primera consulta del usuario en lenguaje natural"
     },
+    "lastQuery": {
+      "type": "string",
+      "description": "\u00daltima consulta registrada"
+    },
     "firstVictoryAt": {
       "type": "string",
       "format": "date-time",
       "description": "Timestamp de primera resoluci\u00f3n exitosa (North Star Metric)"
     },
+    "lastContactAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima interacci\u00f3n registrada (mensaje, caso, doc)"
+    },
+    "messagesCount": {
+      "type": "number",
+      "default": 0,
+      "description": "Total de mensajes que ha intercambiado con Lya"
+    },
     "casesCount": {
       "type": "number",
       "default": 0
     },
+    "documentsCount": {
+      "type": "number",
+      "default": 0
+    },
+    "lifecycleStage": {
+      "type": "string",
+      "enum": [
+        "visitor",
+        "lead",
+        "activated",
+        "engaged",
+        "retained",
+        "converted",
+        "churned"
+      ],
+      "default": "visitor",
+      "description": "Etapa pipeline: visitor \u2192 escribe \u2192 activated (1ra victoria) \u2192 engaged (3+ msgs) \u2192 retained (vuelve) \u2192 converted (Pro/B2B) \u2192 churned"
+    },
+    "priorityScore": {
+      "type": "number",
+      "default": 0,
+      "description": "Score 0-100 para priorizar en la bandeja CRM. Aumenta con urgencia, monto, plazo cr\u00edtico."
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags libres del CRM: 'urgente', 'fraude', 'b2b-frio', 'demo-pendiente'"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas internas del equipo FinLogic sobre este lead/cliente"
+    },
+    "regulatoryBodyMostUsed": {
+      "type": "string",
+      "enum": [
+        "CMF",
+        "SERNAC",
+        "SII",
+        "CSIRT",
+        "BCN",
+        "FOGAPE",
+        "SERCOTEC",
+        "multiple",
+        "ninguno"
+      ],
+      "default": "ninguno"
+    },
     "proTriggerShownAt": {
       "type": "string",
-      "format": "date-time",
-      "description": "Timestamp en que se mostr\u00f3 el Momento Pro"
+      "format": "date-time"
     },
     "convertedToPro": {
       "type": "boolean",
@@ -74,23 +172,10 @@
       "format": "date-time"
     },
     "referralCode": {
-      "type": "string",
-      "description": "C\u00f3digo \u00fanico para tracking de referidos"
+      "type": "string"
     },
     "referredBy": {
-      "type": "string",
-      "description": "referralCode del usuario que refiri\u00f3"
-    },
-    "lifecycleStage": {
-      "type": "string",
-      "enum": [
-        "visitor",
-        "activated",
-        "retained",
-        "converted",
-        "churned"
-      ],
-      "default": "visitor"
+      "type": "string"
     }
   },
   "rls": {
