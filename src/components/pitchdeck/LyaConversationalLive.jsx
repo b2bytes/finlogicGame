@@ -3,10 +3,36 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Conversation } from '@elevenlabs/client';
 import {
   Phone, PhoneOff, Mic, MicOff, Radio, Loader2, X,
-  Sparkles, Volume2, MessageCircle,
+  Sparkles, Volume2, MessageCircle, Navigation, ExternalLink,
+  Zap, Search,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import StageScene from './StageScene';
+
+// ─── Mapa de slides (id → label legible para mostrar al activarse) ──
+const SLIDE_LABELS = {
+  'slide-hero': 'Apertura',
+  'slide-problema': 'El problema',
+  'slide-perfiles': '4 perfiles',
+  'slide-demo': 'Demo en vivo',
+  'slide-casos': 'Casos resueltos',
+  'slide-traccion': 'Tracción',
+  'slide-api': 'Compliance API',
+  'slide-sfa': 'Ventana SFA',
+  'slide-equipo': 'Equipo',
+  'slide-cierre': 'Cierre',
+};
+
+// ─── Métricas resaltables (id → selector + label) ───────────────────
+const METRIC_TARGETS = {
+  casos: { slide: 'slide-traccion', label: 'consultas resueltas' },
+  score: { slide: 'slide-traccion', label: 'score verificador IA' },
+  recuperado: { slide: 'slide-casos', label: 'CLP recuperados' },
+  latencia: { slide: 'slide-demo', label: 'latencia <600ms' },
+  alucinacion: { slide: 'slide-traccion', label: '0.4% alucinación' },
+  sfa: { slide: 'slide-sfa', label: 'Ventana 4 julio' },
+  pricing: { slide: 'slide-api', label: '$490.000 CLP/mes' },
+};
 
 /**
  * LyaConversationalLive — Conversación bidireccional en vivo con el Agente
@@ -26,12 +52,97 @@ export default function LyaConversationalLive() {
   const [agentSpeaking, setAgentSpeaking] = useState(false);
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState(null);
-  const [transcript, setTranscript] = useState([]); // [{role, text, ts}]
+  const [transcript, setTranscript] = useState([]); // [{role|action, text, ts, meta}]
   const [elapsed, setElapsed] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(null);
+  const [activeMetric, setActiveMetric] = useState(null);
 
   const conversationRef = useRef(null);
   const startTimeRef = useRef(null);
   const transcriptScrollRef = useRef(null);
+  const metricTimeoutRef = useRef(null);
+
+  // ─── Client tools que el agente puede ejecutar EN VIVO ──────────
+  const clientTools = useRef({
+    navigateToSlide: ({ slideId }) => {
+      const el = document.getElementById(slideId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setCurrentSlide(slideId);
+        setTranscript((t) => [
+          ...t,
+          {
+            role: 'action',
+            tool: 'navigateToSlide',
+            text: `Navegando a "${SLIDE_LABELS[slideId] || slideId}"`,
+            ts: Date.now(),
+          },
+        ]);
+        return `OK, mostrando slide ${SLIDE_LABELS[slideId] || slideId}`;
+      }
+      return `Slide ${slideId} no encontrado`;
+    },
+    openPage: ({ path, reason }) => {
+      const url = `${window.location.origin}${path}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setTranscript((t) => [
+        ...t,
+        {
+          role: 'action',
+          tool: 'openPage',
+          text: `Abriendo página ${path}${reason ? ` · ${reason}` : ''}`,
+          ts: Date.now(),
+        },
+      ]);
+      return `Página ${path} abierta en pestaña nueva`;
+    },
+    highlightMetric: ({ metric }) => {
+      const target = METRIC_TARGETS[metric];
+      if (target) {
+        const el = document.getElementById(target.slide);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActiveMetric(metric);
+        if (metricTimeoutRef.current) clearTimeout(metricTimeoutRef.current);
+        metricTimeoutRef.current = setTimeout(() => setActiveMetric(null), 4000);
+        setTranscript((t) => [
+          ...t,
+          {
+            role: 'action',
+            tool: 'highlightMetric',
+            text: `Resaltando: ${target.label}`,
+            ts: Date.now(),
+          },
+        ]);
+        return `Métrica ${metric} resaltada`;
+      }
+      return `Métrica ${metric} no encontrada`;
+    },
+    queryFinLogic: async ({ question }) => {
+      setTranscript((t) => [
+        ...t,
+        {
+          role: 'action',
+          tool: 'queryFinLogic',
+          text: `Consultando pipeline IA: "${question.slice(0, 80)}…"`,
+          ts: Date.now(),
+        },
+      ]);
+      try {
+        const res = await base44.functions.invoke('lyaKnowledgeQuery', {
+          query: question,
+          mode: 'voice',
+          userProfile: 'general',
+        });
+        const data = res.data || {};
+        const answer = data.response || 'Sin respuesta del pipeline';
+        const score = data.verifierScore || data.confidence || null;
+        const sources = (data.sources || []).slice(0, 2).join(', ');
+        return `Respuesta verificada (score ${score ?? 'N/A'}): ${answer.slice(0, 600)}${sources ? `. Fuentes: ${sources}` : ''}`;
+      } catch (err) {
+        return `Error consultando pipeline: ${err.message}`;
+      }
+    },
+  });
 
   // ─── Cronómetro de la sesión ────────────────────────────────────
   useEffect(() => {
@@ -67,9 +178,10 @@ export default function LyaConversationalLive() {
       const signedUrl = res.data?.signedUrl;
       if (!signedUrl) throw new Error('No se pudo obtener la signed URL del agente');
 
-      // 3. Iniciar sesión con el SDK de ElevenLabs
+      // 3. Iniciar sesión con el SDK de ElevenLabs (con client tools)
       const conversation = await Conversation.startSession({
         signedUrl,
+        clientTools: clientTools.current,
         onConnect: () => {
           setStatus('connected');
         },
@@ -139,7 +251,10 @@ export default function LyaConversationalLive() {
   }, [endConversation]);
 
   // Cleanup al desmontar
-  useEffect(() => () => { endConversation(); }, [endConversation]);
+  useEffect(() => () => {
+    endConversation();
+    if (metricTimeoutRef.current) clearTimeout(metricTimeoutRef.current);
+  }, [endConversation]);
 
   const formatTime = (s) => {
     const m = Math.floor(s / 60);
@@ -225,6 +340,22 @@ export default function LyaConversationalLive() {
           <StageScene speaking={agentSpeaking} />
         </div>
 
+        {/* Slide actual narrando */}
+        {currentSlide && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative mt-3 flex items-center justify-center gap-1.5"
+          >
+            <span className="text-[9px] font-mono-editorial uppercase tracking-wider text-mint-200">
+              Slide actual
+            </span>
+            <span className="text-[10px] font-bold text-white px-2 py-0.5 rounded-full bg-white/20 backdrop-blur">
+              {SLIDE_LABELS[currentSlide]}
+            </span>
+          </motion.div>
+        )}
+
         {/* Estado en banner */}
         <div className="relative mt-3 flex items-center justify-center gap-2 text-[11px] text-mint-50/90">
           {status === 'connected' && agentSpeaking && (
@@ -281,27 +412,50 @@ export default function LyaConversationalLive() {
         )}
 
         <AnimatePresence initial={false}>
-          {transcript.map((t, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`flex ${t.role === 'lya' ? 'justify-start' : 'justify-end'}`}
-            >
-              <div
-                className={`max-w-[88%] rounded-2xl px-3.5 py-2 text-[12.5px] leading-relaxed shadow-soft border ${
-                  t.role === 'lya'
-                    ? 'bg-mint-50 border-mint-100 text-foreground rounded-tl-md'
-                    : 'bg-secondary border-border text-foreground rounded-tr-md'
-                }`}
+          {transcript.map((t, i) => {
+            // Acciones de Lya (navegación, queries) → tarjeta especial
+            if (t.role === 'action') {
+              const Icon = t.tool === 'navigateToSlide' ? Navigation
+                : t.tool === 'openPage' ? ExternalLink
+                : t.tool === 'highlightMetric' ? Zap
+                : Search;
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex justify-center"
+                >
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-mint-600 text-white text-[11px] font-mono-editorial shadow-soft">
+                    <Icon className="w-3 h-3" />
+                    <span>{t.text}</span>
+                  </div>
+                </motion.div>
+              );
+            }
+            // Mensajes normales (Lya o público)
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex ${t.role === 'lya' ? 'justify-start' : 'justify-end'}`}
               >
-                <p className="text-[9px] font-mono-editorial uppercase tracking-wider mb-0.5 opacity-60">
-                  {t.role === 'lya' ? 'Lya · IA' : 'Público / Paula'}
-                </p>
-                <p>{t.text}</p>
-              </div>
-            </motion.div>
-          ))}
+                <div
+                  className={`max-w-[88%] rounded-2xl px-3.5 py-2 text-[12.5px] leading-relaxed shadow-soft border ${
+                    t.role === 'lya'
+                      ? 'bg-mint-50 border-mint-100 text-foreground rounded-tl-md'
+                      : 'bg-secondary border-border text-foreground rounded-tr-md'
+                  }`}
+                >
+                  <p className="text-[9px] font-mono-editorial uppercase tracking-wider mb-0.5 opacity-60">
+                    {t.role === 'lya' ? 'Lya · IA' : 'Público / Paula'}
+                  </p>
+                  <p>{t.text}</p>
+                </div>
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
 
         {status === 'connected' && transcript.length === 0 && (
