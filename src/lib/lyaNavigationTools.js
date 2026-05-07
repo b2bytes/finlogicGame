@@ -1,10 +1,11 @@
 // lyaNavigationTools.js — Catálogo central de páginas y secciones que Lya
 // puede usar para navegar la plataforma. Mantiene su conocimiento sincronizado
 // entre frontend (client tools) y backend (system prompt del agente).
-// v1.2 · cache-bust HMR — exporta: scrollToElement, scrollToPosition, scrollToText,
-// navigateToPath, goBackHistory, goForwardHistory, reloadPage, findByText,
-// clickByText, describeCurrentPage, listInteractiveElements, fillField,
-// clickByLyaAction, triggerLyaToast, openLyaChat, LYA_PAGES, LYA_SLIDES.
+// v1.3 · cache-bust HMR forzado — exporta: scrollToElement, scrollToPosition,
+// scrollToText, navigateToPath, goBackHistory, goForwardHistory, reloadPage,
+// findByText, clickByText, describeCurrentPage, listInteractiveElements,
+// fillField, clickByLyaAction, triggerLyaToast, openLyaChat, LYA_PAGES,
+// LYA_SLIDES.
 
 // Páginas principales con descripción para el agente.
 export const LYA_PAGES = [
