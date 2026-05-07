@@ -37,13 +37,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ElevenLabs cobra por carácter — recortamos a 1500 chars (suficiente para
-    // una respuesta completa de Lya). Cierre limpio en último punto.
+    // ElevenLabs cobra por carácter — recortamos a 2800 chars (suficiente para
+    // un slide completo del pitch sin cortes). Cierre limpio en último punto.
     let cleanText = text.trim();
-    if (cleanText.length > 1500) {
-      const cut = cleanText.substring(0, 1500);
+    if (cleanText.length > 2800) {
+      const cut = cleanText.substring(0, 2800);
       const lastDot = cut.lastIndexOf('. ');
-      cleanText = lastDot > 1000 ? cut.substring(0, lastDot + 1) : cut + '.';
+      cleanText = lastDot > 2000 ? cut.substring(0, lastDot + 1) : cut + '.';
     }
 
     const ttsResponse = await fetch(

@@ -61,9 +61,9 @@ function sanitizeForSpeech(text) {
 
   clean = clean.replace(/\s+/g, ' ').replace(/\s+([.,;:])/g, '$1').trim();
 
-  if (clean.length > 1500) {
-    const lastDot = clean.substring(0, 1500).lastIndexOf('. ');
-    clean = lastDot > 1000 ? clean.substring(0, lastDot + 1) : clean.substring(0, 1500) + '.';
+  if (clean.length > 2800) {
+    const lastDot = clean.substring(0, 2800).lastIndexOf('. ');
+    clean = lastDot > 2000 ? clean.substring(0, lastDot + 1) : clean.substring(0, 2800) + '.';
   }
   return clean;
 }
