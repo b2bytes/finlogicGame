@@ -6,6 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { AccessibilityProvider } from '@/lib/AccessibilityContext';
 import { SkinProvider } from '@/lib/SkinContext.jsx';
+import { LyaPersistentProvider } from '@/lib/LyaPersistentContext.jsx';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Home from '@/pages/Home';
 import Consulta from '@/pages/Consulta';
@@ -110,14 +111,16 @@ const AuthenticatedApp = () => {
     <ErrorBoundary scope="lya-widget" variant="silent">
       <LyaChatWidget />
     </ErrorBoundary>
-    {/* Lya voz global — card flotante bottom-right APILADA sobre el LyaChatWidget.
-        stackOffset=92px deja espacio al chat widget (FAB ~72px + 20px gap).
-        Excluida en rutas que ya tienen su propio widget de voz dedicado. */}
-    {!['/PitchDeck', '/AsistenteLya', '/Consulta', '/Embed/Lya'].some((p) =>
-      location?.pathname?.startsWith(p)
-    ) && (
+    {/* Lya voz global PERSISTENTE — montada UNA SOLA VEZ y sobrevive a
+        navegaciones SPA gracias al LyaPersistentProvider. Solo se excluye
+        en /Embed/Lya (iframe externo) para evitar doble instancia. */}
+    {!location?.pathname?.startsWith('/Embed/Lya') && (
       <ErrorBoundary scope="lya-voice-card" variant="silent">
-        <LyaVoiceCard position="bottom-right" stackOffset={92} />
+        <LyaVoiceCard
+          position="bottom-right"
+          stackOffset={92}
+          pitchMode={location?.pathname?.startsWith('/PitchDeck')}
+        />
       </ErrorBoundary>
     )}
     <ErrorBoundary scope="shell" variant="silent">
@@ -138,12 +141,14 @@ function App() {
       <AuthProvider>
         <AccessibilityProvider>
           <SkinProvider>
-            <QueryClientProvider client={queryClientInstance}>
-              <Router>
-                <AuthenticatedApp />
-              </Router>
-              <Toaster />
-            </QueryClientProvider>
+            <LyaPersistentProvider>
+              <QueryClientProvider client={queryClientInstance}>
+                <Router>
+                  <AuthenticatedApp />
+                </Router>
+                <Toaster />
+              </QueryClientProvider>
+            </LyaPersistentProvider>
           </SkinProvider>
         </AccessibilityProvider>
       </AuthProvider>

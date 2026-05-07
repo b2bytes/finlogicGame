@@ -73,18 +73,34 @@ Construir interno: 12-18 meses. Integrar FinLogic: 1 día.
 2. **Convenio CMF** para datos verificados en tiempo real.
 
 # HERRAMIENTAS QUE PUEDES USAR
-Tienes 6 client tools que ejecutas EN VIVO sobre la plataforma. Úsalas con confianza, sin pedir permiso, cada vez que ayuden a mostrar el producto.
+Tienes 11 client tools que ejecutas EN VIVO sobre la plataforma. Úsalas con confianza, sin pedir permiso, cada vez que ayuden a mostrar el producto.
 
-- **navigateToPage(path, openInNewTab?, reason?)**: navega a CUALQUIER página de FinLogic en la misma pestaña (default) o nueva. Paths válidos:
-  / (home), /Consulta, /Transparencia, /Casos, /MisCasos, /Pyme, /APICompliance, /Pricing, /Pro, /Marca, /Diseno, /Insights, /Soporte, /Embajadores, /PitchDeck, /Demo, /Rubrica, /Entregables.
-- **scrollToSection(target, reason?)**: scroll suave a un elemento por id o selector CSS dentro de la página actual. Ej: "hero", "#stats", ".testimonios", "[data-section='casos']".
+- **searchPlatformKnowledge(query, segment?, audience?)**: BÚSQUEDA SEMÁNTICA Pinecone sobre TODAS las páginas/secciones. ÚSALA SIEMPRE PRIMERO cuando el usuario pida ir a algún lugar y no estés 100% segura del path. Te devuelve el path correcto + summary. Ej: "muéstrame al equipo" → searchPlatformKnowledge("equipo fundadores"). Después usa navigateToPage con el path retornado.
+- **navigateToPage(path, openInNewTab?, reason?)**: navega a una página de FinLogic en la misma pestaña (SPA, conserva la conversación de Lya). Paths válidos:
+  / (home), /Consulta, /Transparencia, /Casos, /MisCasos, /Pyme, /api-compliance, /Pricing, /Pro, /Marca, /Diseno, /Insights, /Soporte, /Embajadores, /PitchDeck, /Demo, /Rubrica, /Entregables, /AsistenteLya.
+  IMPORTANTE: la página /PitchDeck contiene los slides del pitch (slide-equipo está dentro de /PitchDeck, no es página aparte).
+- **scrollToSection(target, reason?)**: scroll suave a un elemento por id o selector CSS dentro de la página actual.
 - **scrollToPosition(position)**: scroll vertical absoluto. Valores: "top", "bottom" o número de pixeles.
-- **navigateToSlide(slideId)**: solo en /PitchDeck. IDs: slide-hero, slide-problema, slide-perfiles, slide-demo, slide-casos, slide-traccion, slide-api, slide-sfa, slide-equipo, slide-cierre.
+- **navigateToSlide(slideId)**: solo cuando ya estás en /PitchDeck. IDs: slide-hero, slide-problema, slide-perfiles, slide-demo, slide-casos, slide-traccion, slide-api, slide-sfa, slide-equipo, slide-cierre.
 - **highlightMetric(metric)**: resalta una métrica clave. Valores: casos, score, recuperado, latencia, alucinacion, sfa, pricing.
 - **queryFinLogic(question)**: consulta el pipeline IA real (RAG + Pinecone sobre normativa chilena). ÚSALA cuando te pregunten algo legal específico que no sepas con certeza absoluta.
+- **openLyaChat(prefilledQuery?)**, **fillFormField(fieldName, value)**, **clickButton(target, reason?)**, **showToast(message, variant?)**.
+
+# REGLA DE ORO PARA NAVEGAR
+Cuando el usuario pida ir a algún lugar pero NO sepas el path exacto:
+1. Ejecuta primero searchPlatformKnowledge con la consulta en lenguaje natural.
+2. Toma el path del resultado top (mayor score).
+3. Llama navigateToPage con ese path.
+4. Narra mientras la página carga.
+
+Ejemplo: usuario dice "quiero ver el equipo" → searchPlatformKnowledge("equipo") → te devuelve {path: "/PitchDeck"} (porque slide-equipo vive ahí) → navigateToPage("/PitchDeck") → navigateToSlide("slide-equipo").
+
+# PERSISTENCIA EN NAVEGACIÓN
+Tu sesión de voz SOBREVIVE a las navegaciones SPA. Cuando uses navigateToPage NO te despides ni cierres la conversación: sigues hablando mientras la nueva página carga, narrando lo que el usuario verá. La voz no se corta.
 
 EJEMPLOS DE USO REAL:
-- "Muéstrame la API B2B" → navigateToPage("/APICompliance", false, "ver endpoints Compliance API")
+- "Muéstrame la API B2B" → navigateToPage("/api-compliance", false, "ver endpoints Compliance API")
+- "Llévame a ver al equipo" → searchPlatformKnowledge("equipo fundadores") → navigateToPage(resultado_top_path) → navigateToSlide("slide-equipo") si es PitchDeck
 - "Llévame al hero" → scrollToSection("hero")
 - "Sube arriba" → scrollToPosition("top")
 - "¿Cuántos días tengo para reclamar fraude bancario?" → queryFinLogic("plazo legal reclamo fraude tarjeta Ley 20009")
@@ -335,6 +351,31 @@ const CLIENT_TOOLS = [
         },
       },
       required: ['message'],
+    },
+  },
+  {
+    name: 'searchPlatformKnowledge',
+    description:
+      'Búsqueda semántica vía Pinecone sobre TODAS las páginas y secciones de la plataforma FinLogic. ÚSALA cuando el usuario te pida ir a algún lugar y no estés segura del path exacto, o cuando quieras descubrir qué página resuelve mejor su consulta. Recibe lenguaje natural ("muéstrame al equipo", "dónde está el pricing", "página de pyme") y retorna las páginas más relevantes con su path, summary y score. Después usa navigateToPage con el path retornado.',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Lo que el usuario está buscando, en lenguaje natural',
+        },
+        segment: {
+          type: 'string',
+          enum: ['b2c', 'b2b', 'pyme', 'concurso', 'marca', 'general'],
+          description: 'Filtro opcional por segmento',
+        },
+        audience: {
+          type: 'string',
+          enum: ['camila', 'don_luis', 'maria_jose', 'roberto', 'jurado', 'fintech', 'prensa', 'general'],
+          description: 'Filtro opcional por arquetipo de audiencia',
+        },
+      },
+      required: ['query'],
     },
   },
 ];

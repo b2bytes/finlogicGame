@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Conversation } from '@elevenlabs/client';
 import { Mic, MicOff, X, Loader2, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import LyaVoiceWaves from './LyaVoiceWaves';
 import LyaCyberAvatar from './LyaCyberAvatar';
+import { useLyaPersistent } from '@/lib/LyaPersistentContext.jsx';
 import {
   LYA_PAGES,
   LYA_SLIDES,
@@ -38,16 +38,22 @@ export default function LyaVoiceCard({
   stackOffset = 0,
 }) {
   const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState('idle'); // idle | connecting | connected | error
-  const [agentSpeaking, setAgentSpeaking] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [error, setError] = useState(null);
-  const [lastMessage, setLastMessage] = useState(null); // { role, text }
   const [currentSlide, setCurrentSlide] = useState(null);
   const [actionLabel, setActionLabel] = useState(null); // breve confirmación visual
-
-  const conversationRef = useRef(null);
   const actionTimeoutRef = useRef(null);
+
+  // ─── Estado y control desde el Provider persistente ──────────
+  const {
+    status,
+    agentSpeaking,
+    muted,
+    error,
+    lastMessage,
+    startConversation,
+    endConversation,
+    toggleMute,
+    registerTools,
+  } = useLyaPersistent();
 
   const showAction = useCallback((label) => {
     setActionLabel(label);
@@ -58,7 +64,7 @@ export default function LyaVoiceCard({
   // ─── Tools que el agente ejecuta en vivo ──────────────────────
   // Disponibles SIEMPRE (no solo en pitchMode): Lya navega cualquier página
   // y hace scroll a cualquier sección de la app.
-  const clientTools = useRef({
+  const clientToolsObj = {
     // Navegar a una página de la plataforma (misma pestaña por defecto)
     navigateToPage: ({ path, openInNewTab = false, reason }) => {
       const validPaths = LYA_PAGES.map((p) => p.path);
@@ -162,73 +168,47 @@ export default function LyaVoiceCard({
       triggerLyaToast(message, variant);
       return `Toast mostrado: ${message}`;
     },
-  });
 
-  const startConversation = useCallback(async () => {
-    setError(null);
-    setStatus('connecting');
-    setLastMessage(null);
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      const res = await base44.functions.invoke('elevenLabsAgentSignedUrl', {});
-      const signedUrl = res.data?.signedUrl;
-      if (!signedUrl) throw new Error('No se pudo obtener signed URL');
+    // ─── Búsqueda inteligente de páginas vía Pinecone ─────────────
+    // Lya descubre dinámicamente qué página visitar dado un query
+    // en lenguaje natural ("muéstrame al equipo", "dónde está el pricing").
+    searchPlatformKnowledge: async ({ query, segment, audience }) => {
+      try {
+        const res = await base44.functions.invoke('searchPlatformKnowledge', {
+          query, topK: 4, segment, audience,
+        });
+        const results = res.data?.results || [];
+        if (results.length === 0) {
+          return `No encontré páginas relevantes para "${query}". Páginas disponibles: ${LYA_PAGES.map(p => p.name).join(', ')}`;
+        }
+        const top = results[0];
+        return `Mejor match: "${top.name}" (ruta ${top.path}, score ${top.score}). ${top.summary}. Otras opciones: ${results.slice(1, 3).map(r => `${r.name} (${r.path})`).join(', ')}`;
+      } catch (e) {
+        return `Error en búsqueda: ${e.message}`;
+      }
+    },
+  };
 
-      const conversation = await Conversation.startSession({
-        signedUrl,
-        clientTools: clientTools.current,
-        onConnect: () => setStatus('connected'),
-        onDisconnect: () => { setStatus('idle'); setAgentSpeaking(false); },
-        onError: (err) => {
-          setError(typeof err === 'string' ? err : err?.message || 'Error de conexión');
-          setStatus('error');
-        },
-        onModeChange: (mode) => setAgentSpeaking(mode?.mode === 'speaking'),
-        onMessage: (msg) => {
-          if (!msg?.message) return;
-          setLastMessage({
-            role: msg.source === 'ai' ? 'lya' : 'user',
-            text: msg.message,
-          });
-        },
-      });
-      conversationRef.current = conversation;
-    } catch (err) {
-      setError(
-        err?.name === 'NotAllowedError'
-          ? 'Permiso de micrófono denegado'
-          : err?.message || 'No pude conectar con Lya'
-      );
-      setStatus('error');
-    }
-  }, []);
-
-  const endConversation = useCallback(async () => {
-    try { await conversationRef.current?.endSession(); } catch (_) { /* noop */ }
-    conversationRef.current = null;
-    setStatus('idle');
-    setAgentSpeaking(false);
-    setMuted(false);
-  }, []);
-
-  const toggleMute = useCallback(() => {
-    if (!conversationRef.current) return;
-    const newMuted = !muted;
-    try { conversationRef.current.setMicMuted?.(newMuted); } catch (_) { /* noop */ }
-    setMuted(newMuted);
-  }, [muted]);
+  // Registra las tools en el Provider persistente para que sobrevivan
+  // a navegaciones SPA y queden disponibles SIEMPRE para Lya.
+  useEffect(() => {
+    registerTools(clientToolsObj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registerTools]);
 
   const close = useCallback(async () => {
     await endConversation();
     setOpen(false);
-    setLastMessage(null);
-    setError(null);
   }, [endConversation]);
 
   useEffect(() => () => {
-    endConversation();
     if (actionTimeoutRef.current) clearTimeout(actionTimeoutRef.current);
-  }, [endConversation]);
+  }, []);
+
+  // Si Lya ya está conectada (sobrevivió una navegación), abrimos el card auto.
+  useEffect(() => {
+    if (status === 'connected' && !open) setOpen(true);
+  }, [status, open]);
 
   // ─── Posicionamiento + apilado ────────────────────────────────
   const baseStyle = (() => {
@@ -260,7 +240,7 @@ export default function LyaVoiceCard({
         transition={{ delay: 0.4, type: 'spring', stiffness: 320, damping: 22 }}
         onClick={() => {
           setOpen(true);
-          setTimeout(() => startConversation(), 200);
+          setTimeout(() => startConversation(clientToolsObj), 200);
         }}
         aria-label="Hablar con Lya"
         style={baseStyle}
@@ -406,7 +386,7 @@ export default function LyaVoiceCard({
             </button>
           ) : (
             <button
-              onClick={startConversation}
+              onClick={() => startConversation(clientToolsObj)}
               aria-label="Iniciar conversación"
               className="relative w-11 h-11 rounded-full bg-white inline-flex items-center justify-center shadow-xl hover:scale-105 transition-transform"
             >
