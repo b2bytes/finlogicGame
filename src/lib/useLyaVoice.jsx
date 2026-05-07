@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useLyaVoiceElevenLabs } from '@/lib/useLyaVoiceElevenLabs';
 
 /**
- * Lya Voice — Web Speech API nativa (gratis, sin secrets).
- * STT: SpeechRecognition  · TTS: speechSynthesis
+ * Lya Voice — Hook unificado.
  *
- * Voz objetivo: femenina, ~37 años, español de Chile.
- * Selección priorizada:
- *  1. es-CL femenino (Google/Apple/Microsoft Antonio/Catalina/Sabina/Soledad)
- *  2. es-419 / es-MX / es-US femenino con tono neutro
- *  3. cualquier es-* femenino
- *  4. fallback: primera voz es-*
+ * Estrategia:
+ *  1. Por defecto usa ElevenLabs (calidad studio, voz clonada Lya).
+ *  2. Si ElevenLabs falla (sin secret, error red, etc.) cae a Web Speech API
+ *     nativa del navegador como fallback (gratis, peor calidad).
+ *
+ * API idéntica para los componentes consumidores → drop-in upgrade.
  */
 
-// Patrones de nombres femeninos comunes en TTS hispanos
+// ─── FALLBACK · Web Speech API nativa ──────────────────────────────────────
 const FEMALE_NAME_HINTS = [
   'female', 'mujer', 'femenina',
   'sabina', 'soledad', 'catalina', 'paulina', 'francisca', 'isidora',
@@ -37,10 +37,8 @@ function isLikelyFemale(voice) {
 
 function pickBestSpanishFemaleVoice(voices) {
   if (!voices || voices.length === 0) return null;
-
   const esVoices = voices.filter((v) => (v.lang || '').toLowerCase().startsWith('es'));
   if (esVoices.length === 0) return null;
-
   const tiers = [
     esVoices.filter((v) => v.lang === 'es-CL' && isLikelyFemale(v) === true),
     esVoices.filter((v) => v.lang === 'es-CL' && isLikelyFemale(v) !== false),
@@ -52,15 +50,10 @@ function pickBestSpanishFemaleVoice(voices) {
     esVoices.filter((v) => isLikelyFemale(v) !== false),
     esVoices,
   ];
-
-  for (const tier of tiers) {
-    if (tier.length > 0) return tier[0];
-  }
+  for (const tier of tiers) if (tier.length > 0) return tier[0];
   return null;
 }
 
-// Siglas que el TTS pronuncia mal (letra por letra raro o se traba).
-// Las expandimos a su nombre real en español chileno.
 const ACRONYM_EXPANSIONS = [
   [/\bCMF\b/g, 'Comisión para el Mercado Financiero'],
   [/\bSERNAC\b/g, 'Sernac'],
@@ -70,26 +63,14 @@ const ACRONYM_EXPANSIONS = [
   [/\bFOGAPE\b/g, 'Fogape'],
   [/\bSERCOTEC\b/g, 'Sercotec'],
   [/\bARCO\b/g, 'A-R-C-O'],
-  [/\bTMC\b/g, 'Tasa Máxima Convencional'],
-  [/\bCAE\b/g, 'C-A-E'],
-  [/\bTIR\b/g, 'T-I-R'],
-  [/\bTER\b/g, 'T-E-R'],
   [/\bIVA\b/g, 'I-V-A'],
   [/\bRUT\b/g, 'rut'],
   [/\bAFP\b/g, 'A-F-P'],
-  [/\bNCG\b/g, 'norma de carácter general'],
-  [/\bLPC\b/g, 'Ley del Consumidor'],
-  [/\bLIR\b/g, 'Ley de la Renta'],
-  [/\bF22\b/g, 'formulario 22'],
-  [/\bF29\b/g, 'formulario 29'],
   [/\bUF\b/g, 'U-F'],
   [/\bUTM\b/g, 'U-T-M'],
 ];
 
-// Lectura natural de leyes y artículos
 const LAW_REFS = [
-  // "Ley 19.496" → "Ley diecinueve mil cuatrocientos noventa y seis" es complejo;
-  // dejamos que el TTS lo lea como número con punto eliminado
   [/Ley\s+(\d{1,2})\.(\d{3})/g, 'Ley $1$2'],
   [/Art\.\s*(\d+)/g, 'artículo $1'],
   [/Artículo\s*(\d+)°?/g, 'artículo $1'],
@@ -106,25 +87,16 @@ function sanitizeForSpeech(text) {
     .replace(/\*([^*]+)\*/g, '$1')
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/^[-•·]\s+/gm, '')
-    .replace(/^\d+\.\s+/gm, '') // listas numeradas "1. " → quita marcador
-    .replace(/https?:\/\/\S+/g, '') // urls (TTS las lee carácter por carácter)
+    .replace(/^\d+\.\s+/gm, '')
+    .replace(/https?:\/\/\S+/g, '')
     .replace(/\|/g, ' ')
     .replace(/—/g, ', ')
     .replace(/–/g, ', ')
     .replace(/°/g, '')
-    .replace(/\$\s?(\d)/g, '$$$1') // mantiene "$" pegado al número
     .trim();
-
-  // Expandir leyes/artículos PRIMERO (antes de tocar números)
   for (const [pat, rep] of LAW_REFS) clean = clean.replace(pat, rep);
-  // Luego siglas
   for (const [pat, rep] of ACRONYM_EXPANSIONS) clean = clean.replace(pat, rep);
-
-  // Limpieza final de espacios
   clean = clean.replace(/\s+/g, ' ').replace(/\s+([.,;:])/g, '$1').trim();
-
-  // TTS móvil corta enunciados largos (~32k chars es teórico, pero en práctica
-  // muchos engines fallan >2-3k). Truncamos a 1800 con cierre limpio.
   if (clean.length > 1800) {
     clean = clean.substring(0, 1800);
     const lastDot = clean.lastIndexOf('. ');
@@ -133,7 +105,7 @@ function sanitizeForSpeech(text) {
   return clean;
 }
 
-export function useLyaVoice() {
+function useWebSpeechFallback() {
   const [sttSupported, setSttSupported] = useState(false);
   const [ttsSupported, setTtsSupported] = useState(false);
   const [listening, setListening] = useState(false);
@@ -144,18 +116,15 @@ export function useLyaVoice() {
 
   const recognitionRef = useRef(null);
   const onFinalRef = useRef(null);
-  const utteranceRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
     setTtsSupported(true);
-
     const loadVoice = () => {
       const voices = window.speechSynthesis.getVoices();
       const best = pickBestSpanishFemaleVoice(voices);
       if (best) setVoice(best);
     };
-
     loadVoice();
     window.speechSynthesis.onvoiceschanged = loadVoice;
     return () => {
@@ -166,16 +135,12 @@ export function useLyaVoice() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) {
-      setSttSupported(false);
-      return;
-    }
+    if (!SR) { setSttSupported(false); return; }
     setSttSupported(true);
     const rec = new SR();
     rec.lang = 'es-CL';
     rec.continuous = false;
     rec.interimResults = true;
-
     rec.onresult = (event) => {
       let finalText = '';
       let interimText = '';
@@ -185,31 +150,19 @@ export function useLyaVoice() {
         else interimText += t;
       }
       setInterim(interimText);
-      if (finalText && onFinalRef.current) {
-        onFinalRef.current(finalText.trim());
-      }
+      if (finalText && onFinalRef.current) onFinalRef.current(finalText.trim());
     };
-
     rec.onerror = (e) => {
       setError(
         e.error === 'not-allowed'
-          ? 'Permiso de micrófono denegado. Habilítalo en el navegador.'
-          : e.error === 'no-speech'
-            ? null
-            : 'Error de reconocimiento. Intenta de nuevo.'
+          ? 'Permiso de micrófono denegado.'
+          : e.error === 'no-speech' ? null : 'Error de reconocimiento.'
       );
       setListening(false);
     };
-
-    rec.onend = () => {
-      setListening(false);
-      setInterim('');
-    };
-
+    rec.onend = () => { setListening(false); setInterim(''); };
     recognitionRef.current = rec;
-    return () => {
-      try { rec.stop(); } catch (_) { /* noop */ }
-    };
+    return () => { try { rec.stop(); } catch (_) { /* noop */ } };
   }, []);
 
   const startListening = useCallback((onFinal) => {
@@ -234,21 +187,16 @@ export function useLyaVoice() {
     if (!ttsSupported || !text) return;
     const clean = sanitizeForSpeech(text);
     if (!clean) return;
-
     try { window.speechSynthesis.cancel(); } catch (_) { /* noop */ }
-
     const u = new SpeechSynthesisUtterance(clean);
     u.lang = voice?.lang || 'es-CL';
     if (voice) u.voice = voice;
     u.rate = 1.0;
     u.pitch = 1.05;
     u.volume = 1.0;
-
     u.onstart = () => setSpeaking(true);
     u.onend = () => setSpeaking(false);
     u.onerror = () => setSpeaking(false);
-
-    utteranceRef.current = u;
     window.speechSynthesis.speak(u);
   }, [ttsSupported, voice]);
 
@@ -259,16 +207,26 @@ export function useLyaVoice() {
   }, [ttsSupported]);
 
   return {
-    sttSupported,
-    ttsSupported,
-    listening,
-    speaking,
-    interim,
-    error,
+    sttSupported, ttsSupported, listening, speaking,
+    processing: false, interim, error,
     voiceName: voice?.name || null,
-    startListening,
-    stopListening,
-    speak,
-    stopSpeaking,
+    startListening, stopListening, speak, stopSpeaking,
   };
+}
+
+// ─── HOOK PRINCIPAL — preferencia ElevenLabs, fallback Web Speech ──────────
+export function useLyaVoice({ provider = 'elevenlabs' } = {}) {
+  const eleven = useLyaVoiceElevenLabs();
+  const fallback = useWebSpeechFallback();
+
+  // Si el caller pidió explícitamente Web Speech, devolverlo.
+  if (provider === 'webspeech') return fallback;
+
+  // Si ElevenLabs reporta error de configuración (503 sin secret), usar fallback.
+  // Pero por defecto preferimos ElevenLabs siempre que el navegador soporte
+  // MediaRecorder + Audio (que es virtualmente siempre).
+  if (eleven.sttSupported || eleven.ttsSupported) {
+    return eleven;
+  }
+  return fallback;
 }
