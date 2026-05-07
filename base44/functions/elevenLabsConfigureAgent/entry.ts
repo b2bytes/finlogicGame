@@ -103,6 +103,19 @@ Tienes 17 client tools que ejecutas EN VIVO sobre la plataforma. NO HAY LISTA CE
 ## Conocimiento legal
 - **queryFinLogic(question)**: pipeline IA real (RAG + Pinecone normativa chilena) para preguntas legales específicas.
 
+## Generación de documentos profesionales (capa premium)
+- **generateDocument(documentType?, addressedTo?)**: Crea un documento profesional brandeado FinLogic basado en la conversación que estás teniendo. Lo inserta en el chat del usuario como una tarjeta con dos botones grandes: DESCARGAR PDF y ENVIAR POR CORREO. Tipos válidos: 'cotizacion', 'correo_formal', 'carta_comercial', 'carta_arco', 'denuncia_sernac', 'reclamo_cmf', 'reporte_csirt', 'declaracion_sii', 'carta_generica'. Si no especificas documentType, lo detecto por el contenido de la conversación.
+- **sendDocumentByEmail(to, subject?)**: Envía el último documento generado al correo indicado. Llega con diseño brandeado FinLogic en HTML. Usa esta tool cuando el usuario diga "envíalo a [email]" o "mándalo a mi correo".
+- **openConversationModal()**: Abre el modal de chat expandido para que el usuario vea el historial completo y los documentos adjuntos. Úsala cuando vayas a generar un documento o cuando el usuario diga "muéstrame el chat".
+
+# CÓMO ATENDER A USUARIOS MAYORES (Don Luis, 68)
+Si detectas que el usuario es mayor o tiene dificultades:
+- Habla MÁS LENTO, pausas más largas.
+- Frases cortas, una idea por frase.
+- Confirma cada paso: "¿quieres que lo descargue ahora?", "¿a qué correo lo envío?".
+- Cuando generes un doc, AVISA: "Listo, en tu pantalla aparece una tarjeta verde con tu documento. Hay dos botones grandes: uno para descargar y otro para enviarlo por correo. ¿Cuál prefieres?".
+- NO uses jerga técnica.
+
 # FLUJO INTELIGENTE DE NAVEGACIÓN
 Cuando el usuario pida moverse:
 
@@ -124,6 +137,11 @@ EJEMPLOS DE USO REAL:
 - "Lleva al footer" → scrollToPosition("bottom")
 - "Vuelve atrás" → goBack()
 - "Abre la web del Fintech Forum en otra pestaña" → navigateToPage("https://www.chilefintechforum.com/", true)
+- "Hazme una cotización por 3 horas de asesoría a 50 mil pesos cada una" → openConversationModal() → generateDocument(documentType: "cotizacion")
+- "Escríbeme un correo formal pidiendo una reunión a Felipe Pizarro" → generateDocument(documentType: "correo_formal", addressedTo: "Felipe Pizarro")
+- "Genera la denuncia para el banco por el fraude" → generateDocument(documentType: "reclamo_cmf")
+- "Envíaselo a luis@gmail.com" → sendDocumentByEmail(to: "luis@gmail.com")
+- "Mándalo a mi correo" → pregunta el correo si no lo tienes y luego sendDocumentByEmail(to)
 - "Llévame al hero" → scrollToSection("hero")
 - "Sube arriba" → scrollToPosition("top")
 - "¿Cuántos días tengo para reclamar fraude bancario?" → queryFinLogic("plazo legal reclamo fraude tarjeta Ley 20009")
@@ -407,6 +425,45 @@ const CLIENT_TOOLS = [
       },
       required: ['message'],
     },
+  },
+  {
+    name: 'generateDocument',
+    description:
+      'Genera un documento profesional brandeado FinLogic (cotización, correo formal, carta comercial, reclamo CMF, denuncia SERNAC, carta ARCO, reporte CSIRT, presentación SII) usando como input la conversación actual del chat. El documento aparece en el modal de Lya como una tarjeta con dos botones grandes: DESCARGAR PDF y ENVIAR POR CORREO. Si no envías documentType, lo detecto automáticamente desde el contenido de la conversación. ÚSALA en cuanto el usuario te pida un documento, sin preguntar de más.',
+    parameters: {
+      type: 'object',
+      properties: {
+        documentType: {
+          type: 'string',
+          enum: ['cotizacion', 'correo_formal', 'carta_comercial', 'carta_arco', 'denuncia_sernac', 'reclamo_cmf', 'reporte_csirt', 'declaracion_sii', 'carta_generica'],
+          description: 'Tipo de documento. Si lo omites, se detecta automáticamente.',
+        },
+        addressedTo: {
+          type: 'string',
+          description: 'Destinatario del documento (persona, empresa u organismo). Opcional.',
+        },
+      },
+      required: [],
+    },
+  },
+  {
+    name: 'sendDocumentByEmail',
+    description:
+      'Envía el ÚLTIMO documento generado por generateDocument al correo indicado, con diseño brandeado FinLogic en HTML. Úsala cuando el usuario diga "envíaselo a X" o "mándalo a mi correo". Confirma siempre el correo destino antes de llamarla.',
+    parameters: {
+      type: 'object',
+      properties: {
+        to: { type: 'string', description: 'Correo destino válido' },
+        subject: { type: 'string', description: 'Asunto del correo. Opcional.' },
+      },
+      required: ['to'],
+    },
+  },
+  {
+    name: 'openConversationModal',
+    description:
+      'Abre el modal de chat expandido donde el usuario ve el historial completo de la conversación y las tarjetas de documentos generados con sus botones de descarga/envío. Llámala antes de generateDocument para que el usuario vea claramente la tarjeta del documento al aparecer.',
+    parameters: { type: 'object', properties: {}, required: [] },
   },
   {
     name: 'searchPlatformKnowledge',

@@ -48,16 +48,52 @@ Debe incluir: identificación del titular, datos a acceder/rectificar/cancelar, 
     legalBasis: 'Normativa vigente',
     instructions: 'Redacta una carta formal según la situación descrita.',
   },
+  cotizacion: {
+    title: 'Cotización FinLogic',
+    addressedTo: 'Cliente',
+    legalBasis: 'Documento comercial — sin valor tributario',
+    instructions: `Redacta una cotización profesional FinLogic. Debe incluir EN ESTE ORDEN, en formato markdown limpio:
+## Cliente
+(nombre, RUT si lo hay, contacto)
+## Detalle
+Una tabla simple con: Ítem · Descripción · Cantidad · Precio unitario CLP · Subtotal CLP. Mínimo 1 ítem, máximo 8.
+## Totales
+Subtotal · IVA 19% · **Total CLP**
+## Condiciones
+Validez de la cotización (30 días por defecto), forma de pago, plazo de entrega.
+NO inventes precios si el usuario no los dio: usa [precio a confirmar]. NO inventes RUT.`,
+  },
+  correo_formal: {
+    title: 'Correo formal',
+    addressedTo: 'Destinatario',
+    legalBasis: 'Comunicación formal',
+    instructions: `Redacta un correo formal claro, breve y profesional. Debe incluir:
+**Asunto:** una línea, máx 80 chars
+**Saludo** cordial
+**Cuerpo** en 2-4 párrafos cortos, una idea por párrafo
+**Cierre** con CTA específico (qué espera de respuesta)
+**Firma** con nombre, cargo si lo hay, email
+Tono cálido pero ejecutivo. Cero relleno.`,
+  },
+  carta_comercial: {
+    title: 'Carta comercial',
+    addressedTo: 'Empresa destinataria',
+    legalBasis: 'Documento comercial',
+    instructions: `Redacta una carta comercial profesional (propuesta, agradecimiento, seguimiento, cobro o presentación según el contexto). Estructura: encabezado con destinatario y fecha, asunto en bold, cuerpo en párrafos claros, cierre con CTA y firma del emisor.`,
+  },
 };
 
 // Heurística para sugerir el tipo si el cliente no lo manda
 function detectDocType(text) {
   const t = (text || '').toLowerCase();
+  if (/(cotizaci[oó]n|presupuesto|quote|valor.+servicio|cu[aá]nto.+cobra)/.test(t)) return 'cotizacion';
+  if (/(correo|email|mail formal|escribir.+correo|env[ií]a.+correo)/.test(t)) return 'correo_formal';
   if (/(arco|borrar.+dato|rectific|acces.+dato|cancelar.+dato|protecci[oó]n.+dato)/.test(t)) return 'carta_arco';
   if (/(cmf|fintech|banco.*reclamo|reclam.+banco|sfa)/.test(t)) return 'reclamo_cmf';
   if (/(phishing|hacke|cyber|ciber|robo.+cuenta|csirt|fraude.+digital)/.test(t)) return 'reporte_csirt';
   if (/(sii|impuesto|f29|f22|iva|renta|tribut)/.test(t)) return 'declaracion_sii';
   if (/(sernac|consumidor|cobro.+indebido|garant[ií]a|retracto|cargo.+no.+reconoc)/.test(t)) return 'denuncia_sernac';
+  if (/(carta comercial|propuesta comercial|cotizar|seguimiento.+cliente)/.test(t)) return 'carta_comercial';
   return 'carta_generica';
 }
 

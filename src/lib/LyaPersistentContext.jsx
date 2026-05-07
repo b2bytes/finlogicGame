@@ -27,9 +27,19 @@ export function LyaPersistentProvider({ children }) {
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState(null);
   const [lastMessage, setLastMessage] = useState(null);
+  // Historial completo de la conversación para visualizarla tipo chat.
+  // Cada item: { id, role: 'lya'|'user', text, ts, doc?: { title, content, addressedTo, legalBasis, documentType } }
+  const [history, setHistory] = useState([]);
 
   const conversationRef = useRef(null);
   const toolsRef = useRef({});
+
+  // Permite a tools push-ear contenido al historial (ej: documento generado)
+  const pushHistory = useCallback((msg) => {
+    setHistory((prev) => [...prev, { id: Date.now() + Math.random(), ts: Date.now(), ...msg }]);
+  }, []);
+
+  const clearHistory = useCallback(() => setHistory([]), []);
 
   // Permite a cualquier página inyectar/sobreescribir tools en caliente
   const registerTools = useCallback((newTools) => {
@@ -79,9 +89,13 @@ export function LyaPersistentProvider({ children }) {
         onModeChange: (mode) => setAgentSpeaking(mode?.mode === 'speaking'),
         onMessage: (msg) => {
           if (!msg?.message) return;
-          setLastMessage({
-            role: msg.source === 'ai' ? 'lya' : 'user',
-            text: msg.message,
+          const role = msg.source === 'ai' ? 'lya' : 'user';
+          setLastMessage({ role, text: msg.message });
+          // Agrega al historial completo (deduplica si llega el mismo turno doble)
+          setHistory((prev) => {
+            const last = prev[prev.length - 1];
+            if (last && last.role === role && last.text === msg.message) return prev;
+            return [...prev, { id: Date.now() + Math.random(), ts: Date.now(), role, text: msg.message }];
           });
         },
       });
@@ -120,6 +134,9 @@ export function LyaPersistentProvider({ children }) {
     muted,
     error,
     lastMessage,
+    history,
+    pushHistory,
+    clearHistory,
     startConversation,
     endConversation,
     toggleMute,

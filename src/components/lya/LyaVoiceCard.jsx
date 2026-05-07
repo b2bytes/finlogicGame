@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, X, Loader2, Sparkles } from 'lucide-react';
+import { Mic, MicOff, X, Loader2, Sparkles, Maximize2, MessageSquare } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import LyaVoiceWaves from './LyaVoiceWaves';
 import LyaCyberAvatar from './LyaCyberAvatar';
+import LyaConversationModal from './LyaConversationModal';
 import { useLyaPersistent } from '@/lib/LyaPersistentContext.jsx';
+import { useAuth } from '@/lib/AuthContext';
 import {
   LYA_PAGES,
   LYA_SLIDES,
@@ -45,6 +47,7 @@ export default function LyaVoiceCard({
   stackOffset = 0,
 }) {
   const [open, setOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false); // modal expandido tipo chat
   const [currentSlide, setCurrentSlide] = useState(null);
   const [actionLabel, setActionLabel] = useState(null); // breve confirmación visual
   const actionTimeoutRef = useRef(null);
@@ -56,11 +59,17 @@ export default function LyaVoiceCard({
     muted,
     error,
     lastMessage,
+    history,
+    pushHistory,
     startConversation,
     endConversation,
     toggleMute,
     registerTools,
   } = useLyaPersistent();
+
+  // Email del usuario (si está logueado) para pre-llenar envío de docs
+  const auth = useAuth();
+  const userEmail = auth?.user?.email || '';
 
   const showAction = useCallback((label) => {
     setActionLabel(label);
@@ -201,6 +210,85 @@ export default function LyaVoiceCard({
       return `Toast mostrado: ${message}`;
     },
 
+    // ─── Generación de documentos profesionales ──────────────────
+    // Lya genera cotizaciones, cartas, correos formales, denuncias, etc.,
+    // los inserta como tarjeta en el chat con botones DESCARGAR PDF y ENVIAR POR CORREO.
+    generateDocument: async ({ documentType, addressedTo }) => {
+      // Aseguramos modal de chat abierto para que el usuario vea la tarjeta
+      setChatOpen(true);
+      showAction('📄 Generando documento…');
+      try {
+        // Convertimos historial actual al formato que espera el endpoint
+        const chatHistory = (history || []).map((m) => ({
+          role: m.role === 'lya' ? 'assistant' : 'user',
+          content: m.text || '',
+        }));
+        if (chatHistory.length === 0) {
+          return 'Necesito que primero conversemos sobre el documento que quieres. Cuéntame los detalles y luego lo genero.';
+        }
+        const res = await base44.functions.invoke('lyaGenerateDocFromChat', {
+          history: chatHistory,
+          documentType,
+          addressedTo,
+        });
+        const data = res.data || {};
+        if (!data.success) {
+          return `No pude generar el documento: ${data.error || 'razón desconocida'}`;
+        }
+        // Insertamos en el historial un turno de Lya con la tarjeta del doc adjunta
+        pushHistory({
+          role: 'lya',
+          text: `Listo. Generé tu ${data.documentType.replace('_', ' ')}. Puedes descargarlo o enviármelo por correo desde la tarjeta.`,
+          doc: {
+            title: data.title,
+            content: data.content,
+            addressedTo: data.addressedTo,
+            legalBasis: data.legalBasis,
+            documentType: data.documentType,
+          },
+        });
+        showAction(`✓ ${data.title}`);
+        return `Documento "${data.title}" generado correctamente. El usuario lo verá en su chat con botones para descargar PDF o enviar por correo.`;
+      } catch (e) {
+        return `Error generando documento: ${e.message}`;
+      }
+    },
+
+    // Enviar el último documento generado al correo indicado.
+    sendDocumentByEmail: async ({ to, subject }) => {
+      // Buscamos el último mensaje con doc en el historial
+      const lastDocMsg = [...(history || [])].reverse().find((m) => m.doc);
+      if (!lastDocMsg?.doc) {
+        return 'No hay documento generado aún. Primero usa generateDocument.';
+      }
+      if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+        return 'Necesito un correo válido para enviar el documento.';
+      }
+      showAction(`📧 Enviando a ${to}…`);
+      try {
+        await base44.functions.invoke('lyaSendDocByEmail', {
+          to,
+          subject,
+          title: lastDocMsg.doc.title,
+          content: lastDocMsg.doc.content,
+          addressedTo: lastDocMsg.doc.addressedTo,
+          legalBasis: lastDocMsg.doc.legalBasis,
+          documentType: lastDocMsg.doc.documentType,
+        });
+        showAction(`✓ Enviado a ${to}`);
+        return `Documento "${lastDocMsg.doc.title}" enviado a ${to}.`;
+      } catch (e) {
+        return `Error enviando correo: ${e.message}`;
+      }
+    },
+
+    // Abrir el modal de conversación tipo chat (donde se ve historial completo)
+    openConversationModal: () => {
+      setChatOpen(true);
+      showAction('💬 Chat abierto');
+      return 'Modal de conversación abierto, el usuario puede ver el historial completo.';
+    },
+
     // ─── Búsqueda inteligente de páginas vía Pinecone ─────────────
     // Lya descubre dinámicamente qué página visitar dado un query
     // en lenguaje natural ("muéstrame al equipo", "dónde está el pricing").
@@ -327,6 +415,14 @@ export default function LyaVoiceCard({
             </p>
           </div>
           <button
+            onClick={() => setChatOpen(true)}
+            aria-label="Abrir chat completo"
+            title="Ver conversación completa"
+            className="w-7 h-7 rounded-full bg-mint-500/20 hover:bg-mint-500/30 inline-flex items-center justify-center text-mint-200 hover:text-white transition-colors flex-shrink-0 border border-mint-400/30"
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={close}
             aria-label="Cerrar"
             className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 inline-flex items-center justify-center text-white/80 hover:text-white transition-colors flex-shrink-0"
@@ -403,6 +499,19 @@ export default function LyaVoiceCard({
                 {muted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
               </button>
               <button
+                onClick={() => setChatOpen(true)}
+                aria-label="Ver chat"
+                title="Ver chat completo y documentos"
+                className="relative w-10 h-10 rounded-full bg-mint-500/25 hover:bg-mint-500/40 border border-mint-400/40 text-mint-100 inline-flex items-center justify-center transition-all"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                {history && history.length > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-mint-400 text-slate-900 text-[9px] font-bold inline-flex items-center justify-center">
+                    {history.length}
+                  </span>
+                )}
+              </button>
+              <button
                 onClick={endConversation}
                 className="px-3.5 h-10 rounded-full bg-red-500/90 hover:bg-red-500 text-white text-[11px] font-bold transition-colors shadow-lg"
               >
@@ -436,6 +545,21 @@ export default function LyaVoiceCard({
           </div>
         )}
       </div>
+
+      {/* Modal expandido tipo chat con historial completo + documentos */}
+      <LyaConversationModal
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+        history={history}
+        status={status}
+        agentSpeaking={agentSpeaking}
+        muted={muted}
+        error={error}
+        onToggleMute={toggleMute}
+        onEnd={endConversation}
+        onStart={() => startConversation(clientToolsObj)}
+        userEmail={userEmail}
+      />
     </motion.div>
   );
 }
