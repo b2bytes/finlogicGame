@@ -1,31 +1,38 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Conversation } from '@elevenlabs/client';
 import { Mic, MicOff, X, Loader2, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import LyaVoiceWaves from './LyaVoiceWaves';
+import LyaCyberAvatar from './LyaCyberAvatar';
+import {
+  LYA_PAGES,
+  LYA_SLIDES,
+  scrollToElement,
+  scrollToPosition,
+  navigateToPath,
+} from '@/lib/lyaNavigationTools';
 
 /**
  * LyaVoiceCard — Card flotante de voz con Lya estética glassmorphism dark.
- * Inspirado en "Daily Design Challenge · Day 14": card oscura con ondas
- * sonoras, mic central, transcripción mínima en la parte superior.
+ * Estética cibernética femenina: avatar SVG, ondas sonoras, mic central.
  *
- * Compacto (~300px), no obstaculiza la vista, transcripción de la última
- * línea hablada. Posicionado bottom-left para no chocar con LyaChatWidget
- * (bottom-right).
- *
- * Acepta `pitchMode=true` para activar tools de navegación de slides.
+ * Props:
+ *  - position: 'bottom-right' (default) · 'bottom-left' · 'top-right'
+ *  - stackOffset: px adicionales del bottom (para apilarse encima del LyaChatWidget)
+ *  - pitchMode: bool — habilita modo pitch (slides labels en UI)
  */
 
-const SLIDE_LABELS = {
-  'slide-hero': 'Apertura', 'slide-problema': 'Problema',
-  'slide-perfiles': 'Perfiles', 'slide-demo': 'Demo',
-  'slide-casos': 'Casos', 'slide-traccion': 'Tracción',
-  'slide-api': 'API', 'slide-sfa': 'SFA',
-  'slide-equipo': 'Equipo', 'slide-cierre': 'Cierre',
-};
+const SLIDE_LABEL_MAP = LYA_SLIDES.reduce((acc, s) => {
+  acc[s.id] = s.label;
+  return acc;
+}, {});
 
-export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-left' }) {
+export default function LyaVoiceCard({
+  pitchMode = false,
+  position = 'bottom-right',
+  stackOffset = 0,
+}) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | connecting | connected | error
   const [agentSpeaking, setAgentSpeaking] = useState(false);
@@ -33,36 +40,86 @@ export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-lef
   const [error, setError] = useState(null);
   const [lastMessage, setLastMessage] = useState(null); // { role, text }
   const [currentSlide, setCurrentSlide] = useState(null);
+  const [actionLabel, setActionLabel] = useState(null); // breve confirmación visual
 
   const conversationRef = useRef(null);
+  const actionTimeoutRef = useRef(null);
 
-  // Tools (solo se usan cuando pitchMode=true)
+  const showAction = useCallback((label) => {
+    setActionLabel(label);
+    if (actionTimeoutRef.current) clearTimeout(actionTimeoutRef.current);
+    actionTimeoutRef.current = setTimeout(() => setActionLabel(null), 3000);
+  }, []);
+
+  // ─── Tools que el agente ejecuta en vivo ──────────────────────
+  // Disponibles SIEMPRE (no solo en pitchMode): Lya navega cualquier página
+  // y hace scroll a cualquier sección de la app.
   const clientTools = useRef({
-    navigateToSlide: ({ slideId }) => {
-      const el = document.getElementById(slideId);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setCurrentSlide(slideId);
-        return `OK, mostrando ${SLIDE_LABELS[slideId] || slideId}`;
+    // Navegar a una página de la plataforma (misma pestaña por defecto)
+    navigateToPage: ({ path, openInNewTab = false, reason }) => {
+      const validPaths = LYA_PAGES.map((p) => p.path);
+      if (!validPaths.includes(path)) {
+        return `Ruta ${path} no existe. Usa solo: ${validPaths.join(', ')}`;
       }
-      return `Slide ${slideId} no encontrado`;
+      navigateToPath(path, openInNewTab);
+      const pageName = LYA_PAGES.find((p) => p.path === path)?.name || path;
+      showAction(`→ ${pageName}`);
+      return `Navegando a ${pageName}${reason ? ` para ${reason}` : ''}`;
     },
-    openPage: ({ path, reason }) => {
-      window.open(`${window.location.origin}${path}`, '_blank', 'noopener,noreferrer');
-      return `Página ${path} abierta${reason ? ` · ${reason}` : ''}`;
+
+    // Scroll suave a un elemento por id o selector CSS
+    scrollToSection: ({ target, reason }) => {
+      const ok = scrollToElement(target);
+      if (ok) {
+        showAction(`↓ ${target}`);
+        return `OK, scroll a ${target}${reason ? ` (${reason})` : ''}`;
+      }
+      return `No encontré el elemento ${target} en esta página`;
     },
-    highlightMetric: ({ metric }) => `Métrica ${metric} resaltada`,
+
+    // Scroll a posición vertical (top, bottom, número)
+    scrollToPosition: ({ position: pos }) => {
+      const ok = scrollToPosition(pos);
+      if (ok) {
+        showAction(pos === 'top' ? '↑ Inicio' : pos === 'bottom' ? '↓ Final' : `↕ ${pos}px`);
+        return `Scroll a ${pos}`;
+      }
+      return `Posición ${pos} inválida`;
+    },
+
+    // Navegar a un slide del pitch (solo aplica en /PitchDeck)
+    navigateToSlide: ({ slideId }) => {
+      const ok = scrollToElement(slideId);
+      if (ok) {
+        setCurrentSlide(slideId);
+        showAction(`▶ ${SLIDE_LABEL_MAP[slideId] || slideId}`);
+        return `OK, mostrando ${SLIDE_LABEL_MAP[slideId] || slideId}`;
+      }
+      return `Slide ${slideId} no encontrado (¿estás en /PitchDeck?)`;
+    },
+
+    // Resaltar una métrica clave (visual feedback)
+    highlightMetric: ({ metric }) => {
+      showAction(`★ ${metric}`);
+      return `Métrica ${metric} resaltada`;
+    },
+
+    // Consultar pipeline IA real (RAG + Pinecone) para responder con datos verificados
     queryFinLogic: async ({ question }) => {
+      showAction('🔎 Consultando pipeline IA…');
       try {
         const res = await base44.functions.invoke('lyaKnowledgeQuery', {
-          query: question, mode: 'voice', userProfile: 'general',
+          query: question,
+          mode: 'voice',
+          userProfile: 'general',
         });
         const data = res.data || {};
-        const answer = data.response || 'Sin respuesta';
+        const answer = data.response || 'Sin respuesta verificada';
         const score = data.verifierScore || data.confidence || null;
-        return `Respuesta verificada (score ${score ?? 'N/A'}): ${answer.slice(0, 600)}`;
+        const sources = (data.sources || []).slice(0, 2).join(', ');
+        return `Respuesta verificada (score ${score ?? 'N/A'}/100): ${answer.slice(0, 600)}${sources ? `. Fuentes: ${sources}` : ''}`;
       } catch (err) {
-        return `Error: ${err.message}`;
+        return `Error consultando pipeline: ${err.message}`;
       }
     },
   });
@@ -79,7 +136,7 @@ export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-lef
 
       const conversation = await Conversation.startSession({
         signedUrl,
-        ...(pitchMode ? { clientTools: clientTools.current } : {}),
+        clientTools: clientTools.current,
         onConnect: () => setStatus('connected'),
         onDisconnect: () => { setStatus('idle'); setAgentSpeaking(false); },
         onError: (err) => {
@@ -104,7 +161,7 @@ export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-lef
       );
       setStatus('error');
     }
-  }, [pitchMode]);
+  }, []);
 
   const endConversation = useCallback(async () => {
     try { await conversationRef.current?.endSession(); } catch (_) { /* noop */ }
@@ -128,17 +185,33 @@ export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-lef
     setError(null);
   }, [endConversation]);
 
-  // Cleanup al desmontar
-  useEffect(() => () => { endConversation(); }, [endConversation]);
+  useEffect(() => () => {
+    endConversation();
+    if (actionTimeoutRef.current) clearTimeout(actionTimeoutRef.current);
+  }, [endConversation]);
 
-  // Posicionamiento
-  const positionClass = position === 'top-right'
-    ? 'top-20 right-4 sm:right-6'
-    : position === 'bottom-left'
-      ? 'bottom-5 left-4 sm:left-6'
-      : 'bottom-5 right-4 sm:right-6';
+  // ─── Posicionamiento + apilado ────────────────────────────────
+  const baseStyle = (() => {
+    const safeBottom = `max(1.25rem, env(safe-area-inset-bottom))`;
+    const safeRight = `max(1rem, env(safe-area-inset-right))`;
+    const safeLeft = `max(1rem, env(safe-area-inset-left))`;
+    if (position === 'top-right') {
+      return { top: '5rem', right: safeRight };
+    }
+    if (position === 'bottom-left') {
+      return { bottom: `calc(${safeBottom} + ${stackOffset}px)`, left: safeLeft };
+    }
+    return { bottom: `calc(${safeBottom} + ${stackOffset}px)`, right: safeRight };
+  })();
 
-  // ─── FAB cerrado · pequeño botón flotante ─────────────────────
+  const transformOrigin =
+    position === 'top-right' ? 'top right'
+    : position === 'bottom-left' ? 'bottom left'
+    : 'bottom right';
+
+  const listening = status === 'connected' && !muted && !agentSpeaking;
+
+  // ─── FAB cerrado ──────────────────────────────────────────────
   if (!open) {
     return (
       <motion.button
@@ -150,15 +223,12 @@ export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-lef
           setTimeout(() => startConversation(), 200);
         }}
         aria-label="Hablar con Lya"
-        style={{
-          bottom: position === 'bottom-left' ? 'max(1.25rem, env(safe-area-inset-bottom))' : undefined,
-          left: position === 'bottom-left' ? 'max(1rem, env(safe-area-inset-left))' : undefined,
-        }}
-        className={`fixed ${positionClass} z-40 group inline-flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-xl border border-white/10 shadow-soft-lg hover:border-mint-300/40 hover:shadow-mint transition-all`}
+        style={baseStyle}
+        className="fixed z-40 group inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-slate-900/95 backdrop-blur-xl border border-white/10 shadow-soft-lg hover:border-mint-300/40 hover:shadow-mint transition-all"
       >
-        <span className="relative flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-mint-400 to-mint-600 ring-1 ring-white/20">
-          <span className="absolute inset-0 rounded-full bg-mint-400 animate-ping opacity-30" />
-          <Mic className="relative w-3.5 h-3.5 text-white" />
+        <span className="relative flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-mint-400/30 to-mint-700/30 ring-1 ring-mint-300/30 overflow-hidden">
+          <span className="absolute inset-0 rounded-full bg-mint-400 animate-ping opacity-25" />
+          <LyaCyberAvatar size={32} />
         </span>
         <span className="text-[11px] font-bold text-white whitespace-nowrap tracking-tight">
           Hablar con Lya
@@ -167,7 +237,7 @@ export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-lef
     );
   }
 
-  // ─── Card abierta · estética glassmorphism dark ───────────────
+  // ─── Card abierta ─────────────────────────────────────────────
   return (
     <motion.div
       initial={{ opacity: 0, y: 16, scale: 0.94 }}
@@ -176,100 +246,113 @@ export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-lef
       transition={{ type: 'spring', stiffness: 320, damping: 26 }}
       role="dialog"
       aria-label="Lya voz"
-      style={{
-        bottom: position === 'bottom-left' ? 'max(1.25rem, env(safe-area-inset-bottom))' : undefined,
-        left: position === 'bottom-left' ? 'max(1rem, env(safe-area-inset-left))' : undefined,
-        transformOrigin: position === 'bottom-left' ? 'bottom left' : 'top right',
-      }}
-      className={`fixed ${positionClass} z-50 w-[300px] sm:w-[320px] rounded-[28px] overflow-hidden`}
+      style={{ ...baseStyle, transformOrigin }}
+      className="fixed z-50 w-[280px] sm:w-[300px] rounded-[26px] overflow-visible"
     >
-      {/* Glow exterior tipo aurora */}
-      <div aria-hidden className="absolute -inset-8 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/30 via-mint-400/20 to-cyan-400/30 blur-2xl rounded-full" />
+      {/* Glow exterior aurora */}
+      <div aria-hidden className="absolute -inset-6 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/25 via-mint-400/20 to-cyan-400/25 blur-2xl rounded-full" />
       </div>
 
-      {/* Card interior · vidrio oscuro */}
-      <div className="relative bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-950/95 backdrop-blur-2xl border border-white/10 rounded-[28px] p-4 shadow-2xl">
-        {/* Botón cerrar */}
-        <button
-          onClick={close}
-          aria-label="Cerrar"
-          className="absolute top-3 right-3 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 inline-flex items-center justify-center text-white/80 hover:text-white transition-colors z-10"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
+      {/* Card · vidrio oscuro */}
+      <div className="relative bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-950/95 backdrop-blur-2xl border border-white/10 rounded-[26px] p-3.5 shadow-2xl">
+        {/* Header con avatar + cerrar */}
+        <div className="flex items-start gap-2.5 mb-2">
+          <LyaCyberAvatar size={44} speaking={agentSpeaking} listening={listening} />
+          <div className="flex-1 min-w-0 pt-1">
+            <div className="flex items-center gap-1.5">
+              <p className="text-[12px] font-bold text-white leading-none">Lya</p>
+              <span className="text-[8px] font-mono uppercase tracking-wider text-mint-300/90 px-1.5 py-0.5 rounded-full bg-mint-500/15 border border-mint-400/20">
+                IA legal
+              </span>
+            </div>
+            <p className="text-[10px] text-white/55 mt-0.5 leading-tight">
+              {status === 'connected' && agentSpeaking ? 'Hablando…'
+                : status === 'connected' && muted ? 'Mic silenciado'
+                : status === 'connected' ? 'Escuchando'
+                : status === 'connecting' ? 'Conectando…'
+                : 'Toca el mic para hablar'}
+            </p>
+          </div>
+          <button
+            onClick={close}
+            aria-label="Cerrar"
+            className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 inline-flex items-center justify-center text-white/80 hover:text-white transition-colors flex-shrink-0"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
 
-        {/* Texto: último mensaje o estado */}
-        <div className="min-h-[80px] pr-8 pb-2">
+        {/* Texto: último mensaje, error o estado */}
+        <div className="min-h-[60px] mb-1">
           {status === 'error' && error ? (
-            <p className="text-[13px] text-red-300 leading-snug">
+            <p className="text-[12px] text-red-300 leading-snug">
               <span className="font-bold">Error:</span> {error}
             </p>
           ) : status === 'connecting' ? (
-            <p className="text-[13px] text-white/70 leading-snug flex items-center gap-2">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <p className="text-[12px] text-white/70 leading-snug flex items-center gap-2">
+              <Loader2 className="w-3 h-3 animate-spin" />
               Conectando con Lya…
             </p>
           ) : lastMessage ? (
             <div>
-              <p className="text-[9px] font-mono uppercase tracking-wider text-mint-300/80 mb-1">
+              <p className="text-[8px] font-mono uppercase tracking-wider text-mint-300/80 mb-0.5">
                 {lastMessage.role === 'lya' ? 'Lya' : 'Tú'}
               </p>
-              <p className="text-[13px] text-white/95 leading-snug line-clamp-3">
-                {lastMessage.role === 'lya' ? (
-                  <>
-                    {lastMessage.text.length > 140
-                      ? lastMessage.text.slice(0, 140) + '…'
-                      : lastMessage.text}
-                  </>
-                ) : (
-                  lastMessage.text
-                )}
+              <p className="text-[12px] text-white/95 leading-snug line-clamp-3">
+                {lastMessage.text.length > 130
+                  ? lastMessage.text.slice(0, 130) + '…'
+                  : lastMessage.text}
               </p>
             </div>
           ) : (
-            <div>
-              <p className="text-[9px] font-mono uppercase tracking-wider text-mint-300/80 mb-1">
-                Lya · IA legal
-              </p>
-              <p className="text-[13px] text-white/95 leading-snug">
-                Hola, soy <span className="text-mint-300 font-semibold">Lya</span>. Hazme tu consulta sobre{' '}
-                <span className="text-mint-300 font-semibold italic">tus derechos…</span>
-              </p>
-            </div>
+            <p className="text-[12px] text-white/85 leading-snug">
+              Hola, soy <span className="text-mint-300 font-semibold">Lya</span>. Pregúntame por{' '}
+              <span className="text-mint-300 italic">tus derechos</span> o pídeme navegar la plataforma.
+            </p>
           )}
 
-          {/* Slide actual (solo pitchMode) */}
+          {/* Etiqueta breve de acción ejecutada */}
+          {actionLabel && (
+            <motion.span
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-block mt-1.5 text-[9px] font-mono text-mint-200 px-2 py-0.5 rounded-full bg-mint-500/15 border border-mint-400/20"
+            >
+              {actionLabel}
+            </motion.span>
+          )}
+
           {pitchMode && currentSlide && (
-            <span className="inline-block mt-2 text-[9px] font-mono uppercase tracking-wider text-mint-300 px-2 py-0.5 rounded-full bg-mint-500/15 border border-mint-400/20">
-              {SLIDE_LABELS[currentSlide]}
+            <span className="inline-block mt-1.5 ml-1 text-[9px] font-mono uppercase tracking-wider text-mint-300 px-2 py-0.5 rounded-full bg-mint-500/15 border border-mint-400/20">
+              {SLIDE_LABEL_MAP[currentSlide]}
             </span>
           )}
         </div>
 
-        {/* Ondas sonoras animadas */}
-        <div className="my-2 -mx-1">
+        {/* Ondas sonoras */}
+        <div className="my-1 -mx-1">
           <LyaVoiceWaves active={status === 'connected' && (agentSpeaking || !muted)} />
         </div>
 
-        {/* Mic button central */}
-        <div className="flex items-center justify-center gap-3 pt-1">
+        {/* Controles */}
+        <div className="flex items-center justify-center gap-2 pt-0.5">
           {status === 'connected' ? (
             <>
               <button
                 onClick={toggleMute}
                 aria-label={muted ? 'Activar mic' : 'Silenciar'}
-                className={`w-11 h-11 rounded-full inline-flex items-center justify-center transition-all border ${
+                className={`w-10 h-10 rounded-full inline-flex items-center justify-center transition-all border ${
                   muted
                     ? 'bg-amber-500/20 border-amber-400/40 text-amber-200 hover:bg-amber-500/30'
                     : 'bg-white/95 border-white/20 text-slate-900 hover:bg-white shadow-lg'
                 }`}
               >
-                {muted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                {muted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
               </button>
               <button
                 onClick={endConversation}
-                className="px-4 h-11 rounded-full bg-red-500/90 hover:bg-red-500 text-white text-[12px] font-bold transition-colors shadow-lg"
+                className="px-3.5 h-10 rounded-full bg-red-500/90 hover:bg-red-500 text-white text-[11px] font-bold transition-colors shadow-lg"
               >
                 Finalizar
               </button>
@@ -277,34 +360,29 @@ export default function LyaVoiceCard({ pitchMode = false, position = 'bottom-lef
           ) : status === 'connecting' ? (
             <button
               disabled
-              className="w-11 h-11 rounded-full bg-white/10 text-white/40 inline-flex items-center justify-center cursor-wait"
+              className="w-10 h-10 rounded-full bg-white/10 text-white/40 inline-flex items-center justify-center cursor-wait"
             >
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
             </button>
           ) : (
             <button
               onClick={startConversation}
               aria-label="Iniciar conversación"
-              className="relative w-12 h-12 rounded-full bg-white inline-flex items-center justify-center shadow-xl hover:scale-105 transition-transform"
+              className="relative w-11 h-11 rounded-full bg-white inline-flex items-center justify-center shadow-xl hover:scale-105 transition-transform"
             >
               <span className="absolute inset-0 rounded-full bg-mint-400 animate-ping opacity-30" />
-              <Mic className="relative w-5 h-5 text-slate-900" />
+              <Mic className="relative w-4 h-4 text-slate-900" />
             </button>
           )}
         </div>
 
-        {/* Estado footer minimal */}
-        <div className="mt-2 flex items-center justify-center gap-1.5 text-[9px] text-white/50 font-mono uppercase tracking-wider">
-          {status === 'connected' && agentSpeaking ? (
-            <><Sparkles className="w-2.5 h-2.5 text-mint-300" /> Hablando…</>
-          ) : status === 'connected' && !muted ? (
-            <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Escuchando</>
-          ) : status === 'connected' && muted ? (
-            <>Mic silenciado</>
-          ) : (
-            <>Toca el mic para hablar</>
-          )}
-        </div>
+        {/* Footer minimal */}
+        {status === 'connected' && agentSpeaking && (
+          <div className="mt-2 flex items-center justify-center gap-1 text-[8px] text-mint-300/80 font-mono uppercase tracking-wider">
+            <Sparkles className="w-2.5 h-2.5" />
+            En vivo · interrumpible
+          </div>
+        )}
       </div>
     </motion.div>
   );

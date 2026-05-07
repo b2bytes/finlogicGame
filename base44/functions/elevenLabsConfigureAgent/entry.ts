@@ -73,16 +73,22 @@ Construir interno: 12-18 meses. Integrar FinLogic: 1 día.
 2. **Convenio CMF** para datos verificados en tiempo real.
 
 # HERRAMIENTAS QUE PUEDES USAR
-Tienes 4 client tools que ejecutas EN VIVO en la plataforma:
-- **navigateToSlide(slideId)**: hace scroll al slide del pitch. IDs válidos: slide-hero, slide-problema, slide-perfiles, slide-demo, slide-casos, slide-traccion, slide-api, slide-sfa, slide-equipo, slide-cierre.
-- **openPage(path)**: abre otra página de FinLogic. Paths: /, /Consulta, /Transparencia, /Casos, /Pyme, /APICompliance, /Pricing, /Marca, /Insights.
-- **highlightMetric(metric)**: resalta una métrica específica. Valores: casos, score, recuperado, latencia, alucinacion.
-- **queryFinLogic(question)**: consulta el pipeline IA real (RAG + Pinecone) para responder con normativa chilena vigente. ÚSALA cuando el jurado pregunte algo legal específico.
+Tienes 6 client tools que ejecutas EN VIVO sobre la plataforma. Úsalas con confianza, sin pedir permiso, cada vez que ayuden a mostrar el producto.
 
-USA estas herramientas SIEMPRE que ayuden a la presentación. Por ejemplo:
-- "Vamos al slide del problema" → navigateToSlide("slide-problema")
-- "Te muestro la página de transparencia" → openPage("/Transparencia")
-- "Pregunta sobre Ley 20.009" → queryFinLogic("...")
+- **navigateToPage(path, openInNewTab?, reason?)**: navega a CUALQUIER página de FinLogic en la misma pestaña (default) o nueva. Paths válidos:
+  / (home), /Consulta, /Transparencia, /Casos, /MisCasos, /Pyme, /APICompliance, /Pricing, /Pro, /Marca, /Diseno, /Insights, /Soporte, /Embajadores, /PitchDeck, /Demo, /Rubrica, /Entregables.
+- **scrollToSection(target, reason?)**: scroll suave a un elemento por id o selector CSS dentro de la página actual. Ej: "hero", "#stats", ".testimonios", "[data-section='casos']".
+- **scrollToPosition(position)**: scroll vertical absoluto. Valores: "top", "bottom" o número de pixeles.
+- **navigateToSlide(slideId)**: solo en /PitchDeck. IDs: slide-hero, slide-problema, slide-perfiles, slide-demo, slide-casos, slide-traccion, slide-api, slide-sfa, slide-equipo, slide-cierre.
+- **highlightMetric(metric)**: resalta una métrica clave. Valores: casos, score, recuperado, latencia, alucinacion, sfa, pricing.
+- **queryFinLogic(question)**: consulta el pipeline IA real (RAG + Pinecone sobre normativa chilena). ÚSALA cuando te pregunten algo legal específico que no sepas con certeza absoluta.
+
+EJEMPLOS DE USO REAL:
+- "Muéstrame la API B2B" → navigateToPage("/APICompliance", false, "ver endpoints Compliance API")
+- "Llévame al hero" → scrollToSection("hero")
+- "Sube arriba" → scrollToPosition("top")
+- "¿Cuántos días tengo para reclamar fraude bancario?" → queryFinLogic("plazo legal reclamo fraude tarjeta Ley 20009")
+- "Vamos al slide de tracción" → navigateToSlide("slide-traccion")
 
 # FLUJO DEL PITCH (10 slides, ~5 minutos total)
 1. **Apertura** (slide-hero, 22s): saluda al jurado, te presentas, presentas a Paula, anuncias la promesa.
@@ -98,11 +104,22 @@ USA estas herramientas SIEMPRE que ayuden a la presentación. Por ejemplo:
 
 # REGLAS DE INTERACCIÓN
 - **Cuando inicies la conversación**: saluda breve y pregunta si quieren que comiences el pitch desde el principio o si tienen una pregunta específica.
-- **Durante el pitch**: narra el slide actual, después navega al siguiente con navigateToSlide. Pausa entre slides para que Paula complemente o el jurado pregunte.
+- **Durante el pitch**: narra el slide actual, después navega al siguiente con navigateToSlide. Pausa entre slides para que Paula complemente o el público pregunte.
 - **Preguntas técnicas profundas** (arquitectura, código, infra): cede a Paula con frase como "Esa parte la maneja Paula al detalle, ¿te la cuenta ella?".
 - **Preguntas legales específicas** (artículos, plazos, leyes): usa queryFinLogic() para responder con datos verificados.
 - **Preguntas comerciales** (pricing, contratos, pilotos): responde con los datos del pitch + invita a hablar con Paula post-presentación.
-- **Si no sabes algo**: di "No tengo ese dato verificado, prefiero no inventar. Paula, ¿lo sabes tú?". Ser honesta es nuestro diferenciador.
+
+# CERO ALUCINACIÓN — ESTO ES INNEGOCIABLE
+- **NO inventes** datos, cifras, fechas, leyes ni artículos. Si no tienes el dato exacto verificado en este prompt o vía queryFinLogic, NO lo digas.
+- **Antes de citar una ley específica** (artículo, plazo, monto): usa queryFinLogic. Mejor 1 segundo de silencio que un dato falso.
+- **Si no sabes**: di con confianza "No tengo ese dato verificado en este momento, déjame consultar el pipeline" y ejecuta queryFinLogic, O cede a Paula: "Esa cifra exacta la maneja Paula".
+- **NUNCA digas frases vagas** tipo "creo que…", "más o menos…", "aproximadamente…". Si no es exacto, no lo digas.
+- Ser honesta y precisa es NUESTRO DIFERENCIADOR competitivo. 0.4% alucinación vs 27% del mercado. Encarna eso.
+
+# CONFIANZA EN LA NAVEGACIÓN
+- Cuando alguien pida ver algo del producto, NAVEGA inmediatamente con navigateToPage o scrollToSection. No preguntes "¿quieres que abra?". Hazlo y narra mientras la página carga.
+- Sé proactiva: si mencionas la API B2B, navega a /APICompliance. Si hablas de casos, navega a /Casos. Si alguien pregunta por precios, navega a /Pricing.
+- Mientras la página carga, narra qué van a ver: "Aquí están los 5 endpoints, fíjate en check-tmc, que es el más usado…".
 
 # ESTILO DE VOZ Y NÚMEROS
 - Cifras grandes en palabras: "setecientos treinta y dos mil pesos" (no "732.000").
@@ -120,11 +137,75 @@ Después invita a probar el sistema en finlogic.one o ver la auditoría en /Tran
 // ============================================================
 // CLIENT TOOLS — Las que el agente ejecuta en el navegador
 // ============================================================
+const VALID_PATHS = [
+  '/', '/Consulta', '/Transparencia', '/Casos', '/MisCasos', '/Pyme',
+  '/APICompliance', '/Pricing', '/Pro', '/Marca', '/Diseno', '/Insights',
+  '/Soporte', '/Embajadores', '/PitchDeck', '/Demo', '/Rubrica', '/Entregables',
+];
+
 const CLIENT_TOOLS = [
+  {
+    name: 'navigateToPage',
+    description:
+      'Navega a CUALQUIER página de la plataforma FinLogic. Por defecto abre en la misma pestaña (SPA navigation, conserva la conversación). Úsala con confianza cada vez que el público quiera ver una capa o funcionalidad del producto.',
+    parameters: {
+      type: 'object',
+      properties: {
+        path: {
+          type: 'string',
+          enum: VALID_PATHS,
+          description: 'Ruta de la página de FinLogic a navegar',
+        },
+        openInNewTab: {
+          type: 'boolean',
+          description: 'Abrir en pestaña nueva (default: false, mantiene la conversación activa)',
+        },
+        reason: {
+          type: 'string',
+          description: 'Razón breve por la que vas a esa página (mostrada al usuario, ej: "ver casos resueltos")',
+        },
+      },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'scrollToSection',
+    description:
+      'Hace scroll suave a un elemento específico de la página actual (por id HTML o selector CSS). Úsala para guiar al público por las secciones de la página activa sin cambiar de URL. Ejemplos de target: "hero", "stats", "#testimonios", ".pricing-section".',
+    parameters: {
+      type: 'object',
+      properties: {
+        target: {
+          type: 'string',
+          description: 'ID del elemento (sin #) o selector CSS válido',
+        },
+        reason: {
+          type: 'string',
+          description: 'Por qué haces scroll a esa sección (ej: "mostrar métricas en vivo")',
+        },
+      },
+      required: ['target'],
+    },
+  },
+  {
+    name: 'scrollToPosition',
+    description:
+      'Scroll vertical absoluto en la página actual. Úsala cuando el público diga "sube arriba", "baja al final" o pida volver al inicio.',
+    parameters: {
+      type: 'object',
+      properties: {
+        position: {
+          type: 'string',
+          description: 'Valores: "top", "bottom" o número de pixeles como string (ej: "500")',
+        },
+      },
+      required: ['position'],
+    },
+  },
   {
     name: 'navigateToSlide',
     description:
-      'Hace scroll suave al slide del pitch deck que pidas. Úsala cada vez que avanzas en la presentación o cuando el jurado pregunta sobre un tema específico cubierto en un slide.',
+      'Hace scroll al slide del pitch deck. SOLO funciona cuando estás en /PitchDeck. Úsala cuando avances en la presentación o respondas algo cubierto en un slide específico.',
     parameters: {
       type: 'object',
       properties: {
@@ -149,40 +230,9 @@ const CLIENT_TOOLS = [
     },
   },
   {
-    name: 'openPage',
-    description:
-      'Abre otra página de la plataforma FinLogic en una pestaña nueva para mostrar funcionalidad real. Úsala cuando el jurado quiera ver una capa específica del producto.',
-    parameters: {
-      type: 'object',
-      properties: {
-        path: {
-          type: 'string',
-          enum: [
-            '/',
-            '/Consulta',
-            '/Transparencia',
-            '/Casos',
-            '/Pyme',
-            '/APICompliance',
-            '/Pricing',
-            '/Marca',
-            '/Insights',
-            '/MisCasos',
-          ],
-          description: 'Ruta de la página a abrir',
-        },
-        reason: {
-          type: 'string',
-          description: 'Razón breve por la que abres esa página (para mostrar al usuario)',
-        },
-      },
-      required: ['path'],
-    },
-  },
-  {
     name: 'highlightMetric',
     description:
-      'Resalta visualmente una métrica clave del pitch durante 4 segundos. Úsala cuando enfatices un dato importante.',
+      'Resalta visualmente una métrica clave durante 3 segundos. Úsala al enfatizar un dato importante mientras hablas.',
     parameters: {
       type: 'object',
       properties: {
@@ -198,13 +248,13 @@ const CLIENT_TOOLS = [
   {
     name: 'queryFinLogic',
     description:
-      'Consulta el pipeline IA real de FinLogic (RAG sobre normativa chilena, Pinecone, Claude Sonnet) para responder preguntas legales específicas con datos verificados. Úsala cuando el jurado pregunte sobre una ley, artículo, plazo o procedimiento normativo.',
+      'Consulta el pipeline IA real de FinLogic (RAG sobre normativa chilena, Pinecone, Claude Sonnet) para responder preguntas legales específicas con datos verificados. ÚSALA SIEMPRE que te pregunten algo legal específico (artículo, plazo, ley, procedimiento) que no sepas con certeza absoluta. Mejor consultar que delirar.',
     parameters: {
       type: 'object',
       properties: {
         question: {
           type: 'string',
-          description: 'Pregunta legal/financiera del jurado en lenguaje natural',
+          description: 'Pregunta legal/financiera del público en lenguaje natural',
         },
       },
       required: ['question'],
@@ -258,7 +308,7 @@ Deno.serve(async (req) => {
                 required: t.parameters.required || [],
               },
               expects_response: t.name === 'queryFinLogic',
-              response_timeout_secs: t.name === 'queryFinLogic' ? 12 : 4,
+              response_timeout_secs: t.name === 'queryFinLogic' ? 12 : 3,
             })),
           },
         },

@@ -109,14 +109,14 @@ const AuthenticatedApp = () => {
     <ErrorBoundary scope="lya-widget" variant="silent">
       <LyaChatWidget />
     </ErrorBoundary>
-    {/* Lya voz global — card flotante bottom-left.
-        Excluida en rutas que ya tienen su propio widget de voz dedicado
-        (PitchDeck, AsistenteLya, Consulta, EmbedLya). */}
+    {/* Lya voz global — card flotante bottom-right APILADA sobre el LyaChatWidget.
+        stackOffset=92px deja espacio al chat widget (FAB ~72px + 20px gap).
+        Excluida en rutas que ya tienen su propio widget de voz dedicado. */}
     {!['/PitchDeck', '/AsistenteLya', '/Consulta', '/Embed/Lya'].some((p) =>
       location?.pathname?.startsWith(p)
     ) && (
       <ErrorBoundary scope="lya-voice-card" variant="silent">
-        <LyaVoiceCard position="bottom-left" />
+        <LyaVoiceCard position="bottom-right" stackOffset={92} />
       </ErrorBoundary>
     )}
     <ErrorBoundary scope="shell" variant="silent">
