@@ -11,6 +11,7 @@ import SlideSection from '@/components/pitchdeck/SlideSection';
 import PerfilCard from '@/components/pitchdeck/PerfilCard';
 import CasoOutcomeCard from '@/components/pitchdeck/CasoOutcomeCard';
 import MetricCard from '@/components/pitchdeck/MetricCard';
+import LyaPitchPresenter from '@/components/pitchdeck/LyaPitchPresenter';
 
 const PERFILES = [
   {
@@ -111,8 +112,11 @@ export default function PitchDeck() {
         <span className="hidden sm:inline">Descargar PDF</span>
       </button>
 
+      {/* === Lya presentando el pitch (compañera de Paula Garcés) === */}
+      <LyaPitchPresenter />
+
       {/* === SLIDE 1 — HERO === */}
-      <section className="relative min-h-screen flex items-center px-6 lg:px-12 overflow-hidden">
+      <section id="slide-hero" className="relative min-h-screen flex items-center px-6 lg:px-12 overflow-hidden">
         <div aria-hidden className="absolute inset-0 -z-10">
           <div className="absolute -top-40 right-0 w-[600px] h-[600px] bg-mint-100/40 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[hsl(28_80%_92%)]/50 rounded-full blur-3xl" />
@@ -197,7 +201,7 @@ export default function PitchDeck() {
       </section>
 
       {/* === SLIDE 2 — EL PROBLEMA === */}
-      <SlideSection eyebrow="EL PROBLEMA · CHILE 2026">
+      <SlideSection id="slide-problema" eyebrow="EL PROBLEMA · CHILE 2026">
         <EditorialHeading size="xl" className="max-w-5xl">
           Hoy en Chile hay <span className="text-destructive">500.000 personas</span> que presentaron un reclamo en SERNAC <span className="text-mint-600">sin saber qué decía la ley.</span>
         </EditorialHeading>
@@ -219,7 +223,7 @@ export default function PitchDeck() {
       </SlideSection>
 
       {/* === SLIDE 3 — A QUIÉN RESOLVEMOS === */}
-      <SlideSection eyebrow="A QUIÉN RESOLVEMOS" variant="card">
+      <SlideSection id="slide-perfiles" eyebrow="A QUIÉN RESOLVEMOS" variant="card">
         <EditorialHeading size="xl">
           4 chilenos, 4 capas funcionales.
         </EditorialHeading>
@@ -230,7 +234,7 @@ export default function PitchDeck() {
       </SlideSection>
 
       {/* === SLIDE 5 — DEMO LYA === */}
-      <SlideSection eyebrow="DEMO EN VIVO">
+      <SlideSection id="slide-demo" eyebrow="DEMO EN VIVO">
         <EditorialHeading size="xl">
           Conoce a <span className="text-mint-600">Lya.</span>
         </EditorialHeading>
@@ -288,7 +292,7 @@ export default function PitchDeck() {
       </SlideSection>
 
       {/* === SLIDE 6 — CASOS REALES === */}
-      <SlideSection eyebrow="CASOS REALES · DATOS RADIOGRAFÍA" variant="card">
+      <SlideSection id="slide-casos" eyebrow="CASOS REALES · DATOS RADIOGRAFÍA" variant="card">
         <EditorialHeading size="xl">
           $732.000 recuperados.<br />
           <span className="text-mint-600">9.5 días promedio.</span>
@@ -300,7 +304,7 @@ export default function PitchDeck() {
       </SlideSection>
 
       {/* === SLIDE 7 — TRACCIÓN === */}
-      <SlideSection eyebrow="TRACCIÓN REAL · PRODUCCIÓN · ÚLTIMOS 7 DÍAS">
+      <SlideSection id="slide-traccion" eyebrow="TRACCIÓN REAL · PRODUCCIÓN · ÚLTIMOS 7 DÍAS">
         <EditorialHeading size="xl">
           Justicia financiera<br />
           <span className="text-mint-600">medida en segundos.</span>
@@ -319,7 +323,7 @@ export default function PitchDeck() {
       </SlideSection>
 
       {/* === SLIDE 8 — COMPLIANCE API === */}
-      <SlideSection eyebrow="MODELO DE NEGOCIO · COMPLIANCE API" variant="card">
+      <SlideSection id="slide-api" eyebrow="MODELO DE NEGOCIO · COMPLIANCE API" variant="card">
         <EditorialHeading size="xl">
           5 endpoints.<br />
           <span className="text-mint-600">Multa CMF de 5.000 UF</span> evitada en 340ms.
@@ -349,7 +353,7 @@ export default function PitchDeck() {
       </SlideSection>
 
       {/* === SLIDE 9 — VENTANA SFA · DARK === */}
-      <SlideSection eyebrow="VENTANA DE MERCADO · 4 JUL 2026" variant="dark">
+      <SlideSection id="slide-sfa" eyebrow="VENTANA DE MERCADO · 4 JUL 2026" variant="dark">
         <EditorialHeading size="xl" className="!text-[hsl(60_30%_96%)]">
           SFA entra en vigencia<br />
           en <span className="text-mint-400">59 días.</span>
@@ -376,7 +380,7 @@ export default function PitchDeck() {
       </SlideSection>
 
       {/* === SLIDE 11 — EQUIPO === */}
-      <SlideSection eyebrow="EL EQUIPO" variant="card">
+      <SlideSection id="slide-equipo" eyebrow="EL EQUIPO" variant="card">
         <EditorialHeading size="xl">
           4 personas, 4 disciplinas.<br />
           <span className="text-mint-600">Los puentes que faltaban.</span>
@@ -419,7 +423,7 @@ export default function PitchDeck() {
       </SlideSection>
 
       {/* === SLIDE 12 — CIERRE === */}
-      <section className="relative min-h-screen flex items-center px-6 lg:px-12 overflow-hidden">
+      <section id="slide-cierre" className="relative min-h-screen flex items-center px-6 lg:px-12 overflow-hidden">
         <div aria-hidden className="absolute inset-0 -z-10">
           <div className="absolute -top-40 right-0 w-[600px] h-[600px] bg-mint-100/40 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[hsl(28_80%_92%)]/50 rounded-full blur-3xl" />
