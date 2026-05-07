@@ -115,21 +115,39 @@ export function goBackHistory() { try { window.history.back(); return true; } ca
 export function goForwardHistory() { try { window.history.forward(); return true; } catch (_) { return false; } }
 export function reloadPage() { try { window.location.reload(); return true; } catch (_) { return false; } }
 
+// Helper: normaliza texto para búsqueda — quita tildes, lowercases, trim.
+// Permite que "equipo" matchee "Equipo", "EQUIPO", "Equípo" sin distinción.
+function normalizeText(str) {
+  return String(str || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // Helper: encontrar elementos por TEXTO VISIBLE (sin requerir id/data-attr).
-// Devuelve el primer match cuyo textContent contenga `text` (case-insensitive).
-export function findByText(text, tagsHint = ['a', 'button', 'h1', 'h2', 'h3', 'h4', 'section', 'nav', 'p']) {
+// Estrategia en cascada: (1) match exacto > (2) match por palabras > (3) match
+// substring. Prioriza elementos más cortos y visibles. Insensible a tildes.
+export function findByText(text, tagsHint = ['a', 'button', 'h1', 'h2', 'h3', 'h4', 'h5', '[role="button"]', 'section', 'nav', 'p', 'span', 'li']) {
   if (!text) return null;
-  const needle = String(text).toLowerCase().trim();
+  const needle = normalizeText(text);
+  if (!needle) return null;
   const candidates = document.querySelectorAll(tagsHint.join(','));
-  let best = null;
-  let bestLen = Infinity;
+  let exact = null;
+  let bestSubstr = null;
+  let bestSubstrLen = Infinity;
   candidates.forEach((el) => {
-    const txt = (el.textContent || '').toLowerCase().trim();
-    if (txt.includes(needle) && txt.length < bestLen && el.offsetParent !== null) {
-      best = el; bestLen = txt.length;
+    if (el.offsetParent === null) return;
+    const raw = el.getAttribute('aria-label') || el.textContent || '';
+    const txt = normalizeText(raw);
+    if (!txt) return;
+    if (txt === needle && !exact) exact = el;
+    if (txt.includes(needle) && txt.length < bestSubstrLen) {
+      bestSubstr = el; bestSubstrLen = txt.length;
     }
   });
-  return best;
+  return exact || bestSubstr;
 }
 
 // Helper: scroll a elemento por TEXTO VISIBLE

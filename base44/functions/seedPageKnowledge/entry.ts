@@ -19,16 +19,29 @@ const PAGES = [
     path: '/',
     name: 'Home',
     title: 'FinLogic — Tu derecho financiero, en tu idioma',
-    summary: 'Landing principal. Hero con propuesta de valor, indicadores live (UF, dólar, IPC, TPM), capas FinLogic (B2C ciudadana, Pyme, B2B Compliance API), perfiles de los 4 arquetipos (Camila, Don Luis, María José, Roberto), antes/después, casos resueltos recientes, organismos cubiertos (CMF, SERNAC, SII, CSIRT, BCN, FOGAPE, SERCOTEC), media logos y CTA al asistente Lya.',
-    keywords: ['home', 'inicio', 'landing', 'principal', 'hero', 'propuesta', 'finlogic', 'que es', 'introducción'],
+    summary: 'Landing principal. Banner Impact Lab, banner urgencia SFA, hero con propuesta de valor "Tu derecho financiero, en tu idioma", indicadores live (UF, dólar, IPC, TPM), media logos, organismos cubiertos (CMF, SERNAC, SII, CSIRT, BCN, FOGAPE, SERCOTEC), stats bar, pull-quote impacto, antes/después del problema, las 3 capas FinLogic, cómo funciona, casos recientes, perfiles arquetipos, testimonios, trust, diferenciador, sección B2B y CTA final.',
+    keywords: ['home', 'inicio', 'landing', 'principal', 'hero', 'propuesta', 'finlogic', 'que es', 'introducción', 'capas', 'perfiles', 'organismos'],
     segment: 'general',
-    audience: ['general', 'jurado', 'prensa'],
+    audience: ['general', 'jurado', 'prensa', 'camila', 'don_luis', 'maria_jose', 'roberto'],
     sections: [
-      { id: 'hero', label: 'Hero principal', summary: 'Propuesta de valor + CTA' },
+      { id: 'hero', label: 'Hero principal', summary: 'Propuesta de valor + CTA principal' },
       { id: 'indicadores', label: 'Indicadores live', summary: 'UF, dólar, IPC, TPM en tiempo real' },
+      { id: 'organismos', label: 'Organismos cubiertos', summary: 'CMF, SERNAC, SII, CSIRT, BCN, FOGAPE, SERCOTEC' },
+      { id: 'stats', label: 'Métricas globales', summary: 'Casos resueltos, score, recuperado' },
+      { id: 'antes-despues', label: 'Antes / Después', summary: 'Comparativa del problema vs solución' },
       { id: 'capas', label: 'Las 3 capas FinLogic', summary: 'B2C, Pyme, B2B Compliance API' },
+      { id: 'how-it-works', label: 'Cómo funciona', summary: 'Pipeline IA explicado' },
+      { id: 'casos', label: 'Casos recientes', summary: 'Casos reales resueltos' },
       { id: 'perfiles', label: 'Perfiles ciudadanos', summary: '4 arquetipos: Camila, Don Luis, María José, Roberto' },
-      { id: 'casos', label: 'Casos resueltos', summary: 'Casos reales con métricas' },
+      { id: 'testimonios', label: 'Testimonios', summary: 'Voces reales de usuarios' },
+      { id: 'trust', label: 'Garantías', summary: 'Trust signals' },
+      { id: 'diferencial', label: 'Diferenciador', summary: 'Por qué FinLogic' },
+      { id: 'b2b', label: 'B2B Compliance', summary: 'Sección API para fintechs' },
+      { id: 'cta-final', label: 'CTA final', summary: 'Probar el asistente Lya' },
+    ],
+    ctas: [
+      { action: 'consulta-cta', label: 'Hacer una consulta gratis' },
+      { action: 'open-lya', label: 'Hablar con Lya' },
     ],
     priority: 100,
     tags: ['landing', 'b2c', 'b2b', 'pyme'],
@@ -272,17 +285,21 @@ const PAGES = [
     priority: 80,
     tags: ['lya', 'asistente'],
   },
-  {
-    path: '/Lanzamiento',
-    name: 'Lanzamiento',
-    title: 'Lanzamiento Chile Fintech Forum 2026',
-    summary: 'Plan de marketing táctico para tomar el Chile Fintech Forum 2026 en Espacio Riesco (6-7 mayo). Targets priorizados (Felipe Pizarro, Hugo Guerra, Josefina Movillo, Carlos Prada Nubank, Carlos Urrutia Revolut, Mario Braz Stripe, autoridades CMF/SII/BCN). Timeline 24h, mensajes copy-paste, KPIs medibles.',
-    keywords: ['lanzamiento', 'fintech forum', 'cff26', 'espacio riesco', 'marketing', 'plan', 'pizarro', 'hugo guerra', 'movillo', 'speakers', 'evento'],
-    segment: 'concurso',
-    audience: ['jurado', 'prensa', 'fintech', 'general'],
-    priority: 95,
-    tags: ['lanzamiento', 'cff26', 'marketing'],
-  },
+  // /Admin/Lanzamiento es PRIVADO — solo admin Gabriel. NO se indexa en
+  // Pinecone para que Lya nunca lo sugiera a ciudadanos. Mantenido aquí
+  // como referencia para auditoría manual.
+];
+
+// Páginas privadas (admin-only) — NO se indexan en Pinecone ni se exponen
+// en searchPlatformKnowledge. Lya no las descubre para usuarios normales.
+const ADMIN_ONLY_PAGES = [
+  '/Admin/Lanzamiento',
+  '/Admin/CRM',
+  '/Admin/SystemMetrics',
+  '/Admin/ContentStudio',
+  '/B2B/APIKeys',
+  '/FinancialDashboard',
+  '/OperacionesDashboard',
 ];
 
 // ─── Helpers Pinecone ───────────────────────────────────────────────────
