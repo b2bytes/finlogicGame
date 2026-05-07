@@ -63,10 +63,10 @@ export default function HeroCenterPanel() {
           className="relative flex-1 min-h-0 flex items-center justify-center"
         >
           <div
+            className="relative aspect-square"
             style={{
               width: 'min(260px, 28vh)',
-              height: 'min(260px, 28vh)',
-              position: 'relative',
+              maxHeight: '100%',
             }}
           >
             <LyaOrb size={undefined} />
