@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, SkipForward, SkipBack, X, Mic, Sparkles, List, Keyboard } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, X, Sparkles, List, Keyboard, Radio } from 'lucide-react';
 import { useLyaVoice } from '@/lib/useLyaVoice.jsx';
 import { PITCH_SCRIPT } from './LyaPitchScript';
 import LyaPitchNav from './LyaPitchNav';
+import StageScene from './StageScene';
 
 /**
  * LyaPitchPresenter — Lya como mediadora del pitch.
@@ -189,10 +190,10 @@ export default function LyaPitchPresenter() {
         </span>
         <div className="flex flex-col items-start leading-tight">
           <span className="text-[10px] font-mono-editorial uppercase tracking-wider text-mint-700">
-            Pitch en vivo · 10 slides
+            Pitch público · 10 slides
           </span>
           <span className="text-sm font-bold text-foreground whitespace-nowrap">
-            Lya presenta junto a Paula
+            Lya media entre Paula y el jurado
           </span>
         </div>
       </motion.button>
@@ -222,8 +223,8 @@ export default function LyaPitchPresenter() {
         aria-label="Lya presentando el pitch junto a Paula Garcés"
         className="fixed bottom-4 left-4 right-4 sm:left-6 sm:right-auto z-50 sm:w-[460px] rounded-[28px] overflow-hidden shadow-soft-lg backdrop-blur-xl bg-card/95 border border-border"
       >
-        {/* === BANNER ESTUDIO — 3 actores en escena === */}
-        <div className="relative bg-gradient-to-br from-mint-600 via-mint-700 to-[hsl(152_85%_18%)] text-white px-5 pt-4 pb-5 overflow-hidden">
+        {/* === BANNER ESCENARIO — Paula ←→ Lya (mediadora) ←→ Jurado === */}
+        <div className="relative bg-gradient-to-br from-mint-600 via-mint-700 to-[hsl(152_85%_18%)] text-white px-5 pt-4 pb-6 overflow-hidden">
           {/* Patrón decorativo */}
           <div aria-hidden className="absolute inset-0 opacity-10">
             <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white blur-2xl" />
@@ -233,12 +234,13 @@ export default function LyaPitchPresenter() {
           {/* Top row: ON AIR + cerrar */}
           <div className="relative flex items-center justify-between mb-4">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur border border-white/20">
-              <span className="relative flex w-2 h-2">
+              <Radio className="w-3 h-3 text-red-300" />
+              <span className="relative flex w-1.5 h-1.5">
                 <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-75" />
-                <span className="relative w-2 h-2 rounded-full bg-red-500" />
+                <span className="relative w-1.5 h-1.5 rounded-full bg-red-500" />
               </span>
               <span className="text-[10px] font-mono-editorial uppercase tracking-wider font-semibold">
-                En vivo · Slide {idx + 1}/{total}
+                Pitch público · Slide {idx + 1}/{total}
               </span>
             </div>
             <button
@@ -250,32 +252,9 @@ export default function LyaPitchPresenter() {
             </button>
           </div>
 
-          {/* Línea de actores: Lya ↔ Paula ↔ Jurado */}
-          <div className="relative flex items-end justify-between gap-2">
-            {/* Lya — IA mediadora */}
-            <ActorAvatar
-              variant="lya"
-              label="Lya"
-              role="IA · Mediadora"
-              speaking={voice.speaking}
-              prominent
-            />
-            {/* Conector */}
-            <Connector active={voice.speaking} />
-            {/* Paula */}
-            <ActorAvatar
-              variant="paula"
-              label="Paula"
-              role="Humana · Auditoría"
-            />
-            {/* Conector */}
-            <Connector />
-            {/* Jurado/Cliente */}
-            <ActorAvatar
-              variant="jurado"
-              label="Jurado"
-              role="Audiencia"
-            />
+          {/* Escena pública: Paula ←→ Lya ←→ Audiencia */}
+          <div className="relative">
+            <StageScene speaking={voice.speaking} />
           </div>
         </div>
 
@@ -284,12 +263,15 @@ export default function LyaPitchPresenter() {
           <div className="flex items-center gap-2">
             <Sparkles className="w-3 h-3 text-mint-700" />
             <span className="text-[10px] font-mono-editorial uppercase tracking-wider text-mint-700 font-semibold">
-              Hablando ahora
+              Lya traduce a la audiencia
             </span>
           </div>
           <h3 className="mt-1 font-display tracking-tight text-base font-bold text-foreground">
             {current?.title}
           </h3>
+          <p className="text-[10px] font-mono-editorial text-muted-foreground mt-0.5">
+            Slide {String(idx + 1).padStart(2, '0')} de {String(total).padStart(2, '0')} · ~{current?.duration}s
+          </p>
         </div>
 
         {/* === TRANSCRIPCIÓN EDITORIAL === */}
@@ -409,69 +391,5 @@ export default function LyaPitchPresenter() {
         </AnimatePresence>
       </motion.div>
     </>
-  );
-}
-
-// ─── Avatar de actor en escena ─────────────────────────────────
-function ActorAvatar({ variant, label, role, speaking = false, prominent = false }) {
-  const styles = {
-    lya: {
-      bg: 'bg-gradient-to-br from-mint-200 to-mint-400',
-      ring: 'ring-mint-200',
-      icon: <span className="font-editorial text-mint-800 text-xl font-bold leading-none">L</span>,
-    },
-    paula: {
-      bg: 'bg-gradient-to-br from-[hsl(28_80%_75%)] to-[hsl(28_80%_60%)]',
-      ring: 'ring-[hsl(28_80%_85%)]/40',
-      icon: <span className="font-editorial text-white text-lg font-bold leading-none">P</span>,
-    },
-    jurado: {
-      bg: 'bg-gradient-to-br from-[hsl(280_50%_75%)] to-[hsl(280_50%_55%)]',
-      ring: 'ring-[hsl(280_50%_85%)]/40',
-      icon: <span className="text-white text-base font-bold leading-none">★</span>,
-    },
-  };
-  const s = styles[variant];
-  const size = prominent ? 'w-14 h-14' : 'w-11 h-11';
-
-  return (
-    <div className="flex flex-col items-center gap-1 min-w-0">
-      <div className={`relative ${size} rounded-full ${s.bg} ring-2 ${s.ring} flex items-center justify-center flex-shrink-0`}>
-        {/* Halo de "hablando" solo en Lya */}
-        {speaking && variant === 'lya' && (
-          <>
-            <span className="absolute -inset-1 rounded-full ring-2 ring-white/60 animate-ping opacity-75" />
-            <span className="absolute -inset-2 rounded-full ring ring-mint-200/40 animate-pulse" />
-          </>
-        )}
-        {s.icon}
-        {/* Mic indicator solo en Lya cuando habla */}
-        {speaking && variant === 'lya' && (
-          <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-red-500 ring-2 ring-mint-700 flex items-center justify-center">
-            <Mic className="w-2.5 h-2.5 text-white" />
-          </span>
-        )}
-      </div>
-      <div className="text-center min-w-0">
-        <p className={`font-bold leading-none truncate ${prominent ? 'text-[12px]' : 'text-[11px]'}`}>
-          {label}
-        </p>
-        <p className="text-[9px] font-mono-editorial uppercase tracking-wider text-white/60 leading-tight mt-0.5 truncate">
-          {role}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Conector entre actores ────────────────────────────────────
-function Connector({ active = false }) {
-  return (
-    <div className="flex-1 flex items-center justify-center pb-6 px-1 min-w-0">
-      <span
-        aria-hidden
-        className={`block h-px w-full ${active ? 'bg-gradient-to-r from-mint-200 via-white to-mint-200' : 'bg-white/20'} transition-colors`}
-      />
-    </div>
   );
 }
