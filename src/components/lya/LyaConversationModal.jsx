@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Mic, MicOff, Loader2, MessageSquare } from 'lucide-react';
 import LyaCyberAvatar from './LyaCyberAvatar';
 import LyaDocumentCard from './LyaDocumentCard';
+import LyaSuggestionChips from './LyaSuggestionChips';
 
 /**
  * LyaConversationModal — Modal de conversación tipo chat completo con Lya.
@@ -139,8 +140,17 @@ export default function LyaConversationModal({
                 </div>
               )}
 
-              {history.map((m) => (
-                <ChatTurn key={m.id} message={m} userEmail={userEmail} />
+              {history.map((m, idx) => (
+                <ChatTurn
+                  key={m.id}
+                  message={m}
+                  userEmail={userEmail}
+                  isLastLyaTurn={
+                    m.role === 'lya' &&
+                    !history.slice(idx + 1).some((next) => next.role === 'lya')
+                  }
+                  onSuggestionNavigate={onClose}
+                />
               ))}
             </div>
 
@@ -194,8 +204,9 @@ export default function LyaConversationModal({
   );
 }
 
-// Burbuja individual: mensaje + tarjeta de doc adjunta opcional
-function ChatTurn({ message, userEmail }) {
+// Burbuja individual: mensaje + tarjeta de doc adjunta opcional + chips
+// contextuales (solo en el último turno de Lya, para no saturar el chat).
+function ChatTurn({ message, userEmail, isLastLyaTurn, onSuggestionNavigate }) {
   const isUser = message.role === 'user';
 
   return (
@@ -228,6 +239,15 @@ function ChatTurn({ message, userEmail }) {
         <div className="pl-1 pr-1">
           <LyaDocumentCard doc={message.doc} defaultEmail={userEmail} />
         </div>
+      )}
+
+      {/* Chips contextuales: solo en el último turno de Lya, sobre lo que dijo */}
+      {!isUser && isLastLyaTurn && message.text && (
+        <LyaSuggestionChips
+          text={message.text}
+          onNavigate={onSuggestionNavigate}
+          currentPath={typeof window !== 'undefined' ? window.location.pathname : null}
+        />
       )}
     </div>
   );
