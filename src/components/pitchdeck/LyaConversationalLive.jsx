@@ -269,7 +269,11 @@ export default function LyaConversationalLive() {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.6, type: 'spring', stiffness: 320, damping: 22 }}
-        onClick={() => setActive(true)}
+        onClick={() => {
+          setActive(true);
+          // Auto-iniciar la conversación al abrir el panel para evitar el doble click
+          setTimeout(() => startConversation(), 200);
+        }}
         aria-label="Activar a Lya en vivo"
         className="fixed top-20 right-4 sm:right-6 z-40 group inline-flex items-center gap-3 pl-2 pr-5 py-2 rounded-full bg-card border border-border shadow-soft-lg hover:shadow-mint hover:border-mint-300 transition-all"
       >
@@ -388,20 +392,23 @@ export default function LyaConversationalLive() {
       {/* === TRANSCRIPCIÓN EN VIVO === */}
       <div
         ref={transcriptScrollRef}
-        className="flex-1 min-h-[200px] max-h-[340px] overflow-y-auto bg-card px-5 py-4 space-y-2.5"
+        className="flex-1 min-h-[160px] max-h-[280px] sm:max-h-[340px] overflow-y-auto bg-card px-5 py-4 space-y-2.5"
       >
         {status === 'idle' && transcript.length === 0 && (
-          <div className="text-center py-8 space-y-3">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-mint-50 border border-mint-200">
+          <button
+            onClick={startConversation}
+            className="w-full text-center py-8 space-y-3 rounded-2xl hover:bg-mint-50/40 active:bg-mint-50 transition-colors group cursor-pointer"
+          >
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-mint-50 border border-mint-200 group-hover:bg-mint-100 group-hover:scale-105 transition-all">
               <Phone className="w-6 h-6 text-mint-600" />
             </div>
             <h4 className="font-display font-bold text-foreground">
-              Lya lista para mediar el pitch
+              Toca aquí para iniciar
             </h4>
             <p className="text-[12px] text-muted-foreground leading-relaxed max-w-[300px] mx-auto">
-              Al conectar, Lya escuchará al jurado y a Paula en tiempo real, responderá con voz studio y esperará silencios naturales.
+              Lya escuchará al jurado y a Paula en tiempo real, responderá con voz studio y esperará silencios naturales.
             </p>
-          </div>
+          </button>
         )}
 
         {status === 'error' && error && (
