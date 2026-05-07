@@ -412,7 +412,7 @@ function ChatBubble({ message, userQuery, historyForDoc }) {
         animate={{ opacity: 1, y: 0 }}
         className="flex justify-end"
       >
-        <div className="max-w-[82%] rounded-2xl rounded-tr-md bg-mint-600 text-white px-4 py-2.5 text-sm shadow-soft break-words [overflow-wrap:anywhere]">
+        <div translate="no" className="notranslate max-w-[82%] rounded-2xl rounded-tr-md bg-mint-600 text-white px-4 py-2.5 text-sm shadow-soft break-words [overflow-wrap:anywhere]">
           {message.content}
         </div>
       </motion.div>
@@ -426,7 +426,8 @@ function ChatBubble({ message, userQuery, historyForDoc }) {
       className="flex flex-col gap-2 max-w-[92%] min-w-0"
     >
       <div
-        className={`rounded-2xl rounded-tl-md px-4 py-3 text-sm leading-relaxed shadow-soft border break-words [overflow-wrap:anywhere] ${
+        translate="no"
+        className={`notranslate rounded-2xl rounded-tl-md px-4 py-3 text-sm leading-relaxed shadow-soft border break-words [overflow-wrap:anywhere] ${
           message.error
             ? 'bg-destructive/5 border-destructive/20 text-destructive'
             : 'bg-card border-border text-foreground/90'
