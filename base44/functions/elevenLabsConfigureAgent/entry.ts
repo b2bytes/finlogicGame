@@ -340,6 +340,63 @@ const CLIENT_TOOLS = [
 ];
 
 // ============================================================
+// Helpers de la API de tools de ElevenLabs (workspace-scoped)
+// Endpoint: /v1/convai/tools — registra cada tool una vez y luego se
+// referencia por su tool_id en el agente.
+// ============================================================
+
+const EL_BASE = 'https://api.elevenlabs.io/v1/convai';
+
+async function listTools(apiKey) {
+  const res = await fetch(`${EL_BASE}/tools`, { headers: { 'xi-api-key': apiKey } });
+  if (!res.ok) throw new Error(`listTools ${res.status}: ${await res.text()}`);
+  const data = await res.json();
+  return data?.tools || [];
+}
+
+async function deleteTool(apiKey, toolId) {
+  const res = await fetch(`${EL_BASE}/tools/${encodeURIComponent(toolId)}`, {
+    method: 'DELETE',
+    headers: { 'xi-api-key': apiKey },
+  });
+  return res.ok;
+}
+
+// Crea una client tool nueva en el workspace.
+async function createClientTool(apiKey, t) {
+  const expectsResponse = t.name === 'queryFinLogic';
+  const body = {
+    tool_config: {
+      type: 'client',
+      name: t.name,
+      description: t.description,
+      expects_response: expectsResponse,
+      response_timeout_secs: expectsResponse ? 12 : 3,
+      parameters: {
+        type: 'object',
+        properties: t.parameters.properties,
+        required: t.parameters.required || [],
+        description: t.description,
+      },
+    },
+  };
+  const res = await fetch(`${EL_BASE}/tools`, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`createTool(${t.name}) ${res.status}: ${errText.slice(0, 400)}`);
+  }
+  const data = await res.json();
+  return data?.id || data?.tool_id || data?.tool?.id;
+}
+
+// ============================================================
 // HANDLER
 // ============================================================
 Deno.serve(async (req) => {
@@ -361,8 +418,41 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Configuración: solo modificamos lo que necesitamos (prompt + tools + first_message + keywords).
-    // Mantenemos el LLM (gemini-3-flash-preview) y voz (eleven_v3_conversational) ya configurados.
+    // ─── Paso 1: limpiar tools viejas con los mismos nombres ────────
+    const toolNames = CLIENT_TOOLS.map((t) => t.name);
+    const existing = await listTools(apiKey);
+    const stale = existing.filter((t) => toolNames.includes(t?.tool_config?.name || t?.name));
+    console.log(`[configureAgent] Tools existentes: ${existing.length}, a recrear: ${stale.length}`);
+    for (const t of stale) {
+      const id = t.id || t.tool_id;
+      if (id) await deleteTool(apiKey, id);
+    }
+
+    // ─── Paso 2: crear todas las tools nuevas y recolectar tool_ids ─
+    const toolIds = [];
+    const errors = [];
+    for (const t of CLIENT_TOOLS) {
+      try {
+        const id = await createClientTool(apiKey, t);
+        if (id) {
+          toolIds.push(id);
+          console.log(`[configureAgent] Creada tool ${t.name} → ${id}`);
+        } else {
+          errors.push(`${t.name}: no se obtuvo tool_id`);
+        }
+      } catch (e) {
+        errors.push(`${t.name}: ${e.message}`);
+      }
+    }
+
+    if (toolIds.length === 0) {
+      return Response.json(
+        { error: 'No se pudo crear ninguna tool', details: errors },
+        { status: 502 }
+      );
+    }
+
+    // ─── Paso 3: PATCH al agente con tool_ids + prompt + first_message ─
     const agentConfig = {
       conversation_config: {
         agent: {
@@ -374,19 +464,23 @@ Deno.serve(async (req) => {
             llm: 'gemini-3-flash-preview',
             temperature: 0.6,
             max_tokens: -1,
-            tools: CLIENT_TOOLS.map((t) => ({
-              type: 'client',
-              name: t.name,
-              description: t.description,
-              parameters: {
-                type: 'object',
-                description: t.description,
-                properties: t.parameters.properties,
-                required: t.parameters.required || [],
+            tool_ids: toolIds,
+            built_in_tools: {
+              end_call: {
+                name: 'end_call',
+                description:
+                  'Termina la conversación cuando el usuario se despida o el pitch concluya.',
+                response_timeout_secs: 5,
+                params: { system_tool_type: 'end_call' },
               },
-              expects_response: t.name === 'queryFinLogic',
-              response_timeout_secs: t.name === 'queryFinLogic' ? 12 : 3,
-            })),
+              language_detection: {
+                name: 'language_detection',
+                description:
+                  'Detecta automáticamente si el usuario cambia de idioma y ajusta la respuesta.',
+                response_timeout_secs: 5,
+                params: { system_tool_type: 'language_detection' },
+              },
+            },
           },
         },
         asr: {
@@ -394,46 +488,30 @@ Deno.serve(async (req) => {
           provider: 'scribe_realtime',
           user_input_audio_format: 'pcm_16000',
           keywords: [
-            'FinLogic',
-            'Lya',
-            'Paula Garcés',
-            'CMF',
-            'SERNAC',
-            'SII',
-            'CSIRT',
-            'SFA',
-            'Don Luis',
-            'Camila',
-            'María José',
-            'Roberto',
-            'Pro-Pyme',
-            'TMC',
+            'FinLogic', 'Lya', 'Paula Garcés', 'CMF', 'SERNAC', 'SII', 'CSIRT', 'SFA',
+            'Don Luis', 'Camila', 'María José', 'Roberto', 'Pro-Pyme', 'TMC',
           ],
         },
-        conversation: {
-          max_duration_seconds: 1800, // 30 min máx
-          text_only: false,
-        },
+        conversation: { max_duration_seconds: 1800, text_only: false },
       },
     };
 
-    const url = `https://api.elevenlabs.io/v1/convai/agents/${encodeURIComponent(agentId)}`;
+    const url = `${EL_BASE}/agents/${encodeURIComponent(agentId)}`;
     const res = await fetch(url, {
       method: 'PATCH',
-      headers: {
-        'xi-api-key': apiKey,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify(agentConfig),
     });
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('ElevenLabs PATCH agent error:', res.status, errText);
+      console.error('PATCH agent error:', res.status, errText);
       return Response.json(
         {
           error: `ElevenLabs error ${res.status}`,
           details: errText.substring(0, 800),
+          toolIds,
+          createErrors: errors,
         },
         { status: 502 }
       );
@@ -444,14 +522,14 @@ Deno.serve(async (req) => {
       success: true,
       agentId,
       systemPromptChars: LYA_SYSTEM_PROMPT.length,
-      toolsCount: CLIENT_TOOLS.length,
+      toolsRequested: CLIENT_TOOLS.length,
+      toolsCreated: toolIds.length,
+      toolIds,
+      createErrors: errors,
       voiceId,
-      llm: 'claude-sonnet-4',
-      message: 'Lya configurada como mediadora pública del pitch FinLogic.',
-      agent: {
-        name: data?.name,
-        agent_id: data?.agent_id,
-      },
+      llm: 'gemini-3-flash-preview',
+      message: 'Lya configurada con tools registradas vía /v1/convai/tools.',
+      agent: { name: data?.name, agent_id: data?.agent_id },
     });
   } catch (error) {
     console.error('elevenLabsConfigureAgent error:', error);
