@@ -278,3 +278,26 @@ export function openLyaChat(prefilledQuery) {
   );
   return true;
 }
+
+// ─── Re-export defensivo (fuerza recompilación HMR de Vite) ──────────
+// Algunos navegadores/Vite cachean módulos sin detectar exports nuevos;
+// este bloque obliga a regenerar el módulo cuando cambia.
+export default {
+  LYA_PAGES,
+  LYA_SLIDES,
+  scrollToElement,
+  scrollToPosition,
+  scrollToText,
+  navigateToPath,
+  goBackHistory,
+  goForwardHistory,
+  reloadPage,
+  findByText,
+  clickByText,
+  describeCurrentPage,
+  listInteractiveElements,
+  fillField,
+  clickByLyaAction,
+  triggerLyaToast,
+  openLyaChat,
+};
