@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/lib/AuthContext';
 import {
   Settings, X, Search, ExternalLink, Home, MessageCircle, FileText, Briefcase,
   Building2, Code2, DollarSign, BarChart3, Sparkles, Activity, Users, Heart,
@@ -99,10 +98,6 @@ export default function QuickAdminPanel() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const location = useLocation();
-  const { user, isAuthenticated } = useAuth();
-
-  // Solo visible para admins logueados
-  const isAdmin = isAuthenticated && user?.role === 'admin';
 
   // Ocultar en widget embebible (iframe público)
   const isEmbed = location.pathname.startsWith('/Embed');
@@ -157,7 +152,7 @@ export default function QuickAdminPanel() {
 
   const totalPages = SECTIONS.reduce((sum, s) => sum + s.pages.length, 0);
 
-  if (isEmbed || !isAdmin) return null;
+  if (isEmbed) return null;
 
   return (
     <>

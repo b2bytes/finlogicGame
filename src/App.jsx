@@ -50,7 +50,6 @@ import HealthCheck from '@/pages/HealthCheck';
 import HomeOpus from '@/pages/HomeOpus';
 import EditorLegal from '@/pages/EditorLegal';
 import SafeRoute from '@/components/SafeRoute';
-import AdminGuard from '@/components/AdminGuard';
 import { useVisitTracker } from '@/lib/useVisitTracker';
 
 const AuthenticatedApp = () => {
@@ -92,23 +91,23 @@ const AuthenticatedApp = () => {
         <Route path="/MisCasos" element={<SafeRoute name="MisCasos"><MisCasos /></SafeRoute>} />
         <Route path="/Soporte" element={<SafeRoute name="Soporte"><Soporte /></SafeRoute>} />
         <Route path="/MisSoporte" element={<SafeRoute name="MisSoporte"><MisSoporte /></SafeRoute>} />
-        <Route path="/B2B/APIKeys" element={<SafeRoute name="B2BAPIKeys"><AdminGuard><B2BAPIKeys /></AdminGuard></SafeRoute>} />
+        <Route path="/B2B/APIKeys" element={<SafeRoute name="B2BAPIKeys"><B2BAPIKeys /></SafeRoute>} />
         <Route path="/Casos" element={<SafeRoute name="Casos"><Casos /></SafeRoute>} />
         <Route path="/CasosResueltos" element={<SafeRoute name="CasosResueltos"><Casos /></SafeRoute>} />
         <Route path="/api-compliance" element={<SafeRoute name="APICompliance"><APICompliance /></SafeRoute>} />
         <Route path="/Pyme" element={<SafeRoute name="Pyme"><Pyme /></SafeRoute>} />
         <Route path="/Pricing" element={<SafeRoute name="Pricing"><Pricing /></SafeRoute>} />
-        <Route path="/FinancialDashboard" element={<SafeRoute name="FinancialDashboard"><AdminGuard><FinancialDashboard /></AdminGuard></SafeRoute>} />
+        <Route path="/FinancialDashboard" element={<SafeRoute name="FinancialDashboard"><FinancialDashboard /></SafeRoute>} />
         <Route path="/Marca" element={<SafeRoute name="Marca"><Marca /></SafeRoute>} />
         <Route path="/MisCasos/:id" element={<SafeRoute name="CasoDetalle"><CasoDetalle /></SafeRoute>} />
         <Route path="/PitchDeck" element={<SafeRoute name="PitchDeck"><PitchDeck /></SafeRoute>} />
-        <Route path="/OperacionesDashboard" element={<SafeRoute name="OperacionesDashboard"><AdminGuard><OperacionesDashboard /></AdminGuard></SafeRoute>} />
+        <Route path="/OperacionesDashboard" element={<SafeRoute name="OperacionesDashboard"><OperacionesDashboard /></SafeRoute>} />
         <Route path="/Embajadores" element={<SafeRoute name="Embajadores"><Embajadores /></SafeRoute>} />
         <Route path="/Insights" element={<SafeRoute name="Insights"><Insights /></SafeRoute>} />
         <Route path="/Pro" element={<SafeRoute name="Pro"><Pro /></SafeRoute>} />
-        <Route path="/Admin/SystemMetrics" element={<SafeRoute name="SystemMetrics"><AdminGuard><SystemMetrics /></AdminGuard></SafeRoute>} />
+        <Route path="/Admin/SystemMetrics" element={<SafeRoute name="SystemMetrics"><SystemMetrics /></SafeRoute>} />
         <Route path="/AsistenteLya" element={<SafeRoute name="AsistenteLya"><AsistenteLya /></SafeRoute>} />
-        <Route path="/Admin/ContentStudio" element={<SafeRoute name="ContentStudio"><AdminGuard><ContentStudio /></AdminGuard></SafeRoute>} />
+        <Route path="/Admin/ContentStudio" element={<SafeRoute name="ContentStudio"><ContentStudio /></SafeRoute>} />
         <Route path="/Embed/Lya" element={<SafeRoute name="EmbedLya"><EmbedLya /></SafeRoute>} />
         <Route path="/Diseno" element={<SafeRoute name="Diseno"><Diseno /></SafeRoute>} />
         <Route path="/Diseño" element={<SafeRoute name="Diseno"><Diseno /></SafeRoute>} />
@@ -116,9 +115,9 @@ const AuthenticatedApp = () => {
         <Route path="/Rúbrica" element={<SafeRoute name="Rubrica"><Rubrica /></SafeRoute>} />
         <Route path="/Demo" element={<SafeRoute name="Demo"><Demo /></SafeRoute>} />
         <Route path="/Entregables" element={<SafeRoute name="Entregables"><Entregables /></SafeRoute>} />
-        <Route path="/Admin/CRM" element={<SafeRoute name="AdminCRM"><AdminGuard><AdminCRM /></AdminGuard></SafeRoute>} />
-        <Route path="/Admin/Lanzamiento" element={<SafeRoute name="Lanzamiento"><AdminGuard><Lanzamiento /></AdminGuard></SafeRoute>} />
-        <Route path="/Admin/HealthCheck" element={<SafeRoute name="HealthCheck"><AdminGuard><HealthCheck /></AdminGuard></SafeRoute>} />
+        <Route path="/Admin/CRM" element={<SafeRoute name="AdminCRM"><AdminCRM /></SafeRoute>} />
+        <Route path="/Admin/Lanzamiento" element={<SafeRoute name="Lanzamiento"><Lanzamiento /></SafeRoute>} />
+        <Route path="/Admin/HealthCheck" element={<SafeRoute name="HealthCheck"><HealthCheck /></SafeRoute>} />
         <Route path="/HomeOpus" element={<SafeRoute name="HomeOpus"><HomeOpus /></SafeRoute>} />
         <Route path="/EditorLegal" element={<SafeRoute name="EditorLegal"><EditorLegal /></SafeRoute>} />
         <Route path="*" element={<PageNotFound />} />
